@@ -7,6 +7,7 @@ attrs @ file:///home/conda/feedstock_root/build_artifacts/attrs_1671632566681/wo
 backcall @ file:///home/ktietz/src/ci/backcall_1611930011877/work
 beautifulsoup4 @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_croot-cdiouih5/beautifulsoup4_1650462164803/work
 bleach @ file:///home/conda/feedstock_root/build_artifacts/bleach_1656355450470/work
+Bottleneck @ file:///Users/runner/miniforge3/conda-bld/bottleneck_1656803827350/work
 brotlipy @ file:///Users/runner/miniforge3/conda-bld/brotlipy_1648854223204/work
 cached-property @ file:///home/conda/feedstock_root/build_artifacts/cached_property_1615209429212/work
 certifi==2022.12.7
@@ -54,9 +55,11 @@ nbconvert @ file:///home/conda/feedstock_root/build_artifacts/nbconvert-meta_167
 nbformat @ file:///home/conda/feedstock_root/build_artifacts/nbformat_1671474423563/work
 nest-asyncio @ file:///home/conda/feedstock_root/build_artifacts/nest-asyncio_1664684991461/work
 notebook @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_98mevid06x/croots/recipe/notebook_1659083668559/work
+numexpr @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_cef3ah6r8w/croot/numexpr_1668713880672/work
 numpy @ file:///Users/runner/miniforge3/conda-bld/numpy_1649806371302/work
 opt-einsum @ file:///home/conda/feedstock_root/build_artifacts/opt_einsum_1617859230218/work
 packaging @ file:///home/conda/feedstock_root/build_artifacts/packaging_1673482170163/work
+pandas==1.3.5
 pandocfilters @ file:///opt/conda/conda-bld/pandocfilters_1643405455980/work
 parso @ file:///opt/conda/conda-bld/parso_1641458642106/work
 pexpect @ file:///tmp/build/80754af9/pexpect_1605563209008/work
@@ -79,6 +82,7 @@ PyQtWebEngine==5.12.1
 pyrsistent @ file:///opt/concourse/worker/volumes/live/24b7a9ab-37d8-463c-575f-69184f9cfbc8/volume/pyrsistent_1636111022304/work
 PySocks @ file:///Users/runner/miniforge3/conda-bld/pysocks_1648857315402/work
 python-dateutil @ file:///tmp/build/80754af9/python-dateutil_1626374649649/work
+pytz @ file:///home/conda/feedstock_root/build_artifacts/pytz_1671365381334/work
 pyzmq @ file:///Users/runner/miniforge3/conda-bld/pyzmq_1663830586878/work
 qtconsole @ file:///home/conda/feedstock_root/build_artifacts/qtconsole-base_1667404144336/work
 QtPy @ file:///home/conda/feedstock_root/build_artifacts/qtpy_1667873092748/work

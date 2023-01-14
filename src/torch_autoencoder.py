@@ -1,500 +1,233 @@
-import tensorflow as tf
+import torch
+import torch.nn as nn
+import warnings
+from autoencoder import z_derivative, z_derivative_order2, get_initialized_weights,sindy_library_torch, sindy_library_torch_order2
+warnings.filterwarnings("ignore")
 
 
-def full_network(params):
-    """
-    Define the full network architecture.
+class Sindy_net(nn.Module):
+    def __init__(self,params):
+        super().__init__()
+        self.params = params
+        self.activation_f = self.get_activation_f(params)
 
-    Arguments:
-        params - Dictionary object containing the parameters that specify the training.
-        See README file for a description of the parameters.
+        encoder, encoder_layers = self.Encoder(self.params)
+        self.encoder = encoder
+        self.encoder_layers = encoder_layers
 
-    Returns:
-        network - Dictionary containing the tensorflow objects that make up the network.
-    """
-    input_dim = params['input_dim']
-    latent_dim = params['latent_dim']
-    activation = params['activation']
-    poly_order = params['poly_order']
-    if 'include_sine' in params.keys():
-        include_sine = params['include_sine']
-    else:
-        include_sine = False
-    library_dim = params['library_dim']
-    model_order = params['model_order']
+        decoder, decoder_layers = self.Decoder(self.params)
+        self.decoder = decoder
+        self.decoder_layers = decoder_layers
 
-    network = {}
 
-    x = tf.placeholder(tf.float32, shape=[None, input_dim], name='x')
-    dx = tf.placeholder(tf.float32, shape=[None, input_dim], name='dx')
-    if model_order == 2:
-        ddx = tf.placeholder(tf.float32, shape=[None, input_dim], name='ddx')
+    def Encoder(self, params):
+        activation_function = self.get_activation_f(params)
+        input_dim = params['input_dim']
+        latent_dim = params['latent_dim']
+        widths = params['widths']
 
-    if activation == 'linear':
-        z, x_decode, encoder_weights, encoder_biases, decoder_weights, decoder_biases = linear_autoencoder(x, input_dim, latent_dim)
-    else:
-        z, x_decode, encoder_weights, encoder_biases, decoder_weights, decoder_biases = nonlinear_autoencoder(x, input_dim, latent_dim, params['widths'], activation=activation)
-    
-    if model_order == 1:
-        dz = z_derivative(x, dx, encoder_weights, encoder_biases, activation=activation)
-        Theta = sindy_library_tf(z, latent_dim, poly_order, include_sine)
-    else:
-        dz,ddz = z_derivative_order2(x, dx, ddx, encoder_weights, encoder_biases, activation=activation)
-        Theta = sindy_library_tf_order2(z, dz, latent_dim, poly_order, include_sine)
+        layers = []
+        for output_dim in widths:
+            encoder = nn.Linear(input_dim, output_dim)
+            nn.init.xavier_uniform(encoder.weight)
+            nn.init.constant_(encoder.bias.data, 0)
 
-    if params['coefficient_initialization'] == 'xavier':
-        sindy_coefficients = tf.get_variable('sindy_coefficients', shape=[library_dim,latent_dim], initializer=tf.contrib.layers.xavier_initializer())
-    elif params['coefficient_initialization'] == 'specified':
-        sindy_coefficients = tf.get_variable('sindy_coefficients', initializer=params['init_coefficients'])
-    elif params['coefficient_initialization'] == 'constant':
-        sindy_coefficients = tf.get_variable('sindy_coefficients', shape=[library_dim,latent_dim], initializer=tf.constant_initializer(1.0))
-    elif params['coefficient_initialization'] == 'normal':
-        sindy_coefficients = tf.get_variable('sindy_coefficients', shape=[library_dim,latent_dim], initializer=tf.initializers.random_normal())
-    
-    if params['sequential_thresholding']:
-        coefficient_mask = tf.placeholder(tf.float32, shape=[library_dim,latent_dim], name='coefficient_mask')
-        sindy_predict = tf.matmul(Theta, coefficient_mask*sindy_coefficients)
-        network['coefficient_mask'] = coefficient_mask
-    else:
-        sindy_predict = tf.matmul(Theta, sindy_coefficients)
+            input_dim = output_dim
+            layers.append(encoder)
+            layers.append(activation_function)
 
-    if model_order == 1:
+        encoder = nn.Linear(input_dim, latent_dim)
+        nn.init.xavier_uniform(encoder.weight)
+        nn.init.constant_(encoder.bias.data, 0)
+        layers.append(encoder)
+        Encoder = nn.Sequential(*layers)
+        return Encoder, layers
+
+
+    def Decoder(self, params):
+        activation_function = self.get_activation_f(params)
+        final_dim = params['input_dim']
+        input_dim = params['latent_dim']
+        widths = params['widths']
+
+        layers = []
+        for output_dim in widths[::-1]:
+            decoder = nn.Linear(input_dim, output_dim)
+            nn.init.xavier_uniform(decoder.weight)
+            nn.init.constant_(decoder.bias.data, 0)
+
+            input_dim = output_dim
+            layers.append(decoder)
+            layers.append(activation_function)
+
+        decoder = nn.Linear(input_dim, final_dim)
+        nn.init.xavier_uniform(decoder.weight)
+        nn.init.constant_(decoder.bias.data, 0)
+        layers.append(decoder)
+        Decoder = nn.Sequential(*layers)
+        return Decoder, layers
+
+
+    def get_activation_f(self, params):
+        activation = params['activation']
+        if activation == 'relu':
+            activation_function = torch.nn.ReLU()
+        elif activation == 'elu':
+            activation_function = torch.nn.ELU()
+        elif activation == 'sigmoid':
+            activation_function = torch.nn.Sigmoid()
+        return activation_function
+
+
+    def decoder_weights(self):
+        decoder_weights = []
+        decoder_biases = []
+        for layer in self.decoder_layers:
+            try:
+                decoder_weights.append(layer.weight)
+                decoder_biases.append(layer.bias)
+            except AttributeError:
+                pass
+        return decoder_weights, decoder_biases
+
+
+    def encoder_weights(self):
+        encoder_weights = []
+        encoder_biases = []
+        for layer in self.encoder_layers:
+            try:
+                encoder_weights.append(layer.weight)
+                encoder_biases.append(layer.bias)
+            except AttributeError:
+                pass
+        return encoder_weights, encoder_biases
+
+
+    def dz(self, x, dx):
+        activation = self.params['activation']
+        encoder_weights, encoder_biases = self.encoder_weights()
+        return z_derivative(x, dx, encoder_weights, encoder_biases, activation)
+
+
+    def ddz(self, x , dx, ddx):
+        activation = self.params['activation']
+        encoder_weights, encoder_biases = self.encoder_weights()
+        dz, ddz = z_derivative_order2(x, dx, ddx, encoder_weights, encoder_biases, activation=activation)
+        return dz, ddz
+
+
+    def initializer(self):
+        init_param = None
+        init = self.params['coefficient_initialization']
+        if init == 'xavier':
+            intializer = torch.nn.init.xavier_uniform
+        elif init == 'specified':
+            intializer = torch.nn.init.xavier_uniform
+        elif init == 'constant':
+            intializer = torch.nn.init.constant_
+            init_param = [1]
+        elif init == 'normal':
+            intializer = torch.nn.init.normal_
+        return intializer, init_param
+
+
+    def sindy_coefficients(self):
+        library_dim = self.params['library_dim']
+        latent_dim = self.params['latent_dim']
+        initializer, init_param = self.initializer()
+        if init_param:
+            return get_initialized_weights([library_dim, latent_dim], initializer, init_param = init_param)
+        else:
+            return get_initialized_weights([library_dim, latent_dim], initializer)
+
+
+    def Theta(self, z, x, dx):
+        model_order = self.params['model_order']
+        poly_order = self.params['poly_order']
+        include_sine = self.params['include_sine']
+        latent_dim = self.params['latent_dim']
+        if model_order == 1:
+            dz = self.dz(x, dx)
+            Theta = sindy_library_torch(z, latent_dim, poly_order, include_sine)
+        if model_order == 2:
+            dz, ddz = self.ddz(x, dx)
+            Theta = sindy_library_torch_order2(z, dz, latent_dim, poly_order, include_sine)
+        return Theta
+
+
+    def sindy_predict(self, z, x, dx):
+        Theta = self.Theta(z, x, dx)
+        sindy_coefficients = self.sindy_coefficients()
+        return torch.matmul(Theta, sindy_coefficients)
+
+
+    def dx_decode(self,z, x, dx):
+        sindy_predict = self.sindy_predict(z, x, dx)
+        decoder_weights, decoder_biases = self.decoder_weights()
+        activation = self.params['activation']
         dx_decode = z_derivative(z, sindy_predict, decoder_weights, decoder_biases, activation=activation)
-    else:
-        dx_decode,ddx_decode = z_derivative_order2(z, dz, sindy_predict, decoder_weights, decoder_biases,
-                                             activation=activation)
-
-    network['x'] = x
-    network['dx'] = dx
-    network['z'] = z
-    network['dz'] = dz
-    network['x_decode'] = x_decode
-    network['dx_decode'] = dx_decode
-    network['encoder_weights'] = encoder_weights
-    network['encoder_biases'] = encoder_biases
-    network['decoder_weights'] = decoder_weights
-    network['decoder_biases'] = decoder_biases
-    network['Theta'] = Theta
-    network['sindy_coefficients'] = sindy_coefficients
-
-    if model_order == 1:
-        network['dz_predict'] = sindy_predict
-    else:
-        network['ddz'] = ddz
-        network['ddz_predict'] = sindy_predict
-        network['ddx'] = ddx
-        network['ddx_decode'] = ddx_decode
-
-    return network
+        return dx_decode
 
 
-def define_loss(network, params):
-    """
-    Create the loss functions.
-
-    Arguments:
-        network - Dictionary object containing the elements of the network architecture.
-        This will be the output of the full_network() function.
-    """
-    x = network['x']
-    x_decode = network['x_decode']
-    if params['model_order'] == 1:
-        dz = network['dz']
-        dz_predict = network['dz_predict']
-        dx = network['dx']
-        dx_decode = network['dx_decode']
-    else:
-        ddz = network['ddz']
-        ddz_predict = network['ddz_predict']
-        ddx = network['ddx']
-        ddx_decode = network['ddx_decode']
-    sindy_coefficients = params['coefficient_mask']*network['sindy_coefficients']
-
-    losses = {}
-    losses['decoder'] = tf.reduce_mean((x - x_decode)**2)
-    if params['model_order'] == 1:
-        losses['sindy_z'] = tf.reduce_mean((dz - dz_predict)**2)
-        losses['sindy_x'] = tf.reduce_mean((dx - dx_decode)**2)
-    else:
-        losses['sindy_z'] = tf.reduce_mean((ddz - ddz_predict)**2)
-        losses['sindy_x'] = tf.reduce_mean((ddx - ddx_decode)**2)
-    losses['sindy_regularization'] = tf.reduce_mean(tf.abs(sindy_coefficients))
-    loss = params['loss_weight_decoder'] * losses['decoder'] \
-           + params['loss_weight_sindy_z'] * losses['sindy_z'] \
-           + params['loss_weight_sindy_x'] * losses['sindy_x'] \
-           + params['loss_weight_sindy_regularization'] * losses['sindy_regularization']
-
-    loss_refinement = params['loss_weight_decoder'] * losses['decoder'] \
-                      + params['loss_weight_sindy_z'] * losses['sindy_z'] \
-                      + params['loss_weight_sindy_x'] * losses['sindy_x']
-
-    return loss, losses, loss_refinement
+    def ddx_decode(self,z, x, dx):
+        sindy_predict = self.sindy_predict(z, x, dx)
+        decoder_weights, decoder_biases = self.decoder_weights()
+        activation = self.params['activation']
+        dz = self.dz(x,dx)
+        dx_decode, ddx_decode = z_derivative_order2(z, dz, sindy_predict, decoder_weights, decoder_biases, activation=activation)
+        return dx_decode, ddx_decode
 
 
-def linear_autoencoder(x, input_dim, d):
-    # z,encoder_weights,encoder_biases = encoder(x, input_dim, latent_dim, [], None, 'encoder')
-    # x_decode,decoder_weights,decoder_biases = decoder(z, input_dim, latent_dim, [], None, 'decoder')
-    z,encoder_weights,encoder_biases = build_network_layers(x, input_dim, latent_dim, [], None, 'encoder')
-    x_decode,decoder_weights,decoder_biases = build_network_layers(z, latent_dim, input_dim, [], None, 'decoder')
-
-    return z, x_decode, encoder_weights, encoder_biases,decoder_weights,decoder_biases
+    def forward(self, x):
+        z = self.encoder(x)
+        x_p = self.decoder(z)
+        return x_p, z
 
 
-def nonlinear_autoencoder(x, input_dim, latent_dim, widths, activation='elu'):
-    """
-    Construct a nonlinear autoencoder.
-
-    Arguments:
-
-    Returns:
-        z -
-        x_decode -
-        encoder_weights - List of tensorflow arrays containing the encoder weights
-        encoder_biases - List of tensorflow arrays containing the encoder biases
-        decoder_weights - List of tensorflow arrays containing the decoder weights
-        decoder_biases - List of tensorflow arrays containing the decoder biases
-    """
-    if activation == 'relu':
-        activation_function = tf.nn.relu
-    elif activation == 'elu':
-        activation_function = tf.nn.elu
-    elif activation == 'sigmoid':
-        activation_function = tf.sigmoid
-    else:
-        raise ValueError('invalid activation function')
-    # z,encoder_weights,encoder_biases = encoder(x, input_dim, latent_dim, widths, activation_function, 'encoder')
-    # x_decode,decoder_weights,decoder_biases = decoder(z, input_dim, latent_dim, widths[::-1], activation_function, 'decoder')
-    z,encoder_weights,encoder_biases = build_network_layers(x, input_dim, latent_dim, widths, activation_function, 'encoder')
-    x_decode,decoder_weights,decoder_biases = build_network_layers(z, latent_dim, input_dim, widths[::-1], activation_function, 'decoder')
-
-    return z, x_decode, encoder_weights, encoder_biases, decoder_weights, decoder_biases
+    def decoder_loss(self, x, x_pred):
+        criterion = nn.MSELoss()
+        return self.params['loss_weight_decoder'] * criterion(x, x_pred)
 
 
-def build_network_layers(input, input_dim, output_dim, widths, activation, name):
-    """
-    Construct one portion of the network (either encoder or decoder).
-
-    Arguments:
-        input - 2D tensorflow array, input to the network (shape is [?,input_dim])
-        input_dim - Integer, number of state variables in the input to the first layer
-        output_dim - Integer, number of state variables to output from the final layer
-        widths - List of integers representing how many units are in each network layer
-        activation - Tensorflow function to be used as the activation function at each layer
-        name - String, prefix to be used in naming the tensorflow variables
-
-    Returns:
-        input - Tensorflow array, output of the network layers (shape is [?,output_dim])
-        weights - List of tensorflow arrays containing the network weights
-        biases - List of tensorflow arrays containing the network biases
-    """
-    weights = []
-    biases = []
-    last_width=input_dim
-    for i,n_units in enumerate(widths):
-        W = tf.get_variable(name+'_W'+str(i), shape=[last_width,n_units],
-            initializer=tf.contrib.layers.xavier_initializer())
-        b = tf.get_variable(name+'_b'+str(i), shape=[n_units],
-            initializer=tf.constant_initializer(0.0))
-        input = tf.matmul(input, W) + b
-        if activation is not None:
-            input = activation(input)
-        last_width = n_units
-        weights.append(W)
-        biases.append(b)
-    W = tf.get_variable(name+'_W'+str(len(widths)), shape=[last_width,output_dim],
-        initializer=tf.contrib.layers.xavier_initializer())
-    b = tf.get_variable(name+'_b'+str(len(widths)), shape=[output_dim],
-        initializer=tf.constant_initializer(0.0))
-    input = tf.matmul(input,W) + b
-    weights.append(W)
-    biases.append(b)
-    return input, weights, biases
+    def sindy_reg_loss(self):
+        sindy_coefficients = self.sindy_coefficients()
+        return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sindy_coefficients))
 
 
-# def encoder(input, input_dim, d, widths, activation, name):
-#     """
-#     Construct the encoder.
-
-#     Arguments:
-#         input - 2D tensorflow array, input to the network (shape is [?,input_dim])
-#         input_dim - Integer, number of state variables in the original data space
-#         d - Integer, number of state variables in the decoder space
-#         widths - List of integers representing how many units are in each network layer
-#         activation - Tensorflow function to be used as the activation function at each layer
-#         name - String, prefix to be used in naming the tensorflow variables
-
-#     Returns:
-#         input - Tensorflow array, output of the encoder (shape is [?,d])
-#         weights - List of tensorflow arrays containing the network weights
-#         biases - List of tensorflow arrays containing the network biases
-#     """
-#     weights = []
-#     biases = []
-#     last_width=input_dim
-#     for i,n_units in enumerate(widths):
-#         W = tf.get_variable(name+'_W'+str(i), shape=[last_width,n_units],
-#             initializer=tf.contrib.layers.xavier_initializer())
-#         b = tf.get_variable(name+'_b'+str(i), shape=[n_units],
-#             initializer=tf.constant_initializer(0.0))
-#         input = tf.matmul(input, W) + b
-#         if activation is not None:
-#             input = activation(input)
-#         last_width = n_units
-#         weights.append(W)
-#         biases.append(b)
-#     W = tf.get_variable(name+'_W'+str(len(widths)), shape=[last_width,latent_dim],
-#         initializer=tf.contrib.layers.xavier_initializer())
-#     b = tf.get_variable(name+'_b'+str(len(widths)), shape=[latent_dim],
-#         initializer=tf.constant_initializer(0.0))
-#     input = tf.matmul(input,W) + b
-#     weights.append(W)
-#     biases.append(b)
-#     return input, weights, biases
+    def sindy_z_loss(self, z, x, dx, ddx = None):
+        if self.params['model_order'] == 1:
+            dz = self.dz(x, dx)
+            dz_predict = self.sindy_predict(z, x, dx)
+            return self.params['loss_weight_sindy_z'] * torch.mean((dz - dz_predict) ** 2)
+        else:
+            ddz = self.ddz(x, dx, ddx)[1]
+            ddz_predict = self.sindy_predict(z, x, dx)
+            return  self.params['loss_weight_sindy_z'] * torch.mean((ddz - ddz_predict) ** 2)
 
 
-# def decoder(input, input_dim, latent_dim, widths, activation, name):
-#     """
-#     Construct the decoder.
-
-#     Arguments:
-#         input - 2D tensorflow array, input to the network (shape is [?,latent_dim])
-#         input_dim - Integer, number of state variables in the original data space
-#         latent_dim - Integer, number of state variables in the decoder space
-#         widths - List of integers representing how many units are in each network layer
-#         activation - Tensorflow function to be used as the activation function at each layer
-#         name - String, prefix to be used in naming the tensorflow variables
-
-#     Returns:
-#         input - Tensorflow array, output of the decoder (shape is [?,input_dim])
-#         weights - List of tensorflow arrays containing the network weights
-#         biases - List of tensorflow arrays containing the network biases
-#     """
-#     weights = []
-#     biases = []
-#     last_width=latent_dim
-#     for i,n_units in enumerate(widths):
-#         W = tf.get_variable(name+'_W'+str(i), shape=[last_width,n_units],
-#             initializer=tf.contrib.layers.xavier_initializer())
-#         b = tf.get_variable(name+'_b'+str(i), shape=[n_units],
-#             initializer=tf.constant_initializer(0.0))
-#         input = tf.matmul(input, W) + b
-#         if activation is not None:
-#             input = activation(input)
-#         last_width = n_units
-#         weights.append(W)
-#         biases.append(b)
-#     W = tf.get_variable(name+'_W'+str(len(widths)), shape=[last_width,input_dim],
-#         initializer=tf.contrib.layers.xavier_initializer())
-#     b = tf.get_variable(name+'_b'+str(len(widths)), shape=[input_dim],
-#         initializer=tf.constant_initializer(0.0))
-#     input = tf.matmul(input,W) + b
-#     weights.append(W)
-#     biases.append(b)
-#     return input, weights, biases
+    def sindy_x_loss(self, z, x, dx, ddx = None):
+        if self.params['model_order'] == 1:
+            dx_decode = self.dx_decode(z, x, dx)
+            return self.params['loss_weight_sindy_x'] * torch.mean((dx - dx_decode) ** 2)
+        else:
+            dx_decode, ddx_decode = self.ddx_decode(z, x, dx)
+            return  self.params['loss_weight_sindy_x'] * torch.mean((ddx - ddx_decode) ** 2)
 
 
-def sindy_library_tf(z, latent_dim, poly_order, include_sine=False):
-    """
-    Build the SINDy library.
+    def Loss(self, x, x_decode, z, dx, ddx = None):
+        decoder_loss = self.decoder_loss(x, x_decode)
+        sindy_z_loss = self.sindy_x_loss(z, x, dx, ddx)
+        sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
+        reg_loss = self.sindy_reg_loss()
 
-    Arguments:
-        z - 2D tensorflow array of the snapshots on which to build the library. Shape is number of
-        time points by the number of state variables.
-        latent_dim - Integer, number of state variable in z.
-        poly_order - Integer, polynomial order to which to build the library. Max value is 5.
-        include_sine - Boolean, whether or not to include sine terms in the library. Default False.
+        loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss
+        loss = loss_refinement + reg_loss
 
-    Returns:
-        2D tensorflow array containing the constructed library. Shape is number of time points by
-        number of library functions. The number of library functions is determined by the number
-        of state variables of the input, the polynomial order, and whether or not sines are included.
-    """
-    library = [tf.ones(tf.shape(z)[0])]
-
-    for i in range(latent_dim):
-        library.append(z[:,i])
-
-    if poly_order > 1:
-        for i in range(latent_dim):
-            for j in range(i,latent_dim):
-                library.append(tf.multiply(z[:,i], z[:,j]))
-
-    if poly_order > 2:
-        for i in range(latent_dim):
-            for j in range(i,latent_dim):
-                for k in range(j,latent_dim):
-                    library.append(z[:,i]*z[:,j]*z[:,k])
-
-    if poly_order > 3:
-        for i in range(latent_dim):
-            for j in range(i,latent_dim):
-                for k in range(j,latent_dim):
-                    for p in range(k,latent_dim):
-                        library.append(z[:,i]*z[:,j]*z[:,k]*z[:,p])
-
-    if poly_order > 4:
-        for i in range(latent_dim):
-            for j in range(i,latent_dim):
-                for k in range(j,latent_dim):
-                    for p in range(k,latent_dim):
-                        for q in range(p,latent_dim):
-                            library.append(z[:,i]*z[:,j]*z[:,k]*z[:,p]*z[:,q])
-
-    if include_sine:
-        for i in range(latent_dim):
-            library.append(tf.sin(z[:,i]))
-
-    return tf.stack(library, axis=1)
+        losses = {f'decoder: {decoder_loss}, \n sindy_z: {sindy_z_loss}, '
+                  f'\n, sindy_x: {sindy_x_loss}, \n reg: {reg_loss} '}
+        return loss, loss_refinement, losses
 
 
-def sindy_library_tf_order2(z, dz, latent_dim, poly_order, include_sine=False):
-    """
-    Build the SINDy library for a second order system. This is essentially the same as for a first
-    order system, but library terms are also built for the derivatives.
-    """
-    library = [tf.ones(tf.shape(z)[0])]
+    def loss(self, x, x_decode, z, dx, ddx=None):
+        return self.Loss(x, x_decode, z, dx, ddx)[0]
 
-    z_combined = tf.concat([z, dz], 1)
-
-    for i in range(2*latent_dim):
-        library.append(z_combined[:,i])
-
-    if poly_order > 1:
-        for i in range(2*latent_dim):
-            for j in range(i,2*latent_dim):
-                library.append(tf.multiply(z_combined[:,i], z_combined[:,j]))
-
-    if poly_order > 2:
-        for i in range(2*latent_dim):
-            for j in range(i,2*latent_dim):
-                for k in range(j,2*latent_dim):
-                    library.append(z_combined[:,i]*z_combined[:,j]*z_combined[:,k])
-
-    if poly_order > 3:
-        for i in range(2*latent_dim):
-            for j in range(i,2*latent_dim):
-                for k in range(j,2*latent_dim):
-                    for p in range(k,2*latent_dim):
-                        library.append(z_combined[:,i]*z_combined[:,j]*z_combined[:,k]*z_combined[:,p])
-
-    if poly_order > 4:
-        for i in range(2*latent_dim):
-            for j in range(i,2*latent_dim):
-                for k in range(j,2*latent_dim):
-                    for p in range(k,2*latent_dim):
-                        for q in range(p,2*latent_dim):
-                            library.append(z_combined[:,i]*z_combined[:,j]*z_combined[:,k]*z_combined[:,p]*z_combined[:,q])
-
-    if include_sine:
-        for i in range(2*latent_dim):
-            library.append(tf.sin(z_combined[:,i]))
-
-    return tf.stack(library, axis=1)
-
-
-def z_derivative(input, dx, weights, biases, activation='elu'):
-    """
-    Compute the first order time derivatives by propagating through the network.
-
-    Arguments:
-        input - 2D tensorflow array, input to the network. Dimensions are number of time points
-        by number of state variables.
-        dx - First order time derivatives of the input to the network.
-        weights - List of tensorflow arrays containing the network weights
-        biases - List of tensorflow arrays containing the network biases
-        activation - String specifying which activation function to use. Options are
-        'elu' (exponential linear unit), 'relu' (rectified linear unit), 'sigmoid',
-        or linear.
-
-    Returns:
-        dz - Tensorflow array, first order time derivatives of the network output.
-    """
-    dz = dx
-    if activation == 'elu':
-        for i in range(len(weights)-1):
-            input = tf.matmul(input, weights[i]) + biases[i]
-            dz = tf.multiply(tf.minimum(tf.exp(input),1.0),
-                                  tf.matmul(dz, weights[i]))
-            input = tf.nn.elu(input)
-        dz = tf.matmul(dz, weights[-1])
-    elif activation == 'relu':
-        for i in range(len(weights)-1):
-            input = tf.matmul(input, weights[i]) + biases[i]
-            dz = tf.multiply(tf.to_float(input>0), tf.matmul(dz, weights[i]))
-            input = tf.nn.relu(input)
-        dz = tf.matmul(dz, weights[-1])
-    elif activation == 'sigmoid':
-        for i in range(len(weights)-1):
-            input = tf.matmul(input, weights[i]) + biases[i]
-            input = tf.sigmoid(input)
-            dz = tf.multiply(tf.multiply(input, 1-input), tf.matmul(dz, weights[i]))
-        dz = tf.matmul(dz, weights[-1])
-    else:
-        for i in range(len(weights)-1):
-            dz = tf.matmul(dz, weights[i])
-        dz = tf.matmul(dz, weights[-1])
-    return dz
-
-
-def z_derivative_order2(input, dx, ddx, weights, biases, activation='elu'):
-    """
-    Compute the first and second order time derivatives by propagating through the network.
-
-    Arguments:
-        input - 2D tensorflow array, input to the network. Dimensions are number of time points
-        by number of state variables.
-        dx - First order time derivatives of the input to the network.
-        ddx - Second order time derivatives of the input to the network.
-        weights - List of tensorflow arrays containing the network weights
-        biases - List of tensorflow arrays containing the network biases
-        activation - String specifying which activation function to use. Options are
-        'elu' (exponential linear unit), 'relu' (rectified linear unit), 'sigmoid',
-        or linear.
-
-    Returns:
-        dz - Tensorflow array, first order time derivatives of the network output.
-        ddz - Tensorflow array, second order time derivatives of the network output.
-    """
-    dz = dx
-    ddz = ddx
-    if activation == 'elu':
-        for i in range(len(weights)-1):
-            input = tf.matmul(input, weights[i]) + biases[i]
-            dz_prev = tf.matmul(dz, weights[i])
-            elu_derivative = tf.minimum(tf.exp(input),1.0)
-            elu_derivative2 = tf.multiply(tf.exp(input), tf.to_float(input<0))
-            dz = tf.multiply(elu_derivative, dz_prev)
-            ddz = tf.multiply(elu_derivative2, tf.square(dz_prev)) \
-                  + tf.multiply(elu_derivative, tf.matmul(ddz, weights[i]))
-            input = tf.nn.elu(input)
-        dz = tf.matmul(dz, weights[-1])
-        ddz = tf.matmul(ddz, weights[-1])
-    elif activation == 'relu':
-        # NOTE: currently having trouble assessing accuracy of 2nd derivative due to discontinuity
-        for i in range(len(weights)-1):
-            input = tf.matmul(input, weights[i]) + biases[i]
-            relu_derivative = tf.to_float(input>0)
-            dz = tf.multiply(relu_derivative, tf.matmul(dz, weights[i]))
-            ddz = tf.multiply(relu_derivative, tf.matmul(ddz, weights[i]))
-            input = tf.nn.relu(input)
-        dz = tf.matmul(dz, weights[-1])
-        ddz = tf.matmul(ddz, weights[-1])
-    elif activation == 'sigmoid':
-        for i in range(len(weights)-1):
-            input = tf.matmul(input, weights[i]) + biases[i]
-            input = tf.sigmoid(input)
-            dz_prev = tf.matmul(dz, weights[i])
-            sigmoid_derivative = tf.multiply(input, 1-input)
-            sigmoid_derivative2 = tf.multiply(sigmoid_derivative, 1 - 2*input)
-            dz = tf.multiply(sigmoid_derivative, dz_prev)
-            ddz = tf.multiply(sigmoid_derivative2, tf.square(dz_prev)) \
-                  + tf.multiply(sigmoid_derivative, tf.matmul(ddz, weights[i]))
-        dz = tf.matmul(dz, weights[-1])
-        ddz = tf.matmul(ddz, weights[-1])
-    else:
-        for i in range(len(weights)-1):
-            dz = tf.matmul(dz, weights[i])
-            ddz = tf.matmul(ddz, weights[i])
-        dz = tf.matmul(dz, weights[-1])
-        ddz = tf.matmul(ddz, weights[-1])
-    return dz,ddz
