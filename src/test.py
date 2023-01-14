@@ -11,7 +11,7 @@ from example_lorenz import get_lorenz_data
 import torch
 from sindy_utils import library_size
 from tf_training import train_network
-from torch_autoencoder import Sindy_net
+from torch_autoencoder import SindyNet
 import tensorflow as tf
 import pickle
 import warnings
@@ -82,7 +82,7 @@ params['refinement_epochs'] = 200
 
 batch_size = 7
 
-Net = Sindy_net(params)
+Net = SindyNet(params)
 for i in range(len(training_data['x'])//batch_size  - 1):
     x = torch.tensor(training_data['x'][batch_size *i:batch_size *(i+1)], dtype=torch.float32)
     dx = torch.tensor(training_data['dx'][batch_size *i:batch_size *(i+1)], dtype=torch.float32)

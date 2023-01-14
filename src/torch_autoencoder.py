@@ -1,11 +1,13 @@
 import torch
 import torch.nn as nn
 import warnings
-from autoencoder import z_derivative, z_derivative_order2, get_initialized_weights,sindy_library_torch, sindy_library_torch_order2
+from sindy_utils import z_derivative, z_derivative_order2,\
+    get_initialized_weights, sindy_library_torch, sindy_library_torch_order2
+import warnings
 warnings.filterwarnings("ignore")
 
 
-class Sindy_net(nn.Module):
+class SindyNet(nn.Module):
     def __init__(self,params):
         super().__init__()
         self.params = params
