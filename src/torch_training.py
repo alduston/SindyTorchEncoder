@@ -5,6 +5,64 @@ import torch
 from torch_autoencoder import SindyNet
 
 
+def train_one_step(model, data, optimizer):
+    optimizer.zero_grad()
+    #for k, v in data.items():
+        #data[k] = v.to('cuda')
+    if model.params['model_order'] == 1:
+        loss, loss_refinement, losses = model.auto_Loss(x = data['x'], dx = data['dx'])
+    else:
+        loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'])
+    loss.backward()
+    optimizer.step()
+    return loss, loss_refinement, losses
+
+
+def train_one_epoch(model, data_loader, optimizer, scheduler = None):
+    model.train()
+    total_loss = 0
+    total_loss_dict = {}
+    for batch_index, data in enumerate(data_loader):
+        loss, loss_refinement, losses = train_one_step(model, data, optimizer)
+        if scheduler:
+            scheduler.step()
+        total_loss += loss
+        if len(total_loss_dict.keys()):
+            for key in total_loss_dict.keys():
+                total_loss_dict[key] += losses[key]
+        else:
+            for key,val in losses.items():
+                total_loss_dict[key] = val
+    return total_loss, total_loss_dict
+
+
+def validate_one_step(model, data):
+    #for k, v in data.items():
+        #data[k] = v.to('cuda')
+    if model.params['model_order'] == 1:
+        loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'])
+    else:
+        loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx=data['dxx'])
+    return loss, loss_refinement, losses
+
+
+def validate_one_epoch(model, data_loader):
+    model.eval()
+    total_loss = 0
+    total_loss_dict = {}
+    for batch_index, data in enumerate(data_loader):
+        with torch.no_grad():
+            loss, loss_refinement, losses = validate_one_step(model, data)
+            total_loss += loss
+            if len(total_loss_dict.keys()):
+                for key in total_loss_dict.keys():
+                    total_loss_dict[key] += losses[key]
+            else:
+                for key, val in losses.items():
+                    total_loss_dict[key] = val
+    return total_loss, total_loss_dict
+
+
 def torch_train_network(training_data, val_data, params):
     pass
 

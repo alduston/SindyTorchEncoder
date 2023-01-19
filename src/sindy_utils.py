@@ -289,8 +289,8 @@ def z_derivative(input, dx, weights, biases, activation='elu'):
             dz = torch.multiply(torch.minimum(torch.exp(input),torch.full(input.shape,1.0)),
                                   torch.matmul(dz, weights[i]))
             input = torch.nn.ELU()(input)
-
         dz = torch.matmul(dz, weights[-1])
+
     elif activation == 'relu':
         for i in range(len(weights)-1):
             input = torch.add(torch.matmul(weights[i], input), biases[i])
@@ -309,7 +309,7 @@ def z_derivative(input, dx, weights, biases, activation='elu'):
         for i in range(len(weights)-1):
             dz = torch.matmul(weights[-1], dz)
         dz = torch.matmul(weights[-1], dz)
-    return torch.mean(dz)
+    return dz
 
 
 def z_derivative_order2(input, dx, ddx, weights, biases, activation='elu'):

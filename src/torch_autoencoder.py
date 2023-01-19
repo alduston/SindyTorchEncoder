@@ -22,6 +22,7 @@ class SindyNet(nn.Module):
         self.decoder_layers = decoder_layers
 
 
+
     def Encoder(self, params):
         activation_function = self.get_activation_f(params)
         input_dim = params['input_dim']
@@ -37,6 +38,7 @@ class SindyNet(nn.Module):
             input_dim = output_dim
             layers.append(encoder)
             layers.append(activation_function)
+
 
         encoder = nn.Linear(input_dim, latent_dim)
         nn.init.xavier_uniform(encoder.weight)
@@ -181,9 +183,13 @@ class SindyNet(nn.Module):
 
 
     def forward(self, x):
+        net = torch.nn.Linear(128,64)
+        net(x)
+        print(x.shape)
+        print('here')
         z = self.encoder(x)
-        x_p = self.decoder(z)
-        return x_p, z
+        x_decode = self.decoder(z)
+        return x_decode, z
 
 
     def decoder_loss(self, x, x_pred):
@@ -199,37 +205,48 @@ class SindyNet(nn.Module):
     def sindy_z_loss(self, z, x, dx, ddx = None):
         if self.params['model_order'] == 1:
             dz = self.dz(x, dx)
-            dz_predict = self.sindy_predict(z, x, dx)
+            dz_predict = torch.transpose(self.sindy_predict(z, x, dx),0,1)
             return self.params['loss_weight_sindy_z'] * torch.mean((dz - dz_predict) ** 2)
         else:
             ddz = self.ddz(x, dx, ddx)[1]
-            ddz_predict = self.sindy_predict(z, x, dx)
+            ddz_predict = torch.transpose(self.sindy_predict(z, x, dx),0,1)
             return  self.params['loss_weight_sindy_z'] * torch.mean((ddz - ddz_predict) ** 2)
 
 
     def sindy_x_loss(self, z, x, dx, ddx = None):
         if self.params['model_order'] == 1:
-            dx_decode = self.dx_decode(z, x, dx)
+            dx_decode = torch.transpose(self.dx_decode(z, x, dx),0,1)
             return self.params['loss_weight_sindy_x'] * torch.mean((dx - dx_decode) ** 2)
         else:
             dx_decode, ddx_decode = self.ddx_decode(z, x, dx)
+            ddx_decode = torch.transpose(ddx_decode,0,1)
             return  self.params['loss_weight_sindy_x'] * torch.mean((ddx - ddx_decode) ** 2)
 
 
     def Loss(self, x, x_decode, z, dx, ddx = None):
         decoder_loss = self.decoder_loss(x, x_decode)
-        sindy_z_loss = self.sindy_x_loss(z, x, dx, ddx)
+        sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx)
         sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
         reg_loss = self.sindy_reg_loss()
 
         loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss
         loss = loss_refinement + reg_loss
 
-        losses = {f'decoder: {decoder_loss}, \n sindy_z: {sindy_z_loss}, '
-                  f'\n, sindy_x: {sindy_x_loss}, \n reg: {reg_loss} '}
+        losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss,
+                  'sindy_x': sindy_x_loss, 'reg':  reg_loss}
         return loss, loss_refinement, losses
 
 
     def loss(self, x, x_decode, z, dx, ddx=None):
         return self.Loss(x, x_decode, z, dx, ddx)[0]
+
+
+    def auto_loss(self, x, dx, ddx = None):
+        x_decode, z = self.forward(x)
+        return self.loss(x, x_decode, z, dx, ddx)
+
+    def auto_Loss(self, x, dx, ddx=None):
+        x_decode, z = self.forward(x)
+        return self.Loss(x, x_decode, z, dx, ddx)
+
 

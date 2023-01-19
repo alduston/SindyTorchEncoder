@@ -2,8 +2,7 @@ import tensorflow as tf
 import warnings
 warnings.filterwarnings("ignore")
 
-def full_network(params):
-    tf.disable_eager_execution()
+def full_network(params, n = None, encode_w = [], decode_w = [], x = None, dx = None):
     """
     Define the full network architecture.
 
@@ -27,16 +26,20 @@ def full_network(params):
 
     network = {}
 
-    x = tf.placeholder(tf.float32, shape=[None, input_dim], name='x')
-    dx = tf.placeholder(tf.float32, shape=[None, input_dim], name='dx')
+    if x == None:
+        x = tf.placeholder(tf.float32, shape=[n, input_dim], name='x')
+    if dx == None:
+        dx = tf.placeholder(tf.float32, shape=[n, input_dim], name='dx')
 
     if model_order == 2:
-        ddx = tf.placeholder(tf.float32, shape=[None, input_dim], name='ddx')
+        ddx = tf.placeholder(tf.float32, shape=[n, input_dim], name='ddx')
 
     if activation == 'linear':
         z, x_decode, encoder_weights, encoder_biases, decoder_weights, decoder_biases = linear_autoencoder(x, input_dim, latent_dim)
     else:
-        z, x_decode, encoder_weights, encoder_biases, decoder_weights, decoder_biases = nonlinear_autoencoder(x, input_dim, latent_dim, params['widths'], activation=activation)
+        z, x_decode, encoder_weights, encoder_biases, decoder_weights, decoder_biases = nonlinear_autoencoder(x, input_dim, latent_dim,
+                                                                                                              params['widths'],  activation=activation,
+                                                                                                              encode_w = encode_w, decode_w = decode_w)
     if model_order == 1:
         dz = z_derivative(x, dx, encoder_weights, encoder_biases, activation=activation)
         Theta = sindy_library_tf(z, latent_dim, poly_order, include_sine)
@@ -55,9 +58,10 @@ def full_network(params):
 
 
     if params['sequential_thresholding']:
-        coefficient_mask = tf.placeholder(tf.float32, shape=[library_dim,latent_dim], name='coefficient_mask')
-        sindy_predict = tf.matmul(Theta, coefficient_mask*sindy_coefficients)
-        network['coefficient_mask'] = coefficient_mask
+        sindy_predict = tf.matmul(Theta, sindy_coefficients)
+        #coefficient_mask = tf.placeholder(tf.float32, shape=[library_dim,latent_dim], name='coefficient_mask')
+        #sindy_predict = tf.matmul(Theta, coefficient_mask*sindy_coefficients)
+        #network['coefficient_mask'] = coefficient_mask
     else:
         sindy_predict = tf.matmul(Theta, sindy_coefficients)
 
@@ -150,7 +154,7 @@ def linear_autoencoder(x, input_dim, latent_dim):
     return z, x_decode, encoder_weights, encoder_biases,decoder_weights,decoder_biases
 
 
-def nonlinear_autoencoder(x, input_dim, latent_dim, widths, activation='elu'):
+def nonlinear_autoencoder(x, input_dim, latent_dim, widths, activation='elu', encode_w = [], decode_w = []):
     """
     Construct a nonlinear autoencoder.
 
@@ -174,13 +178,13 @@ def nonlinear_autoencoder(x, input_dim, latent_dim, widths, activation='elu'):
         raise ValueError('invalid activation function')
     # z,encoder_weights,encoder_biases = encoder(x, input_dim, latent_dim, widths, activation_function, 'encoder')
     # x_decode,decoder_weights,decoder_biases = decoder(z, input_dim, latent_dim, widths[::-1], activation_function, 'decoder')
-    z,encoder_weights,encoder_biases = build_network_layers(x, input_dim, latent_dim, widths, activation_function, 'encoder')
-    x_decode,decoder_weights,decoder_biases = build_network_layers(z, latent_dim, input_dim, widths[::-1], activation_function, 'decoder')
+    z,encoder_weights,encoder_biases = build_network_layers(x, input_dim, latent_dim, widths, activation_function, 'encoder',  specified_weights = encode_w)
+    x_decode,decoder_weights,decoder_biases = build_network_layers(z, latent_dim, input_dim, widths[::-1], activation_function, 'decoder', specified_weights = decode_w)
 
     return z, x_decode, encoder_weights, encoder_biases, decoder_weights, decoder_biases
 
 
-def build_network_layers(input, input_dim, output_dim, widths, activation, name):
+def build_network_layers(input, input_dim, output_dim, widths, activation, name, specified_weights = []):
     """
     Construct one portion of the network (either encoder or decoder).
 
@@ -201,11 +205,11 @@ def build_network_layers(input, input_dim, output_dim, widths, activation, name)
     biases = []
     last_width=input_dim
     for i,n_units in enumerate(widths):
-        W = tf.get_variable(name+'_W'+str(i), shape=[last_width,n_units],
-            initializer=tf.contrib.layers.xavier_initializer())
-        b = tf.get_variable(name+'_b'+str(i), shape=[n_units],
-            initializer=tf.constant_initializer(0.0))
-
+        if len(specified_weights):
+            W = tf.get_variable(name + '_W' + str(i), initializer=specified_weights[i])
+        else:
+            W = tf.get_variable(name+'_W'+str(i), shape=[last_width,n_units], initializer=tf.contrib.layers.xavier_initializer())
+        b = tf.get_variable(name + '_b' + str(i), shape=[n_units], initializer=tf.constant_initializer(0.0))
         input = tf.matmul(input, W) + b
         if activation is not None:
             input = activation(input)
@@ -213,12 +217,11 @@ def build_network_layers(input, input_dim, output_dim, widths, activation, name)
         weights.append(W)
         biases.append(b)
 
-
-
-    W = tf.get_variable(name+'_W'+str(len(widths)), shape=[last_width,output_dim],
-        initializer=tf.contrib.layers.xavier_initializer())
-    b = tf.get_variable(name+'_b'+str(len(widths)), shape=[output_dim],
-        initializer=tf.constant_initializer(0.0))
+    if len(specified_weights):
+        W = tf.get_variable(name+'_W'+str(len(widths)), initializer=specified_weights[-1])
+    else:
+        W = tf.get_variable(name + '_W' + str(len(widths)), shape=[last_width, output_dim], initializer=tf.contrib.layers.xavier_initializer())
+    b = tf.get_variable(name+'_b'+str(len(widths)), shape=[output_dim], initializer=tf.constant_initializer(0.0))
     input = tf.matmul(input,W) + b
     weights.append(W)
     biases.append(b)
