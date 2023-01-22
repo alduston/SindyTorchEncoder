@@ -16,8 +16,6 @@ from torch.utils.data import Dataset, DataLoader
 warnings.filterwarnings("ignore")
 
 
-
-
 class model_data(Dataset):
     def __init__(self, data={}, params = {}, device = None):
         super().__init__()
@@ -92,7 +90,7 @@ def get_test_params(train_size = 1024):
     return params,training_data, validation_data
 
 
-def get_loader(data, params, workers = 4, device = 'cpu'):
+def get_loader(data, params, workers = 1, device = 'cpu'):
     data_class = model_data(data, params, device)
     return DataLoader(data_class, batch_size=params['batch_size'], num_workers=workers)
 
