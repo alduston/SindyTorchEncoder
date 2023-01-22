@@ -38,26 +38,29 @@ print_freq = 10
 
 
 def run():
-    params,training_data, validation_data = get_test_params(train_size = 100)
+    params,training_data, validation_data = get_test_params(train_size = 200)
     if torch.cuda.is_available():
+        device = 'cuda:0'
         pass
     else:
+        device = 'cpu'
         params['batch_size'] = 5
         params['threshold_frequency'] = 25
         params['max_epochs'] = 2000
     train_loader = get_loader(training_data, params)
     test_loader = get_loader(validation_data, params)
 
-    net = SindyNet(params)
+    net = SindyNet(params).to(device)
     optimizer = torch.optim.Adam(net.parameters(), lr = params['learning_rate'])
     delta_t = 5 / len(training_data['x'])
+
     for epoch in range(params['max_epochs']):
         total_loss, total_loss_dict = torch_training.train_one_epoch(net, train_loader, optimizer)
         if not epoch % print_freq:
             print([f'Epoch: {epoch}, Active coeffs: {net.active_coeffs}'] + [f'{key}: {val.detach().numpy()} \n' for (key,val) in total_loss_dict.items()])
 
     x = training_data['x'][:2]
-    z = net.forward(torch.tensor(x,dtype = torch.float32))[1]
+    z = net.forward(torch.tensor(x,dtype = torch.float32, device = device))[1]
     Z_sim = [z]
     for i in range(2, len(training_data['x'])//50):
         dz_predict = net.sindy_predict(Z_sim[-1])
@@ -66,7 +69,7 @@ def run():
 
     Z_real = []
     for x in training_data['x'][:len(Z_sim)]:
-        x_decode, z = net.forward(torch.tensor(x,dtype = torch.float32))
+        x_decode, z = net.forward(torch.tensor(x,dtype = torch.float32, device = device))
         Z_real.append(z)
 
     Z_sim_cords = [z.detach().numpy()[0][0] for z in Z_sim]
@@ -78,23 +81,8 @@ def run():
     plt.plot(Z_sim_cords, color='blue')
     plt.plot(Z_cords, color='red')
 
-    plt.show()
     plt.savefig('fig.png')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    plt.show()
 
 
 
