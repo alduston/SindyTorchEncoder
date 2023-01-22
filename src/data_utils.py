@@ -4,8 +4,8 @@ sys.path.append("../tf_model/src")
 sys.path.append("../examples/lorenz")
 
 import os
-import datetime
-import pandas as pd
+#import datetime
+#import pandas as pd
 import numpy as np
 from example_lorenz import get_lorenz_data
 import torch
@@ -21,12 +21,16 @@ warnings.filterwarnings("ignore")
 class model_data(Dataset):
 
     def __init__(self, data={}, params = {}):
+        if torch.cuda.is_available():
+            self.device = 'cuda'
+        else:
+            self.device = 'cpu'
         self.data_dict = data
-        self.x = torch.tensor(self.data_dict['x'], dtype=torch.float32)
-        self.dx = torch.tensor(self.data_dict['dx'], dtype=torch.float32)
+        self.x = torch.tensor(self.data_dict['x'], dtype=torch.float32, device = self.device)
+        self.dx = torch.tensor(self.data_dict['dx'], dtype=torch.float32, device = self.device)
         self.params = params
         if self.params['model_order'] == 2:
-            self.dxx = torch.tensor(self.data_dict['dxx'], dtype=torch.float32)
+            self.dxx = torch.tensor(self.data_dict['dxx'], dtype=torch.float32, device = self.device)
         self.n_samples = self.x.shape[1]
 
 

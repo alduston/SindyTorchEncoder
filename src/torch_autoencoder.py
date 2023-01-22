@@ -10,6 +10,10 @@ warnings.filterwarnings("ignore")
 class SindyNet(nn.Module):
     def __init__(self,params):
         super().__init__()
+        if torch.cuda.is_available():
+            self.device = 'cuda'
+        else:
+            self.device = 'cpu'
         self.params = params
         self.activation_f = self.get_activation_f(params)
 
@@ -31,7 +35,7 @@ class SindyNet(nn.Module):
 
         layers = []
         for output_dim in widths:
-            encoder = nn.Linear(input_dim, output_dim)
+            encoder = nn.Linear(input_dim, output_dim, device = self.device)
             nn.init.xavier_uniform(encoder.weight)
             nn.init.constant_(encoder.bias.data, 0)
 
@@ -40,11 +44,11 @@ class SindyNet(nn.Module):
             layers.append(activation_function)
 
 
-        encoder = nn.Linear(input_dim, latent_dim)
+        encoder = nn.Linear(input_dim, latent_dim, device = self.device)
         nn.init.xavier_uniform(encoder.weight)
         nn.init.constant_(encoder.bias.data, 0)
         layers.append(encoder)
-        Encoder = nn.Sequential(*layers)
+        Encoder = nn.Sequential(*layers, device = self.device)
         return Encoder, layers
 
 
@@ -56,7 +60,7 @@ class SindyNet(nn.Module):
 
         layers = []
         for output_dim in widths[::-1]:
-            decoder = nn.Linear(input_dim, output_dim)
+            decoder = nn.Linear(input_dim, output_dim, device = self.device)
             nn.init.xavier_uniform(decoder.weight)
             nn.init.constant_(decoder.bias.data, 0)
 
@@ -64,11 +68,11 @@ class SindyNet(nn.Module):
             layers.append(decoder)
             layers.append(activation_function)
 
-        decoder = nn.Linear(input_dim, final_dim)
+        decoder = nn.Linear(input_dim, final_dim, device = self.device)
         nn.init.xavier_uniform(decoder.weight)
         nn.init.constant_(decoder.bias.data, 0)
         layers.append(decoder)
-        Decoder = nn.Sequential(*layers)
+        Decoder = nn.Sequential(*layers, device = self.device)
         return Decoder, layers
 
 

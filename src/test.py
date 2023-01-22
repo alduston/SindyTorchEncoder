@@ -5,15 +5,15 @@ sys.path.append("../examples/lorenz")
 
 import os
 import datetime
-import pandas as pd
+#import pandas as pd
 import numpy as np
 from example_lorenz import get_lorenz_data
 import torch
 from sindy_utils import library_size
-from tf_training import train_network
+#from tf_training import train_network
 import torch_training
 from torch_autoencoder import SindyNet
-import tensorflow as tf
+#import tensorflow as tf
 import pickle
 import warnings
 from data_utils import get_test_params,get_loader
@@ -37,7 +37,7 @@ warnings.filterwarnings("ignore")
 
 def run():
     params,training_data, validation_data = get_test_params()
-    params['batch_size'] = 5
+    params['batch_size'] = 100
     train_loader = get_loader(training_data, params)
     test_loader = get_loader(validation_data, params)
 
