@@ -250,6 +250,7 @@ class SindyNet(nn.Module):
 
         losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss,
                   'sindy_x': sindy_x_loss, 'reg':  reg_loss}
+        self.iter_count += 1
         return loss, loss_refinement, losses
 
 

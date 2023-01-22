@@ -14,7 +14,6 @@ def train_one_step(model, data, optimizer,  batch_index):
     loss.backward()
     optimizer.step()
 
-    model.iter_count += 1
     return loss, loss_refinement, losses
 
 
