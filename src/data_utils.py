@@ -18,19 +18,22 @@ warnings.filterwarnings("ignore")
 
 
 
-class model_data(Dataset):
+class model_data(Dataset, device = None):
 
     def __init__(self, data={}, params = {}):
-        if torch.cuda.is_available():
-            self.device = 'cuda'
+        if device:
+            self.device = device
         else:
-            self.device = 'cpu'
+            if torch.cuda.is_available():
+                self.device = 'cuda:0'
+            else:
+                self.device = 'cpu'
         self.data_dict = data
-        self.x = torch.tensor(self.data_dict['x'], dtype=torch.float32)
-        self.dx = torch.tensor(self.data_dict['dx'], dtype=torch.float32)
+        self.x = torch.tensor(self.data_dict['x'], dtype=torch.float32, device = self.device)
+        self.dx = torch.tensor(self.data_dict['dx'], dtype=torch.float32, device = self.device)
         self.params = params
         if self.params['model_order'] == 2:
-            self.dxx = torch.tensor(self.data_dict['dxx'], dtype=torch.float32)
+            self.dxx = torch.tensor(self.data_dict['dxx'], dtype=torch.float32, device = self.device)
         self.n_samples = self.x.shape[1]
 
 
@@ -89,8 +92,8 @@ def get_test_params(train_size = 1024):
     return params,training_data, validation_data
 
 
-def get_loader(data, params, workers = 4):
-    data_class = model_data(data, params)
+def get_loader(data, params, workers = 4, device = 'cpu'):
+    data_class = model_data(data, params, device)
     return DataLoader(data_class, batch_size=params['batch_size'], num_workers=workers)
 
 
