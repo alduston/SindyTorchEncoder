@@ -31,7 +31,7 @@ class SindyNet(nn.Module):
         self.iter_count = 0
         self.epoch = 0
 
-        self.sindy_coeffs = torch.nn.Parameter(self.sindy_coefficients(), requires_grad = True, device = self.device)
+        self.sindy_coeffs = torch.nn.Parameter(self.sindy_coefficients(), requires_grad = True)
         if self.params['sequential_thresholding']:
             self.coefficient_mask = torch.tensor(params['coefficient_mask'], dtype = torch.float32, device = self.device)
 
@@ -152,7 +152,8 @@ class SindyNet(nn.Module):
         library_dim = self.params['library_dim']
         latent_dim = self.params['latent_dim']
         initializer, init_param = self.initializer()
-        return get_initialized_weights([library_dim, latent_dim], initializer, init_param = init_param)
+        return get_initialized_weights([library_dim, latent_dim], initializer,
+                                       init_param = init_param, device = self.device)
 
 
     def Theta(self, z, x = None, dx = None):

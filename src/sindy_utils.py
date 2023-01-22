@@ -151,8 +151,8 @@ def sindy_simulate_order2(x0, dx0, t, Xi, poly_order, include_sine):
     return x
 
 
-def get_initialized_weights(shape, initializer, init_param=None):
-    W = torch.nn.Linear(shape[0], shape[1])
+def get_initialized_weights(shape, initializer, init_param=None, device = 'cpu'):
+    W = torch.nn.Linear(shape[0], shape[1], device = device)
     if init_param:
         initializer(W.weight, *init_param)
     else:
