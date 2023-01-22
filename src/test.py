@@ -57,7 +57,8 @@ def run():
     for epoch in range(params['max_epochs']):
         total_loss, total_loss_dict = torch_training.train_one_epoch(net, train_loader, optimizer)
         if not epoch % print_freq:
-            print([f'Epoch: {epoch}, Active coeffs: {net.active_coeffs}'] + [f'{key}: {val.cpu().detach().numpy()} \n' for (key,val) in total_loss_dict.items()])
+            pass
+            #print([f'Epoch: {epoch}, Active coeffs: {net.active_coeffs}'] + [f'{key}: {val.cpu().detach().numpy()} \n' for (key,val) in total_loss_dict.items()])
 
     x = training_data['x'][:2]
     z = net.forward(torch.tensor(x,dtype = torch.float32, device = device))[1]
