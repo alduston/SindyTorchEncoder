@@ -50,6 +50,10 @@ def run():
     train_loader = get_loader(training_data, params, device = device)
     test_loader = get_loader(validation_data, params, device = device)
 
+    print(f'epoch size is {params["epoch_size"]}')
+    print(f'batch size is {params["batch_size"]}')
+    print(f'threshold_frequency is {params["threshold_frequency"]}')
+
     net = SindyNet(params).to(device)
     optimizer = torch.optim.Adam(net.parameters(), lr = params['learning_rate'])
     delta_t = 5 / len(training_data['x'])
