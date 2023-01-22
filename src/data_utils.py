@@ -90,7 +90,7 @@ def get_test_params(train_size = 1024):
     return params,training_data, validation_data
 
 
-def get_loader(data, params, workers = 1, device = 'cpu'):
+def get_loader(data, params, workers = 0, device = 'cpu'):
     data_class = model_data(data, params, device)
     return DataLoader(data_class, batch_size=params['batch_size'], num_workers=workers)
 
