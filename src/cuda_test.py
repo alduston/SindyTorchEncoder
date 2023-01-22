@@ -1,9 +1,24 @@
+import sys
+sys.path.append("../src")
+sys.path.append("../tf_model/src")
+sys.path.append("../examples/lorenz")
+
+import os
+import datetime
+#import pandas as pd
+import numpy as np
+from example_lorenz import get_lorenz_data
 import torch
-import torch.nn as nn
+from sindy_utils import library_size
+#from tf_training import train_network
+import torch_training
+from torch_autoencoder import SindyNet
+#import tensorflow as tf
+import pickle
 import warnings
-from sindy_utils import z_derivative, z_derivative_order2,\
-    get_initialized_weights, sindy_library_torch, sindy_library_torch_order2
-import warnings
+from data_utils import get_test_params,get_loader
+import matplotlib.pyplot as plt
+
 warnings.filterwarnings("ignore")
 
 def run():
@@ -24,3 +39,6 @@ def run():
     for i in range(torch.cuda.device_count()):
         print(torch.cuda.get_device_properties(i).name)
 
+
+if __name__=='__main__':
+    run()
