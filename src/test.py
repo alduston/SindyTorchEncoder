@@ -44,7 +44,7 @@ def run():
     else:
         params['batch_size'] = 5
         params['threshold_frequency'] = 25
-        params['max_epochs'] = 3000
+        params['max_epochs'] = 2000
     train_loader = get_loader(training_data, params)
     test_loader = get_loader(validation_data, params)
 
@@ -78,9 +78,8 @@ def run():
     plt.plot(Z_sim_cords, color='blue')
     plt.plot(Z_cords, color='red')
 
-    plt.save('plot.png')
-
     plt.show()
+    plt.savefig('fig.png')
 
 
 
