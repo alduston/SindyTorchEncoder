@@ -25,6 +25,12 @@ class SindyNet(nn.Module):
         self.decoder = decoder
         self.decoder_layers = decoder_layers
 
+        self.iter_count = 0
+        self.epoch = 0
+
+        self.sindy_coeffs = torch.nn.Parameter(self.sindy_coefficients(), requires_grad = True)
+        if self.params['sequential_thresholding']:
+            self.coefficient_mask = torch.tensor(params['coefficient_mask'], dtype = torch.float32)
 
 
     def Encoder(self, params):
@@ -143,10 +149,7 @@ class SindyNet(nn.Module):
         library_dim = self.params['library_dim']
         latent_dim = self.params['latent_dim']
         initializer, init_param = self.initializer()
-        if init_param:
-            return get_initialized_weights([library_dim, latent_dim], initializer, init_param = init_param)
-        else:
-            return get_initialized_weights([library_dim, latent_dim], initializer)
+        return get_initialized_weights([library_dim, latent_dim], initializer, init_param = init_param)
 
 
     def Theta(self, z, x, dx):
@@ -155,18 +158,26 @@ class SindyNet(nn.Module):
         include_sine = self.params['include_sine']
         latent_dim = self.params['latent_dim']
         if model_order == 1:
-            dz = self.dz(x, dx)
+            #dz = self.dz(x, dx)
             Theta = sindy_library_torch(z, latent_dim, poly_order, include_sine)
         if model_order == 2:
-            dz, ddz = self.ddz(x, dx)
+            #dz, ddz = self.ddz(x, dx)
+            dz = self.dz(x, dx)
             Theta = sindy_library_torch_order2(z, dz, latent_dim, poly_order, include_sine)
         return Theta
 
 
     def sindy_predict(self, z, x, dx):
         Theta = self.Theta(z, x, dx)
-        sindy_coefficients = self.sindy_coefficients()
-        return torch.matmul(Theta, sindy_coefficients)
+        sindy_coefficients = self.sindy_coeffs
+        if self.params['sequential_thresholding']:
+            iter_count = self.iter_count
+            if iter_count and (iter_count % self.params['threshold_frequency'] == 0):
+                self.coefficient_mask = torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'])
+                self.active_coeffs = torch.sum(self.coefficient_mask).detach().numpy()
+            return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
+        else:
+            return torch.matmul(Theta, sindy_coefficients)
 
 
     def dx_decode(self,z, x, dx):
@@ -200,7 +211,7 @@ class SindyNet(nn.Module):
 
 
     def sindy_reg_loss(self):
-        sindy_coefficients = self.sindy_coefficients()
+        sindy_coefficients = self.sindy_coeffs
         return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sindy_coefficients))
 
 
@@ -246,6 +257,7 @@ class SindyNet(nn.Module):
     def auto_loss(self, x, dx, ddx = None):
         x_decode, z = self.forward(x)
         return self.loss(x, x_decode, z, dx, ddx)
+
 
     def auto_Loss(self, x, dx, ddx=None):
         x_decode, z = self.forward(x)

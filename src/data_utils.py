@@ -47,7 +47,7 @@ class model_data(Dataset):
 
 def get_test_params():
     noise_strength = 1e-6
-    training_data = get_lorenz_data(100, noise_strength=noise_strength)
+    training_data = get_lorenz_data(1024, noise_strength=noise_strength)
     validation_data = get_lorenz_data(20, noise_strength=noise_strength)
     params = {}
 
@@ -76,7 +76,7 @@ def get_test_params():
 
     # training parameters
     params['epoch_size'] = training_data['x'].shape[0]
-    params['batch_size'] = 5
+    params['batch_size'] = 1024
     params['learning_rate'] = 1e-3
 
     params['data_path'] = os.getcwd() + '/'
@@ -84,8 +84,8 @@ def get_test_params():
     params['print_frequency'] = 1
 
     # training time cutoffs
-    params['max_epochs'] = 1000
-    params['refinement_epochs'] = 200
+    params['max_epochs'] = 5000
+    params['refinement_epochs'] = 1000
     return params,training_data, validation_data
 
 

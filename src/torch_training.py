@@ -5,25 +5,26 @@ import torch
 from torch_autoencoder import SindyNet
 
 
-def train_one_step(model, data, optimizer):
+def train_one_step(model, data, optimizer,  batch_index):
     optimizer.zero_grad()
-    #for k, v in data.items():
-        #data[k] = v.to('cuda')
     if model.params['model_order'] == 1:
         loss, loss_refinement, losses = model.auto_Loss(x = data['x'], dx = data['dx'])
     else:
         loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'])
     loss.backward()
     optimizer.step()
+
+    model.iter_count += 1
     return loss, loss_refinement, losses
 
 
 def train_one_epoch(model, data_loader, optimizer, scheduler = None):
+    model.iter_count = 0
     model.train()
     total_loss = 0
     total_loss_dict = {}
     for batch_index, data in enumerate(data_loader):
-        loss, loss_refinement, losses = train_one_step(model, data, optimizer)
+        loss, loss_refinement, losses = train_one_step(model, data, optimizer, batch_index)
         if scheduler:
             scheduler.step()
         total_loss += loss
@@ -33,12 +34,11 @@ def train_one_epoch(model, data_loader, optimizer, scheduler = None):
         else:
             for key,val in losses.items():
                 total_loss_dict[key] = val
+    model.epoch += 1
     return total_loss, total_loss_dict
 
 
 def validate_one_step(model, data):
-    #for k, v in data.items():
-        #data[k] = v.to('cuda')
     if model.params['model_order'] == 1:
         loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'])
     else:
@@ -62,9 +62,6 @@ def validate_one_epoch(model, data_loader):
                     total_loss_dict[key] = val
     return total_loss, total_loss_dict
 
-
-def torch_train_network(training_data, val_data, params):
-    pass
 
 
 

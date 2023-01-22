@@ -37,7 +37,11 @@ warnings.filterwarnings("ignore")
 
 def run():
     params,training_data, validation_data = get_test_params()
-    params['batch_size'] = 1024
+    if torch.cuda.is_available():
+        pass
+    else:
+        params['batch_size'] = 5
+        params['threshold_frequency'] = 25
     train_loader = get_loader(training_data, params)
     test_loader = get_loader(validation_data, params)
 
@@ -45,7 +49,7 @@ def run():
     optimizer = torch.optim.Adam(net.parameters(), lr = params['learning_rate'])
     for epoch in range(params['max_epochs']):
         total_loss, total_loss_dict = torch_training.train_one_epoch(net, train_loader, optimizer)
-        print([f'Epoch: {epoch}'] + [f'{key}: {val.detach().numpy()} \n' for (key,val) in total_loss_dict.items()])
+        print([f'Epoch: {epoch}, Active coeffs: {net.active_coeffs}'] + [f'{key}: {val.detach().numpy()} \n' for (key,val) in total_loss_dict.items()])
 
 if __name__=='__main__':
     run()
