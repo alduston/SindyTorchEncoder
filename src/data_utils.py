@@ -18,9 +18,9 @@ warnings.filterwarnings("ignore")
 
 
 
-class model_data(Dataset, device = None):
-
-    def __init__(self, data={}, params = {}):
+class model_data(Dataset):
+    def __init__(self, data={}, params = {}, device = None):
+        super().__init__()
         if device:
             self.device = device
         else:
