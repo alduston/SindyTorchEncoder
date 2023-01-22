@@ -18,7 +18,6 @@ def train_one_step(model, data, optimizer,  batch_index):
 
 
 def train_one_epoch(model, data_loader, optimizer, scheduler = None):
-    model.iter_count = 0
     model.train()
     total_loss = 0
     total_loss_dict = {}

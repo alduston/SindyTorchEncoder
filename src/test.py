@@ -38,7 +38,7 @@ print_freq = 10
 
 
 def run():
-    params,training_data, validation_data = get_test_params(train_size = 200)
+    params,training_data, validation_data = get_test_params()
     if torch.cuda.is_available():
         device = 'cuda:0'
         pass

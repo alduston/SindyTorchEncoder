@@ -176,8 +176,8 @@ class SindyNet(nn.Module):
         Theta = self.Theta(z, x, dx)
         sindy_coefficients = self.sindy_coeffs
         if self.params['sequential_thresholding']:
-            iter_count = self.iter_count
-            if iter_count and (iter_count % self.params['threshold_frequency'] == 0):
+            epoch= self.epoch
+            if epoch and (epoch % self.params['threshold_frequency'] == 0):
                 self.coefficient_mask = torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
                 self.active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
             return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
@@ -250,7 +250,6 @@ class SindyNet(nn.Module):
 
         losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss,
                   'sindy_x': sindy_x_loss, 'reg':  reg_loss}
-        self.iter_count += 1
         return loss, loss_refinement, losses
 
 
