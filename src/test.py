@@ -77,7 +77,7 @@ def run():
 
     plt.plot(Z_sim_cords, color='blue')
     plt.plot(Z_cords, color='red')
-    
+
     plt.save('plot.png')
 
     plt.show()
