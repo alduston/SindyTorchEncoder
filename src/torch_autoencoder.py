@@ -189,8 +189,6 @@ class SindyNet(nn.Module):
     def forward(self, x):
         net = torch.nn.Linear(128,64)
         net(x)
-        print(x.shape)
-        print('here')
         z = self.encoder(x)
         x_decode = self.decoder(z)
         return x_decode, z
