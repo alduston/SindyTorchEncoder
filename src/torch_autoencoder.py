@@ -152,7 +152,7 @@ class SindyNet(nn.Module):
         return get_initialized_weights([library_dim, latent_dim], initializer, init_param = init_param)
 
 
-    def Theta(self, z, x, dx):
+    def Theta(self, z, x = None, dx = None):
         model_order = self.params['model_order']
         poly_order = self.params['poly_order']
         include_sine = self.params['include_sine']
@@ -167,7 +167,7 @@ class SindyNet(nn.Module):
         return Theta
 
 
-    def sindy_predict(self, z, x, dx):
+    def sindy_predict(self, z, x = None, dx = None):
         Theta = self.Theta(z, x, dx)
         sindy_coefficients = self.sindy_coeffs
         if self.params['sequential_thresholding']:
@@ -180,7 +180,7 @@ class SindyNet(nn.Module):
             return torch.matmul(Theta, sindy_coefficients)
 
 
-    def dx_decode(self,z, x, dx):
+    def dx_decode(self,z, x, dx = None):
         sindy_predict = self.sindy_predict(z, x, dx)
         decoder_weights, decoder_biases = self.decoder_weights()
         activation = self.params['activation']
@@ -198,8 +198,6 @@ class SindyNet(nn.Module):
 
 
     def forward(self, x):
-        net = torch.nn.Linear(128,64)
-        net(x)
         z = self.encoder(x)
         x_decode = self.decoder(z)
         return x_decode, z

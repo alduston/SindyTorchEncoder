@@ -17,6 +17,7 @@ from torch_autoencoder import SindyNet
 import pickle
 import warnings
 from data_utils import get_test_params,get_loader
+import matplotlib.pyplot as plt
 
 warnings.filterwarnings("ignore")
 
@@ -33,23 +34,70 @@ warnings.filterwarnings("ignore")
 
 #x = torch.rand(params['input_dim'])
 #dx = torch.rand(params['input_dim'])
+print_freq = 10
 
 
 def run():
-    params,training_data, validation_data = get_test_params()
+    params,training_data, validation_data = get_test_params(train_size = 100)
     if torch.cuda.is_available():
         pass
     else:
         params['batch_size'] = 5
         params['threshold_frequency'] = 25
+        params['max_epochs'] = 3000
     train_loader = get_loader(training_data, params)
     test_loader = get_loader(validation_data, params)
 
     net = SindyNet(params)
     optimizer = torch.optim.Adam(net.parameters(), lr = params['learning_rate'])
+    delta_t = 5 / len(training_data['x'])
     for epoch in range(params['max_epochs']):
         total_loss, total_loss_dict = torch_training.train_one_epoch(net, train_loader, optimizer)
-        print([f'Epoch: {epoch}, Active coeffs: {net.active_coeffs}'] + [f'{key}: {val.detach().numpy()} \n' for (key,val) in total_loss_dict.items()])
+        if not epoch % print_freq:
+            print([f'Epoch: {epoch}, Active coeffs: {net.active_coeffs}'] + [f'{key}: {val.detach().numpy()} \n' for (key,val) in total_loss_dict.items()])
+
+    x = training_data['x'][:2]
+    z = net.forward(torch.tensor(x,dtype = torch.float32))[1]
+    Z_sim = [z]
+    for i in range(2, len(training_data['x'])//50):
+        dz_predict = net.sindy_predict(Z_sim[-1])
+        v = Z_sim[-1] + dz_predict * delta_t
+        Z_sim.append(v)
+
+    Z_real = []
+    for x in training_data['x'][:len(Z_sim)]:
+        x_decode, z = net.forward(torch.tensor(x,dtype = torch.float32))
+        Z_real.append(z)
+
+    Z_sim_cords = [z.detach().numpy()[0][0] for z in Z_sim]
+    Z_cords = [z.detach().numpy()[0] for z in Z_real]
+
+    #print(Z_sim_cords[:5])
+    #print(Z_cords[:5])
+
+    plt.plot(Z_sim_cords, color='blue')
+    plt.plot(Z_cords, color='red')
+    
+    plt.save('plot.png')
+
+    plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 if __name__=='__main__':
     run()

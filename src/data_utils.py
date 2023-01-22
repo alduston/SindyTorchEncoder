@@ -45,9 +45,9 @@ class model_data(Dataset):
         return self.n_samples
 
 
-def get_test_params():
+def get_test_params(train_size = 1024):
     noise_strength = 1e-6
-    training_data = get_lorenz_data(1024, noise_strength=noise_strength)
+    training_data = get_lorenz_data(train_size, noise_strength=noise_strength)
     validation_data = get_lorenz_data(20, noise_strength=noise_strength)
     params = {}
 
@@ -76,7 +76,7 @@ def get_test_params():
 
     # training parameters
     params['epoch_size'] = training_data['x'].shape[0]
-    params['batch_size'] = 1024
+    params['batch_size'] = train_size
     params['learning_rate'] = 1e-3
 
     params['data_path'] = os.getcwd() + '/'
