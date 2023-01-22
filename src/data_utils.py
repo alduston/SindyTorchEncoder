@@ -62,7 +62,6 @@ def get_test_params(train_size = 1024):
     # sequential thresholding parameters
     params['sequential_thresholding'] = True
     params['coefficient_threshold'] = 0.1
-    params['threshold_frequency'] = 500
     params['coefficient_mask'] = np.ones((params['library_dim'], params['latent_dim']))
     params['coefficient_initialization'] = 'constant'
 
@@ -77,7 +76,8 @@ def get_test_params(train_size = 1024):
 
     # training parameters
     params['epoch_size'] = training_data['x'].shape[0]
-    params['batch_size'] = train_size
+    params['batch_size'] = min(params['epoch_size'], train_size = 1024)
+    params['threshold_frequency'] = train_size // 2
     params['learning_rate'] = 1e-3
 
     params['data_path'] = os.getcwd() + '/'
