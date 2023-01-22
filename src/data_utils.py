@@ -77,7 +77,7 @@ def get_test_params(train_size = 1024):
     # training parameters
     params['epoch_size'] = training_data['x'].shape[0]
     params['batch_size'] = min([params['epoch_size']//8, train_size])
-    params['threshold_frequency'] =  4
+    params['threshold_frequency'] =  50
     params['learning_rate'] = 1e-3
 
     params['data_path'] = os.getcwd() + '/'
