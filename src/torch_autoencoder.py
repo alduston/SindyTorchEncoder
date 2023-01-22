@@ -35,7 +35,7 @@ class SindyNet(nn.Module):
 
         layers = []
         for output_dim in widths:
-            encoder = nn.Linear(input_dim, output_dim, device = self.device)
+            encoder = nn.Linear(input_dim, output_dim)
             nn.init.xavier_uniform(encoder.weight)
             nn.init.constant_(encoder.bias.data, 0)
 
@@ -44,11 +44,11 @@ class SindyNet(nn.Module):
             layers.append(activation_function)
 
 
-        encoder = nn.Linear(input_dim, latent_dim, device = self.device)
+        encoder = nn.Linear(input_dim, latent_dim)
         nn.init.xavier_uniform(encoder.weight)
         nn.init.constant_(encoder.bias.data, 0)
         layers.append(encoder)
-        Encoder = nn.Sequential(*layers, device = self.device)
+        Encoder = nn.Sequential(*layers)
         return Encoder, layers
 
 
@@ -60,7 +60,7 @@ class SindyNet(nn.Module):
 
         layers = []
         for output_dim in widths[::-1]:
-            decoder = nn.Linear(input_dim, output_dim, device = self.device)
+            decoder = nn.Linear(input_dim, output_dim)
             nn.init.xavier_uniform(decoder.weight)
             nn.init.constant_(decoder.bias.data, 0)
 
@@ -68,11 +68,11 @@ class SindyNet(nn.Module):
             layers.append(decoder)
             layers.append(activation_function)
 
-        decoder = nn.Linear(input_dim, final_dim, device = self.device)
+        decoder = nn.Linear(input_dim, final_dim)
         nn.init.xavier_uniform(decoder.weight)
         nn.init.constant_(decoder.bias.data, 0)
         layers.append(decoder)
-        Decoder = nn.Sequential(*layers, device = self.device)
+        Decoder = nn.Sequential(*layers)
         return Decoder, layers
 
 

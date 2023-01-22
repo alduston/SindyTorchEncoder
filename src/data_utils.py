@@ -26,11 +26,11 @@ class model_data(Dataset):
         else:
             self.device = 'cpu'
         self.data_dict = data
-        self.x = torch.tensor(self.data_dict['x'], dtype=torch.float32, device = self.device)
-        self.dx = torch.tensor(self.data_dict['dx'], dtype=torch.float32, device = self.device)
+        self.x = torch.tensor(self.data_dict['x'], dtype=torch.float32)
+        self.dx = torch.tensor(self.data_dict['dx'], dtype=torch.float32)
         self.params = params
         if self.params['model_order'] == 2:
-            self.dxx = torch.tensor(self.data_dict['dxx'], dtype=torch.float32, device = self.device)
+            self.dxx = torch.tensor(self.data_dict['dxx'], dtype=torch.float32)
         self.n_samples = self.x.shape[1]
 
 
