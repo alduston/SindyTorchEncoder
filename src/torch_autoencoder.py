@@ -28,8 +28,8 @@ class SindyNet(nn.Module):
         self.decoder = decoder
         self.decoder_layers = decoder_layers
 
-        self.iter_count = 0
-        self.epoch = 0
+        self.iter_count = torch.tensor(0, device = device)
+        self.epoch = torch.tensor(0, device = device)
 
         self.sindy_coeffs = torch.nn.Parameter(self.sindy_coefficients(), requires_grad = True)
         if self.params['sequential_thresholding']:
@@ -178,8 +178,6 @@ class SindyNet(nn.Module):
         if self.params['sequential_thresholding']:
             iter_count = self.iter_count
             if iter_count and (iter_count % self.params['threshold_frequency'] == 0):
-                print(torch.min(torch.abs(sindy_coefficients).cpu().detach().numpy()))
-                print('\n\n')
                 self.coefficient_mask = torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
                 self.active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
             return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
