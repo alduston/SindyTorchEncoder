@@ -179,7 +179,7 @@ class SindyNet(nn.Module):
             iter_count = self.iter_count
             if iter_count and (iter_count % self.params['threshold_frequency'] == 0):
                 self.coefficient_mask = torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'])
-                self.active_coeffs = torch.sum(self.coefficient_mask).cpu()detach().numpy()
+                self.active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
             return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
         else:
             return torch.matmul(Theta, sindy_coefficients)
