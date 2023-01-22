@@ -57,7 +57,7 @@ def run():
     for epoch in range(params['max_epochs']):
         total_loss, total_loss_dict = torch_training.train_one_epoch(net, train_loader, optimizer)
         if not epoch % print_freq:
-            print([f'Epoch: {epoch}, Active coeffs: {net.active_coeffs}'] + [f'{key}: {val.detach().numpy()} \n' for (key,val) in total_loss_dict.items()])
+            print([f'Epoch: {epoch}, Active coeffs: {net.active_coeffs}'] + [f'{key}: {val.cpu().detach().numpy()} \n' for (key,val) in total_loss_dict.items()])
 
     x = training_data['x'][:2]
     z = net.forward(torch.tensor(x,dtype = torch.float32, device = device))[1]
@@ -72,8 +72,8 @@ def run():
         x_decode, z = net.forward(torch.tensor(x,dtype = torch.float32, device = device))
         Z_real.append(z)
 
-    Z_sim_cords = [z.detach().numpy()[0][0] for z in Z_sim]
-    Z_cords = [z.detach().numpy()[0] for z in Z_real]
+    Z_sim_cords = [z.cpu().detach().numpy()[0][0] for z in Z_sim]
+    Z_cords = [z.cpu().detach().numpy()[0] for z in Z_real]
 
     #print(Z_sim_cords[:5])
     #print(Z_cords[:5])
