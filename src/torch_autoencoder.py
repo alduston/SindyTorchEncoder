@@ -8,12 +8,15 @@ warnings.filterwarnings("ignore")
 
 
 class SindyNet(nn.Module):
-    def __init__(self,params):
+    def __init__(self,params, device = None):
         super().__init__()
-        if torch.cuda.is_available():
-            self.device = 'cuda'
+        if device:
+            self.device = device
         else:
-            self.device = 'cpu'
+            if torch.cuda.is_available():
+                self.device = 'cuda'
+            else:
+                self.device = 'cpu'
         self.params = params
         self.activation_f = self.get_activation_f(params)
 
@@ -159,11 +162,11 @@ class SindyNet(nn.Module):
         latent_dim = self.params['latent_dim']
         if model_order == 1:
             #dz = self.dz(x, dx)
-            Theta = sindy_library_torch(z, latent_dim, poly_order, include_sine)
+            Theta = sindy_library_torch(z, latent_dim, poly_order, include_sine, device = self.device)
         if model_order == 2:
             #dz, ddz = self.ddz(x, dx)
             dz = self.dz(x, dx)
-            Theta = sindy_library_torch_order2(z, dz, latent_dim, poly_order, include_sine)
+            Theta = sindy_library_torch_order2(z, dz, latent_dim, poly_order, include_sine, device = self.device)
         return Theta
 
 

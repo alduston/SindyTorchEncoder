@@ -39,8 +39,6 @@ class model_data(Dataset):
         if self.params['model_order'] == 2:
             return {'x': self.x[index], 'dx': self.dx[index], 'dxx': self.dxx[index]}
         else:
-            print(index)
-            print(self.x[index].shape)
             return {'x': self.x[index], 'dx': self.dx[index]}
 
 

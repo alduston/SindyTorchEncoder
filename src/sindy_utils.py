@@ -161,7 +161,7 @@ def get_initialized_weights(shape, initializer, init_param=None):
 
 
 
-def sindy_library_torch(z, latent_dim, poly_order, include_sine=False):
+def sindy_library_torch(z, latent_dim, poly_order, include_sine=False, device = 'cpu'):
     if len(z.shape) == 1:
         z = z.view(len(z),1)
     """
@@ -179,7 +179,7 @@ def sindy_library_torch(z, latent_dim, poly_order, include_sine=False):
         number of library functions. The number of library functions is determined by the number
         of state variables of the input, the polynomial order, and whether or not sines are included.
     """
-    library = [torch.ones(z.shape[0])]
+    library = [torch.ones(z.shape[0], device = device)]
 
     for i in range(latent_dim):
         library.append(z[:,i])
@@ -217,12 +217,12 @@ def sindy_library_torch(z, latent_dim, poly_order, include_sine=False):
     return torch.stack(library, axis=1)
 
 
-def sindy_library_torch_order2(z, dz, latent_dim, poly_order, include_sine=False):
+def sindy_library_torch_order2(z, dz, latent_dim, poly_order, include_sine=False, device = 'cpu'):
     """
     Build the SINDy library for a second order system. This is essentially the same as for a first
     order system, but library terms are also built for the derivatives.
     """
-    library = [torch.ones(z.shape[0])]
+    library = [torch.ones(z.shape[0], device = device)]
 
     z_combined = torch.concat([z, dz], 1)
 
