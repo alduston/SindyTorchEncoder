@@ -31,9 +31,9 @@ class SindyNet(nn.Module):
         self.iter_count = 0
         self.epoch = 0
 
-        self.sindy_coeffs = torch.nn.Parameter(self.sindy_coefficients(), requires_grad = True)
+        self.sindy_coeffs = torch.nn.Parameter(self.sindy_coefficients(), requires_grad = True, device = self.device)
         if self.params['sequential_thresholding']:
-            self.coefficient_mask = torch.tensor(params['coefficient_mask'], dtype = torch.float32)
+            self.coefficient_mask = torch.tensor(params['coefficient_mask'], dtype = torch.float32, device = self.device)
 
 
     def Encoder(self, params):
