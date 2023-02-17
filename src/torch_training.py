@@ -76,7 +76,7 @@ def train_bag_epochs(model, bag_loader, params, train_params):
     Bag_coeffs = []
     for batch_index, bag_data in enumerate(bag_loader):
         bag_model = deepcopy(model)
-        perturbation = .005 * torch.randn(bag_model.sindy_coeffs.shape, device = params['device'])
+        perturbation = .0075 * torch.randn(bag_model.sindy_coeffs.shape, device = params['device'])
         bag_model.sindy_coeffs = torch.nn.Parameter(perturbation + bag_model.sindy_coeffs, requires_grad = True)
         bag_coeffs = get_bag_coeffs(bag_model, bag_data, params, train_params)
         Bag_coeffs.append(bag_coeffs)
@@ -163,7 +163,10 @@ def train_sindy(model_params, train_params, training_data, validation_data):
     net = subtrain_sindy(net, train_loader, model_params, train_params, mode = 'pretrain', print_freq = 99)
     if train_params['bag_epochs']:
         bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
+        shuffle_threshold = train_params['shuffle_threshold']
         for epoch in range(train_params['bag_epochs']):
+            if epoch and not epoch%shuffle_threshold:
+                bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
             net  = train_bag_epochs(net, bag_loader, model_params, train_params)
             net = subtrain_sindy(net, train_loader, model_params, train_params, mode='subtrain', print_freq = 25)
         else:

@@ -40,7 +40,7 @@ print_freq = 10
 def run():
     model_params,training_data, validation_data = get_test_params(max_data = 500)
     train_params = {'bag_epochs': 100, 'pretrain_epochs': 100, 'nbags': 50, 'bag_size':7,
-                    'subtrain_epochs': 50, 'bag_sub_epochs':20, 'bag_learning_rate':.01}
+                    'subtrain_epochs': 50, 'bag_sub_epochs':20, 'bag_learning_rate':.01, 'shuffle_threshold': 3}
     model_params['batch_size'] = 7
     model_params['threshold_frequency'] = 25
     model_params['sequential_thresholding'] = False
@@ -48,8 +48,8 @@ def run():
         l = len(training_data['x'])
         model_params, training_data, validation_data = get_test_params(max_data =5000)
         model_params['sequential_thresholding'] = False
-        train_params = {'bag_epochs': 100, 'pretrain_epochs': 200, 'nbags': l//100, 'bag_size': 100,
-                        'subtrain_epochs': 60, 'bag_sub_epochs':30, 'bag_learning_rate':.01}
+        train_params = {'bag_epochs': 200, 'pretrain_epochs': 200, 'nbags': l//100, 'bag_size': 100,
+                        'subtrain_epochs': 60, 'bag_sub_epochs':30, 'bag_learning_rate':.01, 'shuffle_threshold': 5}
         model_params['batch_size'] = 2000
         model_params['threshold_frequency'] = 25
     torch_training.train_sindy(model_params, train_params, training_data, validation_data)
