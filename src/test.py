@@ -43,11 +43,12 @@ def run():
                     'subtrain_epochs': 20, 'bag_sub_epochs':20, 'bag_learning_rate':.01}
     model_params['batch_size'] = 7
     model_params['threshold_frequency'] = 25
-    model_params['sequential_thresholding'] = False
+    model_params['sequential_thresholding'] = True
 
     if torch.cuda.is_available():
         model_params, training_data, validation_data = get_test_params(max_data=5000)
-        train_params = {'bag_epochs': 200, 'pretrain_epochs': 10, 'nbags': 100, 'bag_size': 50,
+        model_params['sequential_thresholding'] = True
+        train_params = {'bag_epochs': 200, 'pretrain_epochs': 5000, 'nbags': 100, 'bag_size': 50,
                         'subtrain_epochs': 80, 'bag_sub_epochs':20, 'bag_learning_rate':.01}
         model_params['batch_size'] = 2000
         model_params['threshold_frequency'] = 25
