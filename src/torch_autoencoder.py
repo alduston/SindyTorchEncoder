@@ -17,7 +17,7 @@ class SindyNet(nn.Module):
                 self.device = 'cuda'
             else:
                 self.device = 'cpu'
-        params['device'] = device
+        params['device'] = self.device
         self.params = params
         self.activation_f = self.get_activation_f(params)
 

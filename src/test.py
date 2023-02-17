@@ -38,7 +38,7 @@ print_freq = 10
 
 
 def run():
-    model_params,training_data, validation_data = get_test_params(max_data = 5000)
+    model_params,training_data, validation_data = get_test_params(max_data = 500)
 
     train_params = {'bag_epochs': 10, 'pretrain_epochs': 100, 'nbags': 200, 'bag_size':7,
                     'subtrain_epochs': 20}
@@ -46,10 +46,12 @@ def run():
     model_params['threshold_frequency'] = 25
 
     if torch.cuda.is_available():
-        train_params = {'bag_epochs': 50, 'pretrain_epochs': 1000, 'nbags': 500, 'bag_size': 500,
-                        'subtrain_epochs': 50}
-        model_params['batch_size'] = 2000
-        model_params['threshold_frequency'] = 25
+
+        pass
+        #train_params = {'bag_epochs': 50, 'pretrain_epochs': 1000, 'nbags': 500, 'bag_size': 500,
+                        #'subtrain_epochs': 50}
+        #model_params['batch_size'] = 2000
+        #model_params['threshold_frequency'] = 25
     torch_training.train_sindy(model_params, train_params, training_data, validation_data)
 
 
