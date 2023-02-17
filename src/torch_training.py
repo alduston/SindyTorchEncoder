@@ -43,11 +43,12 @@ def get_bag_coeffs(bag_model, bag_data, params, train_params):
 def process_bag_coeffs(Bag_coeffs, params):
     new_mask = np.zeros(Bag_coeffs.shape[1:])
     x,y = new_mask.shape
+    cumul_coeffs = torch.sum(Bag_coeffs, dim = 0)
     for ix in range(x):
         for iy in range(y):
-             param_vals = Bag_coeffs[:,ix,iy].detach().cpu().numpy()
-             tset,pval = ttest_1samp(param_vals, 0)
-             new_mask[ix, iy] = 1 if pval<.05 else 0
+             #param_vals = Bag_coeffs[:,ix,iy].detach().cpu().numpy()
+             #tset,pval = ttest_1samp(param_vals, 0)
+             new_mask[ix, iy] = 1 if cumul_coeffs[ix,iy] > .1 else 0
 
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = params['device'])
     return new_mask
