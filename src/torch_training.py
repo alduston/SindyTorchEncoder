@@ -9,6 +9,7 @@ from copy import deepcopy
 from scipy.stats import ttest_1samp
 import matplotlib.pyplot as plt
 from scipy import stats as st
+import random
 
 
 def clear_plt():
@@ -70,6 +71,15 @@ def process_bag_coeffs(Bag_coeffs, params, model):
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = params['device'])
     #avg_coeffs = torch.tensor(avg_coeffs, dtype = torch.float32, device = params['device'])
     return new_mask#, avg_coeffs
+
+
+def get_choice_tensor(shape, prob, device):
+    num_vals = torch.exp(torch.sum(torch.log(torch.tensor(shape)))).detach().cpu()
+    num_vals = int(num_vals.detach().cpu().numpy())
+    vals = torch.tensor(random.choices([1.0, 0], weights=[prob, 1 - prob], k=num_vals),
+                        dtype=torch.float32, device = device).reshape(shape)
+    return vals
+
 
 
 def train_bag_epochs(model, bag_loader, params, train_params):
@@ -144,6 +154,8 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
     optimizer = torch.optim.Adam(net.parameters(), lr= model_params['learning_rate'])
     for epoch in range(pretrain_epochs):
         total_loss, total_loss_dict = train_one_epoch(net, train_loader, optimizer)
+        choice_tensor = get_choice_tensor(net.sindy_coeffs.shape, 1 / (net.epoch**1.5), net.device)
+        net.coefficient_mask = torch.max(net.coefficient_mask, choice_tensor)
         if not isinf(print_freq):
             if not epoch % print_freq:
                 print(f'TRAIN Epoch {net.epoch}: Active coeffs: {net.num_active_coeffs}, {[f"{key}: {val.cpu().detach().numpy()}" for (key, val) in total_loss_dict.items()]}')
