@@ -46,8 +46,8 @@ def run():
     model_params['sequential_thresholding'] = True
 
     if torch.cuda.is_available():
-        model_params, training_data, validation_data = get_test_params(max_data=5000)
-        model_params['sequential_thresholding'] = True
+        model_params, training_data, validation_data = get_test_params()
+        model_params['sequential_thresholding'] = False
         train_params = {'bag_epochs': 100, 'pretrain_epochs': 50, 'nbags': 100, 'bag_size': 50,
                         'subtrain_epochs': 80, 'bag_sub_epochs':20, 'bag_learning_rate':.01}
         model_params['batch_size'] = 2000
