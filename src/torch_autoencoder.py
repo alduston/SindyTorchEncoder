@@ -272,7 +272,7 @@ class SindyNet(nn.Module):
         return self.Loss(x, x_decode, z, dx, ddx)[0]
 
 
-    def auto_loss(self, x, dx, ddx = None):
+    def auto_loss(self, x, dx, ddx = None, mode = None):
         x_decode, z = self.forward(x)
         return self.loss(x, x_decode, z, dx, ddx)
 
@@ -281,4 +281,14 @@ class SindyNet(nn.Module):
         x_decode, z = self.forward(x)
         return self.Loss(x, x_decode, z, dx, ddx)
 
+    def bag_loss(self, x, dx, ddx=None):
+        x_decode, z = self.forward(x)
+        sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx)
+        sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
+        reg_loss = self.sindy_reg_loss()
+
+        loss_refinement = sindy_z_loss + sindy_x_loss
+        loss = loss_refinement + reg_loss
+
+        return loss
 

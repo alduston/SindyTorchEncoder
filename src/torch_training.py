@@ -7,9 +7,19 @@ from data_utils import get_test_params,get_loader, get_bag_loader
 from math import inf, isinf
 from copy import deepcopy
 from scipy.stats import ttest_1samp
+import matplotlib.pyplot as plt
+from scipy import stats as st
 
 
-def train_one_step(model, data, optimizer):
+def clear_plt():
+    plt.figure().clear()
+    plt.close()
+    plt.cla()
+    plt.clf()
+    return True
+
+
+def train_one_step(model, data, optimizer, mode = None):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
         loss, loss_refinement, losses = model.auto_Loss(x = data['x'], dx = data['dx'])
@@ -23,13 +33,14 @@ def train_one_step(model, data, optimizer):
 def train_one_bagstep(model, data, optimizer):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
-        loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'])
+        loss = model.bag_loss(x = data['x_bag'], dx = data['dx_bag'])
     else:
         pass
         #loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'])
     loss.backward()
     optimizer.step()
-    return loss, loss_refinement, losses
+    return loss
+
 
 def get_bag_coeffs(bag_model, bag_data, params, train_params):
     epochs = train_params['bag_sub_epochs']
@@ -40,19 +51,37 @@ def get_bag_coeffs(bag_model, bag_data, params, train_params):
     return bag_model.active_coeffs()
 
 
-def process_bag_coeffs(Bag_coeffs, params):
+def frac_round(vec,val):
+    vec *=(1/val)
+    vec = np.asarray(np.asarray(vec, int), float)
+    vec *= .05
+    return vec
+
+
+def process_bag_coeffs(Bag_coeffs, params, model):
     new_mask = np.zeros(Bag_coeffs.shape[1:])
+    mode_coeffs = np.zeros(Bag_coeffs.shape[1:])
     x,y = new_mask.shape
-    cumul_coeffs = torch.sum(Bag_coeffs, dim = 0)
+
+    n_samples = Bag_coeffs.shape[0]
+    avg_coeffs = (1/n_samples) * torch.sum(Bag_coeffs, dim = 0)
     for ix in range(x):
         for iy in range(y):
+
+             new_mask[ix, iy] = 1 if avg_coeffs[ix, iy] > .1 else 0
+
              #param_vals = Bag_coeffs[:,ix,iy].detach().cpu().numpy()
              #tset,pval = ttest_1samp(param_vals, 0)
-             new_mask[ix, iy] = 1 if cumul_coeffs[ix,iy] > .1 else 0
+             #if 50 <= model.epoch <= 60:
+                #coef_vec = Bag_coeffs[:,ix, iy].detach().cpu().numpy()
+                #plt.hist(coef_vec, color='blue', edgecolor='black',
+                         #bins=20)
+                #plt.savefig(f'plots/{ix}_{iy}_histogram.png')
+                #clear_plt()
 
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = params['device'])
-    return new_mask
-
+    avg_coeffs = torch.tensor(avg_coeffs, dtype = torch.float32, device = params['device'])
+    return new_mask, avg_coeffs
 
 
 def train_bag_epochs(model, bag_loader, params, train_params):
@@ -62,8 +91,9 @@ def train_bag_epochs(model, bag_loader, params, train_params):
         bag_coeffs = get_bag_coeffs(bag_model, bag_data, params, train_params)
         Bag_coeffs.append(bag_coeffs)
     Bag_coeffs = torch.stack(Bag_coeffs)
-    new_mask = process_bag_coeffs(Bag_coeffs, params)
+    new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, params, model)
     coefficient_mask = new_mask * model.coefficient_mask
+    model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad = True)
     model.coefficient_mask = coefficient_mask
     model.num_active_coeffs = torch.sum(model.coefficient_mask).cpu().detach().numpy()
     return model
