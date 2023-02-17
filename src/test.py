@@ -46,7 +46,7 @@ def run():
     model_params['threshold_frequency'] = 25
 
     if torch.cuda.is_available():
-        train_params = {'bag_epochs': 50, 'pretrain_epochs': 1000, 'nbags': 100, 'bag_size': 500,
+        train_params = {'bag_epochs': 500, 'pretrain_epochs': 1000, 'nbags': 100, 'bag_size': 500,
                         'subtrain_epochs': 50}
         model_params['batch_size'] = 2000
         model_params['threshold_frequency'] = 25

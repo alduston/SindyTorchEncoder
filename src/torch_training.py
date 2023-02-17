@@ -115,7 +115,7 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
         total_loss, total_loss_dict = train_one_epoch(net, train_loader, optimizer)
         if not isinf(print_freq):
             if not epoch % print_freq:
-                print(f'Epoch: {epoch}, Active coeffs: {net.num_active_coeffs}, {[f"{key}: {val.cpu().detach().numpy()}" for (key, val) in total_loss_dict.items()]}')
+                print(f'Epoch: {net.epoch}, Active coeffs: {net.num_active_coeffs}, {[f"{key}: {val.cpu().detach().numpy()}" for (key, val) in total_loss_dict.items()]}')
     return net
 
 
@@ -134,6 +134,7 @@ def train_sindy(model_params, train_params, training_data, validation_data):
         bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
         for epoch in range(train_params['bag_epochs']):
             net  = train_bag_epoc(net, bag_loader, model_params)
+            net.epoch
             net = subtrain_sindy(net, train_loader, model_params, train_params, mode='subtrain', print_freq = 25)
         else:
             return net
