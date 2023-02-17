@@ -130,7 +130,7 @@ def validate_one_epoch(model, data_loader):
             else:
                 for key, val in losses.items():
                     total_loss_dict[key] = val
-    return model.active_coeffs(), total_loss, total_loss_dict
+    return  total_loss, total_loss_dict
 
 
 
@@ -139,14 +139,17 @@ def validate_one_epoch(model, data_loader):
     #bag_params = 0
 
 
-def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_freq = inf):
+def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_freq = inf, test_loader = []):
     pretrain_epochs = train_params[f'{mode}_epochs']
     optimizer = torch.optim.Adam(net.parameters(), lr= model_params['learning_rate'])
     for epoch in range(pretrain_epochs):
         total_loss, total_loss_dict = train_one_epoch(net, train_loader, optimizer)
         if not isinf(print_freq):
             if not epoch % print_freq:
-                print(f'Epoch: {net.epoch}, Active coeffs: {net.num_active_coeffs}, {[f"{key}: {val.cpu().detach().numpy()}" for (key, val) in total_loss_dict.items()]}')
+                print(f'TRAIN Epoch {net.epoch}: Active coeffs: {net.num_active_coeffs}, {[f"{key}: {val.cpu().detach().numpy()}" for (key, val) in total_loss_dict.items()]}')
+                if len(test_loader):
+                    test_loss, test_loss_dict = validate_one_epoch(net, test_loader)
+                print(f'TEST Epoch {net.epoch}: Active coeffs: {net.num_active_coeffs}, {[f"test_{key}: {val.cpu().detach().numpy()}" for (key, val) in test_loss_dict.items()]}')
     return net
 
 
@@ -160,7 +163,8 @@ def train_sindy(model_params, train_params, training_data, validation_data):
     test_loader = get_loader(validation_data, model_params, device=device)
 
     net = SindyNet(model_params).to(device)
-    net = subtrain_sindy(net, train_loader, model_params, train_params, mode = 'pretrain', print_freq = 99)
+    net = subtrain_sindy(net, train_loader, model_params, train_params,
+                         mode = 'pretrain', print_freq = 50, test_loader = test_loader)
     if train_params['bag_epochs']:
         bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
         shuffle_threshold = train_params['shuffle_threshold']
@@ -168,7 +172,8 @@ def train_sindy(model_params, train_params, training_data, validation_data):
             if epoch and not epoch%shuffle_threshold:
                 bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
             net  = train_bag_epochs(net, bag_loader, model_params, train_params)
-            net = subtrain_sindy(net, train_loader, model_params, train_params, mode='subtrain', print_freq = 25)
+            net = subtrain_sindy(net, train_loader, model_params,
+                                 train_params, mode='subtrain', print_freq = 50, test_loader = test_loader)
         else:
             return net
 
