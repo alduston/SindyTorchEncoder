@@ -177,17 +177,15 @@ class SindyNet(nn.Module):
     def sindy_predict(self, z, x = None, dx = None):
         Theta = self.Theta(z, x, dx)
         sindy_coefficients = self.sindy_coeffs
+        epoch = self.epoch
         if self.params['sequential_thresholding']:
-            epoch= self.epoch
             if epoch and (epoch % self.params['threshold_frequency'] == 0):
                 self.coefficient_mask = torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
-        self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
+                self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
         return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
-        #else:
-            #return torch.matmul(Theta, sindy_coefficients)
 
 
-    def get_coefficient_mask(self):
+    def calc_coefficient_mask(self):
         sindy_coefficients = self.sindy_coeffs
         coefficient_mask = self.coefficient_mask * torch.tensor(
             torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'],
@@ -198,7 +196,7 @@ class SindyNet(nn.Module):
 
     def active_coeffs(self):
         sindy_coefficients = self.sindy_coeffs
-        coefficient_mask = self.get_coefficient_mask()
+        coefficient_mask = self.coefficient_mask
         return sindy_coefficients * coefficient_mask
 
 

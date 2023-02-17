@@ -34,7 +34,7 @@ def train_one_bagstep(model, data, optimizer):
 def get_bag_coeffs(bag_model, bag_data, params, train_params):
     epochs = train_params['bag_sub_epochs']
     bag_model.train()
-    optimizer = torch.optim.Adam([bag_model.sindy_coeffs], lr=params['learning_rate'])
+    optimizer = torch.optim.Adam([bag_model.sindy_coeffs], lr=train_params['bag_learning_rate'])
     for epoch in range(epochs):
         train_one_bagstep(bag_model, bag_data, optimizer)
     return bag_model.active_coeffs()
@@ -48,6 +48,7 @@ def process_bag_coeffs(Bag_coeffs, params):
              param_vals = Bag_coeffs[:,ix,iy].detach().cpu().numpy()
              tset,pval = ttest_1samp(param_vals, 0)
              new_mask[ix, iy] = 1 if pval<.05 else 0
+
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = params['device'])
     return new_mask
 
@@ -63,6 +64,7 @@ def train_bag_epochs(model, bag_loader, params, train_params):
     new_mask = process_bag_coeffs(Bag_coeffs, params)
     coefficient_mask = new_mask * model.coefficient_mask
     model.coefficient_mask = coefficient_mask
+    model.num_active_coeffs = torch.sum(model.coefficient_mask).cpu().detach().numpy()
     return model
 
 
@@ -137,12 +139,11 @@ def train_sindy(model_params, train_params, training_data, validation_data):
     test_loader = get_loader(validation_data, model_params, device=device)
 
     net = SindyNet(model_params).to(device)
-    net = subtrain_sindy(net, train_loader, model_params, train_params, mode = 'pretrain', print_freq = 100)
+    net = subtrain_sindy(net, train_loader, model_params, train_params, mode = 'pretrain', print_freq = 99)
     if train_params['bag_epochs']:
         bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
         for epoch in range(train_params['bag_epochs']):
             net  = train_bag_epochs(net, bag_loader, model_params, train_params)
-            net.epoch
             net = subtrain_sindy(net, train_loader, model_params, train_params, mode='subtrain', print_freq = 25)
         else:
             return net
