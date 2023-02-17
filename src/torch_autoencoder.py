@@ -33,9 +33,10 @@ class SindyNet(nn.Module):
         self.epoch = torch.tensor(0, device = device)
 
         self.sindy_coeffs = torch.nn.Parameter(self.sindy_coefficients(), requires_grad = True)
-        if self.params['sequential_thresholding']:
-            self.coefficient_mask = torch.tensor(params['coefficient_mask'], dtype = torch.float32, device = self.device)
-            self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
+        #if self.params['sequential_thresholding']:
+        self.coefficient_mask = torch.tensor(params['coefficient_mask'], dtype = torch.float32, device = self.device)
+        self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
+
 
 
     def Encoder(self, params):
@@ -180,10 +181,10 @@ class SindyNet(nn.Module):
             epoch= self.epoch
             if epoch and (epoch % self.params['threshold_frequency'] == 0):
                 self.coefficient_mask = torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
-                self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
-            return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
-        else:
-            return torch.matmul(Theta, sindy_coefficients)
+        self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
+        return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
+        #else:
+            #return torch.matmul(Theta, sindy_coefficients)
 
 
     def get_coefficient_mask(self):
