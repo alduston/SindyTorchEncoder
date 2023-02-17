@@ -8,7 +8,7 @@ warnings.filterwarnings("ignore")
 
 
 class SindyNet(nn.Module):
-    def __init__(self,params, device = None):
+    def __init__(self, params, device = None):
         super().__init__()
         if device:
             self.device = device
@@ -17,6 +17,7 @@ class SindyNet(nn.Module):
                 self.device = 'cuda'
             else:
                 self.device = 'cpu'
+        params['device'] = device
         self.params = params
         self.activation_f = self.get_activation_f(params)
 
@@ -34,7 +35,7 @@ class SindyNet(nn.Module):
         self.sindy_coeffs = torch.nn.Parameter(self.sindy_coefficients(), requires_grad = True)
         if self.params['sequential_thresholding']:
             self.coefficient_mask = torch.tensor(params['coefficient_mask'], dtype = torch.float32, device = self.device)
-            self.active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
+            self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
 
 
     def Encoder(self, params):
@@ -179,10 +180,25 @@ class SindyNet(nn.Module):
             epoch= self.epoch
             if epoch and (epoch % self.params['threshold_frequency'] == 0):
                 self.coefficient_mask = torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
-                self.active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
+                self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
             return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
         else:
             return torch.matmul(Theta, sindy_coefficients)
+
+
+    def get_coefficient_mask(self):
+        sindy_coefficients = self.sindy_coeffs
+        coefficient_mask = self.coefficient_mask * torch.tensor(
+            torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'],
+            device=self.device)
+        self.coefficient_mask = coefficient_mask
+        return coefficient_mask
+
+
+    def active_coeffs(self):
+        sindy_coefficients = self.sindy_coeffs
+        coefficient_mask = self.get_coefficient_mask()
+        return sindy_coefficients * coefficient_mask
 
 
     def dx_decode(self,z, x, dx = None):

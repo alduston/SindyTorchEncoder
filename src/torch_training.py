@@ -3,7 +3,10 @@ import numpy as np
 import pickle
 import torch
 from torch_autoencoder import SindyNet
-
+from data_utils import get_test_params,get_loader, get_bag_loader
+from math import inf, isinf
+from copy import deepcopy
+from scipy.stats import ttest_1samp
 
 def train_one_step(model, data, optimizer,  batch_index):
     optimizer.zero_grad()
@@ -15,6 +18,44 @@ def train_one_step(model, data, optimizer,  batch_index):
     optimizer.step()
 
     return loss, loss_refinement, losses
+
+
+def get_bag_coeffs(bag_model, bag_data, params):
+    optimizer = torch.optim.Adam([bag_model.sindy_coeffs], lr=params['learning_rate'])
+    bag_model.train()
+    optimizer.zero_grad()
+    if bag_model.params['model_order'] == 1:
+        loss, loss_refinement, losses = bag_model.auto_Loss(x = bag_data['x_bag'], dx = bag_data['dx_bag'])
+    else:
+        loss, loss_refinement, losses = bag_model.auto_Loss(x=bag_data['x'], dx=bag_data['dx'], dxx = bag_data['dxx'])
+    loss.backward()
+    optimizer.step()
+    return bag_model.active_coeffs()
+
+
+def process_bag_coeffs(Bag_coeffs, params):
+    new_mask = np.zeros(Bag_coeffs.shape[1:])
+    x,y = new_mask.shape
+    for ix in range(x):
+        for iy in range(y):
+             param_vals = Bag_coeffs[:,ix,iy].detach().cpu().numpy()
+             tset,pval = ttest_1samp(param_vals, 0)
+             new_mask[ix, iy] = 1 if pval<.05 else 0
+    new_mask = torch.tensor(new_mask, dtype = torch.float32, device = params['device'])
+    return new_mask
+
+
+def train_bag_epoc(model, bag_loader, params):
+    Bag_coeffs = []
+    for batch_index, bag_data in enumerate(bag_loader):
+        bag_model = deepcopy(model)
+        bag_coeffs = get_bag_coeffs(bag_model, bag_data, params)
+        Bag_coeffs.append(bag_coeffs)
+    Bag_coeffs = torch.stack(Bag_coeffs)
+    new_mask = process_bag_coeffs(Bag_coeffs, params)
+    coefficient_mask = new_mask * model.coefficient_mask
+    model.coefficient_mask = coefficient_mask
+    return model
 
 
 def train_one_epoch(model, data_loader, optimizer, scheduler = None):
@@ -58,8 +99,44 @@ def validate_one_epoch(model, data_loader):
             else:
                 for key, val in losses.items():
                     total_loss_dict[key] = val
-    return total_loss, total_loss_dict
+    return model.active_coeffs(), total_loss, total_loss_dict
 
+
+
+#def bagtrain_sindy(net, bag_loader, model_params, train_params, print_freq = inf):
+    #optimizer = torch.optim.Adam(net.bag_parameters(), lr=model_params['learning_rate'])
+    #bag_params = 0
+
+
+def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_freq = inf):
+    pretrain_epochs = train_params[f'{mode}_epochs']
+    optimizer = torch.optim.Adam(net.parameters(), lr= model_params['learning_rate'])
+    for epoch in range(pretrain_epochs):
+        total_loss, total_loss_dict = train_one_epoch(net, train_loader, optimizer)
+        if not isinf(print_freq):
+            if not epoch % print_freq:
+                print(f'Epoch: {epoch}, Active coeffs: {net.num_active_coeffs}, {[f"{key}: {val.cpu().detach().numpy()}" for (key, val) in total_loss_dict.items()]}')
+    return net
+
+
+def train_sindy(model_params, train_params, training_data, validation_data):
+    if torch.cuda.is_available():
+        device = 'cuda:0'
+    else:
+        device = 'cpu'
+
+    train_loader = get_loader(training_data, model_params, device=device)
+    test_loader = get_loader(validation_data, model_params, device=device)
+
+    net = SindyNet(model_params).to(device)
+    net = subtrain_sindy(net, train_loader, model_params, train_params, mode = 'pretrain', print_freq = 100)
+    if train_params['bag_epochs']:
+        bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
+        for epoch in range(train_params['bag_epochs']):
+            net  = train_bag_epoc(net, bag_loader, model_params)
+            net = subtrain_sindy(net, train_loader, model_params, train_params, mode='subtrain', print_freq = 25)
+        else:
+            return net
 
 
 
