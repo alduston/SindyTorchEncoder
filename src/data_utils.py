@@ -91,15 +91,15 @@ def get_test_params(train_size = 100, max_data = 100000):
     params['library_dim'] = library_size(params['latent_dim'], params['poly_order'], params['include_sine'], True)
 
     # sequential thresholding parameters
-    params['sequential_thresholding'] = True
+    params['sequential_thresholding'] = False
     params['coefficient_threshold'] = 0.1
     params['coefficient_mask'] = np.ones((params['library_dim'], params['latent_dim']))
     params['coefficient_initialization'] = 'constant'
 
     # loss function weighting
     params['loss_weight_decoder'] = 1.0
-    #params['loss_weight_sindy_z'] = 0.00
-    params['loss_weight_sindy_z'] = 1e-4
+    params['loss_weight_sindy_z'] = 0.00
+    #params['loss_weight_sindy_z'] = 1e-4
     params['loss_weight_sindy_x'] = 1e-4
     params['loss_weight_sindy_regularization'] = 1e-5
 

@@ -60,40 +60,30 @@ def frac_round(vec,val):
 
 def process_bag_coeffs(Bag_coeffs, params, model):
     new_mask = np.zeros(Bag_coeffs.shape[1:])
-    mode_coeffs = np.zeros(Bag_coeffs.shape[1:])
     x,y = new_mask.shape
 
     n_samples = Bag_coeffs.shape[0]
     avg_coeffs = (1/n_samples) * torch.sum(Bag_coeffs, dim = 0)
     for ix in range(x):
         for iy in range(y):
-
              new_mask[ix, iy] = 1 if avg_coeffs[ix, iy] > .1 else 0
-
-             #param_vals = Bag_coeffs[:,ix,iy].detach().cpu().numpy()
-             #tset,pval = ttest_1samp(param_vals, 0)
-             #if 50 <= model.epoch <= 60:
-                #coef_vec = Bag_coeffs[:,ix, iy].detach().cpu().numpy()
-                #plt.hist(coef_vec, color='blue', edgecolor='black',
-                         #bins=20)
-                #plt.savefig(f'plots/{ix}_{iy}_histogram.png')
-                #clear_plt()
-
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = params['device'])
-    avg_coeffs = torch.tensor(avg_coeffs, dtype = torch.float32, device = params['device'])
-    return new_mask, avg_coeffs
+    #avg_coeffs = torch.tensor(avg_coeffs, dtype = torch.float32, device = params['device'])
+    return new_mask#, avg_coeffs
 
 
 def train_bag_epochs(model, bag_loader, params, train_params):
     Bag_coeffs = []
     for batch_index, bag_data in enumerate(bag_loader):
         bag_model = deepcopy(model)
+        perturbation = .01 * torch.randn(bag_model.sindy_coeffs.shape)
+        bag_model.sindy_coeffs = torch.nn.Parameter(perturbation + bag_model.sindy_coeffs, requires_grad = True)
         bag_coeffs = get_bag_coeffs(bag_model, bag_data, params, train_params)
         Bag_coeffs.append(bag_coeffs)
     Bag_coeffs = torch.stack(Bag_coeffs)
-    new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, params, model)
+    new_mask = process_bag_coeffs(Bag_coeffs, params, model)
     coefficient_mask = new_mask * model.coefficient_mask
-    model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad = True)
+    #model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad = True)
     model.coefficient_mask = coefficient_mask
     model.num_active_coeffs = torch.sum(model.coefficient_mask).cpu().detach().numpy()
     return model

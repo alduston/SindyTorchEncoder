@@ -39,7 +39,7 @@ print_freq = 10
 
 def run():
     model_params,training_data, validation_data = get_test_params(max_data = 500)
-    train_params = {'bag_epochs': 100, 'pretrain_epochs': 50, 'nbags': 50, 'bag_size':7,
+    train_params = {'bag_epochs': 100, 'pretrain_epochs': 200, 'nbags': 50, 'bag_size':7,
                     'subtrain_epochs': 40, 'bag_sub_epochs':20, 'bag_learning_rate':.01}
     model_params['batch_size'] = 7
     model_params['threshold_frequency'] = 25
