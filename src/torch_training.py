@@ -8,7 +8,8 @@ from math import inf, isinf
 from copy import deepcopy
 from scipy.stats import ttest_1samp
 
-def train_one_step(model, data, optimizer,  batch_index):
+
+def train_one_step(model, data, optimizer):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
         loss, loss_refinement, losses = model.auto_Loss(x = data['x'], dx = data['dx'])
@@ -16,20 +17,26 @@ def train_one_step(model, data, optimizer,  batch_index):
         loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'])
     loss.backward()
     optimizer.step()
-
     return loss, loss_refinement, losses
 
 
-def get_bag_coeffs(bag_model, bag_data, params):
-    optimizer = torch.optim.Adam([bag_model.sindy_coeffs], lr=params['learning_rate'])
-    bag_model.train()
+def train_one_bagstep(model, data, optimizer):
     optimizer.zero_grad()
-    if bag_model.params['model_order'] == 1:
-        loss, loss_refinement, losses = bag_model.auto_Loss(x = bag_data['x_bag'], dx = bag_data['dx_bag'])
+    if model.params['model_order'] == 1:
+        loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'])
     else:
-        loss, loss_refinement, losses = bag_model.auto_Loss(x=bag_data['x'], dx=bag_data['dx'], dxx = bag_data['dxx'])
+        pass
+        #loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'])
     loss.backward()
     optimizer.step()
+    return loss, loss_refinement, losses
+
+def get_bag_coeffs(bag_model, bag_data, params, train_params):
+    epochs = train_params['bag_sub_epochs']
+    bag_model.train()
+    optimizer = torch.optim.Adam([bag_model.sindy_coeffs], lr=params['learning_rate'])
+    for epoch in range(epochs):
+        train_one_bagstep(bag_model, bag_data, optimizer)
     return bag_model.active_coeffs()
 
 
@@ -45,11 +52,12 @@ def process_bag_coeffs(Bag_coeffs, params):
     return new_mask
 
 
-def train_bag_epoc(model, bag_loader, params):
+
+def train_bag_epochs(model, bag_loader, params, train_params):
     Bag_coeffs = []
     for batch_index, bag_data in enumerate(bag_loader):
         bag_model = deepcopy(model)
-        bag_coeffs = get_bag_coeffs(bag_model, bag_data, params)
+        bag_coeffs = get_bag_coeffs(bag_model, bag_data, params, train_params)
         Bag_coeffs.append(bag_coeffs)
     Bag_coeffs = torch.stack(Bag_coeffs)
     new_mask = process_bag_coeffs(Bag_coeffs, params)
@@ -63,7 +71,7 @@ def train_one_epoch(model, data_loader, optimizer, scheduler = None):
     total_loss = 0
     total_loss_dict = {}
     for batch_index, data in enumerate(data_loader):
-        loss, loss_refinement, losses = train_one_step(model, data, optimizer, batch_index)
+        loss, loss_refinement, losses = train_one_step(model, data, optimizer)
         if scheduler:
             scheduler.step()
         total_loss += loss
@@ -133,7 +141,7 @@ def train_sindy(model_params, train_params, training_data, validation_data):
     if train_params['bag_epochs']:
         bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
         for epoch in range(train_params['bag_epochs']):
-            net  = train_bag_epoc(net, bag_loader, model_params)
+            net  = train_bag_epochs(net, bag_loader, model_params, train_params)
             net.epoch
             net = subtrain_sindy(net, train_loader, model_params, train_params, mode='subtrain', print_freq = 25)
         else:
