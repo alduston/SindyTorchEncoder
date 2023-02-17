@@ -15,13 +15,13 @@ from torch.utils.data import Dataset, DataLoader
 warnings.filterwarnings("ignore")
 
 
-def make_samples(tensors, n_samples, sample_size):
+def make_samples(tensors, n_samples, sample_size, device):
     samples = [[] for tensor in tensors]
     indexes = list(range(0,tensors[0].shape[0]))
     for i in range(n_samples):
         sub_indexes = random.choices(indexes, k = sample_size)
         for i,tensor in enumerate(tensors):
-            sample = torch.index_select(tensor, 0, torch.tensor(sub_indexes))
+            sample = torch.index_select(tensor, 0, torch.tensor(sub_indexes, device = device))
             samples[i].append(sample)
 
     for i,Sample in enumerate(samples):
@@ -47,7 +47,7 @@ class model_data(Dataset):
         if bag_params:
 
             x_bags,dx_bags = make_samples([self.x,self.dx], n_samples = bag_params['nbags'],
-                                          sample_size = bag_params['bag_size'])
+                                          sample_size = bag_params['bag_size'], device = self.device)
             self.x_bags = x_bags
             self.dx_bags = dx_bags
             self.n_samples = self.x_bags.shape[0]
