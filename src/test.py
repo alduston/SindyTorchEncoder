@@ -50,7 +50,7 @@ def BA_small_test(model_params, training_data, validation_data):
 def BA_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 33, 'pretrain_epochs': 500, 'nbags': l // 100, 'bag_size': 100,
+    train_params = {'bag_epochs': 88, 'pretrain_epochs': 500, 'nbags': l // 250, 'bag_size': 250,
                     'subtrain_epochs': 80, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 5}
     model_params['batch_size'] = 2000
     model_params['threshold_frequency'] = 25
@@ -61,7 +61,7 @@ def BA_test(model_params, training_data, validation_data):
 def A_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 3000, 'nbags': l // 100, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 7500, 'nbags': l // 6, 'bag_size': 100,
                     'subtrain_epochs': 80, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3}
     model_params['batch_size'] = 2000
     model_params['threshold_frequency'] = 25
@@ -72,7 +72,7 @@ def A_test(model_params, training_data, validation_data):
 def A_small_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 200, 'nbags': l // 100, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 200, 'nbags': l // 300, 'bag_size': 300,
                     'subtrain_epochs': 80, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 5}
     model_params['batch_size'] = 7
     model_params['threshold_frequency'] = 25
@@ -80,7 +80,7 @@ def A_small_test(model_params, training_data, validation_data):
     return net, Loss_dict
 
 
-def Meta_test(runs = 20, small = False):
+def Meta_test(runs = 5, small = False):
     Keys = {'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': []}
     Meta_BA_dict = {}
     Meta_A_dict = {}
@@ -90,11 +90,9 @@ def Meta_test(runs = 20, small = False):
             Anet, ALoss_dict = A_small_test(model_params, training_data, validation_data)
             BAnet, BALoss_dict = BA_small_test(model_params, training_data, validation_data)
         else:
-            model_params, training_data, validation_data = get_test_params(max_data=10000)
+            model_params, training_data, validation_data = get_test_params(max_data=8000)
             BAnet, BALoss_dict = BA_test(model_params, training_data, validation_data)
-            print('Halfway done!')
             Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
-            print('Halfway done!')
 
         for key,val in ALoss_dict.items():
             if key== 'epoch' and not run_ix:
@@ -120,17 +118,17 @@ def Meta_test(runs = 20, small = False):
         Meta_BA_dict[f'{key}_avg'] = (1 / runs) * BAavg
 
     Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
-    Meta_A_df.to_csv(' Meta_A_df.csv')
+    Meta_A_df.to_csv('Meta_A_df.csv')
 
     Meta_BA_df = pd.DataFrame.from_dict(Meta_BA_dict, orient='columns')
-    Meta_BA_df.to_csv(' Meta_BA_df.csv')
+    Meta_BA_df.to_csv('Meta_BA_df.csv')
 
     return Meta_A_df, Meta_BA_df
 
 
 def run():
     if torch.cuda.is_available():
-        Meta_test(runs=1, small=False)
+        Meta_test(runs=7, small=False)
     else:
         Meta_test(runs=2, small=True)
 
