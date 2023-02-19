@@ -67,7 +67,7 @@ def process_bag_coeffs(Bag_coeffs, params, model):
     avg_coeffs = (1/n_samples) * torch.sum(Bag_coeffs, dim = 0)
     for ix in range(x):
         for iy in range(y):
-             new_mask[ix, iy] = 1 if avg_coeffs[ix, iy] > .1 else 0
+             new_mask[ix, iy] = 1 if torch.abs(avg_coeffs[ix, iy]) > .1 else 0
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = params['device'])
     #avg_coeffs = torch.tensor(avg_coeffs, dtype = torch.float32, device = params['device'])
     return new_mask#, avg_coeffs
