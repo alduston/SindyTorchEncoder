@@ -5,7 +5,7 @@ sys.path.append("../examples/lorenz")
 
 import os
 import datetime
-#import pandas as pd
+import pandas as pd
 import numpy as np
 from example_lorenz import get_lorenz_data
 import torch
@@ -34,25 +34,120 @@ warnings.filterwarnings("ignore")
 
 #x = torch.rand(params['input_dim'])
 #dx = torch.rand(params['input_dim'])
-print_freq = 10
+
+
+def BA_small_test(model_params, training_data, validation_data):
+    model_params['sequential_thresholding'] = False
+    l = len(training_data['x'])
+    train_params = {'bag_epochs': 5, 'pretrain_epochs': 100, 'nbags': l // 10, 'bag_size': 7,
+                    'subtrain_epochs': 20, 'bag_sub_epochs': 10, 'bag_learning_rate': .01, 'shuffle_threshold': 3}
+    model_params['batch_size'] = 7
+    model_params['threshold_frequency'] = 25
+    net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data)
+    return net, Loss_dict
+
+
+def BA_test(model_params, training_data, validation_data):
+    model_params['sequential_thresholding'] = False
+    l = len(training_data['x'])
+    train_params = {'bag_epochs': 200, 'pretrain_epochs': 500, 'nbags': l // 100, 'bag_size': 100,
+                    'subtrain_epochs': 80, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 5}
+    model_params['batch_size'] = 2000
+    model_params['threshold_frequency'] = 25
+    net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data)
+    return net, Loss_dict
+
+
+def A_test(model_params, training_data, validation_data):
+    model_params['sequential_thresholding'] = True
+    l = len(training_data['x'])
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 10050, 'nbags': l // 100, 'bag_size': 100,
+                    'subtrain_epochs': 80, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3}
+    model_params['batch_size'] = 2000
+    model_params['threshold_frequency'] = 25
+    net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data)
+    return net, Loss_dict
+
+
+def A_small_test(model_params, training_data, validation_data):
+    model_params['sequential_thresholding'] = True
+    l = len(training_data['x'])
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 200, 'nbags': l // 100, 'bag_size': 100,
+                    'subtrain_epochs': 80, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 5}
+    model_params['batch_size'] = 7
+    model_params['threshold_frequency'] = 25
+    net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data)
+    return net, Loss_dict
+
+
+def Meta_test(runs = 20, small = False):
+    Keys = {'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': []}
+    Meta_BA_dict = {}
+    Meta_A_dict = {}
+    for run_ix in range(runs):
+        if small:
+            model_params, training_data, validation_data = get_test_params(max_data = 100)
+            Anet, ALoss_dict = A_small_test(model_params, training_data, validation_data)
+            BAnet, BALoss_dict = BA_small_test(model_params, training_data, validation_data)
+
+        for key,val in ALoss_dict.items():
+            if key== 'epoch' and not run_ix:
+                if not run_ix:
+                    Meta_A_dict[f'{key}'] = val
+            else:
+                Meta_A_dict[f'{key}_{run_ix}'] = val
+
+        for key,val in BALoss_dict.items():
+            if key== 'epoch' and not run_ix:
+                if not run_ix:
+                    Meta_BA_dict[f'{key}'] = val
+            else:
+                Meta_BA_dict[f'{key}_{run_ix}'] = val
+
+    for key in Keys:
+        BAavg = np.zeros(len(Meta_BA_dict[f'{key}_{0}']))
+        Aavg = np.zeros(len(Meta_A_dict[f'{key}_{0}']))
+        for run_ix in range(runs):
+            BAavg += np.asarray(Meta_BA_dict[f'{key}_{run_ix}'])
+            Aavg += np.asarray(Meta_A_dict[f'{key}_{run_ix}'])
+        Meta_A_dict[f'{key}_avg'] = (1/runs) * Aavg
+        Meta_BA_dict[f'{key}_avg'] = (1 / runs) * BAavg
+
+    Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
+    Meta_A_df.to_csv(' Meta_A_df.csv')
+
+    Meta_BA_df = pd.DataFrame.from_dict(Meta_BA_dict, orient='columns')
+    Meta_BA_df.to_csv(' Meta_BA_df.csv')
+
+    return Meta_A_df, Meta_BA_df
 
 
 def run():
+    if torch.cuda.is_available():
+        Meta_test(runs=2, small=False)
+    else:
+        Meta_test(runs=3, small=True)
+
+    '''
     model_params,training_data, validation_data = get_test_params(max_data = 500)
-    train_params = {'bag_epochs': 100, 'pretrain_epochs': 1, 'nbags': 50, 'bag_size':7,
+    net, Loss_dict = BA_small_test
+
+    train_params = {'bag_epochs': 25, 'pretrain_epochs': 200, 'nbags': 100, 'bag_size':7,
                     'subtrain_epochs': 50, 'bag_sub_epochs':20, 'bag_learning_rate':.01, 'shuffle_threshold': 3}
     model_params['batch_size'] = 7
     model_params['threshold_frequency'] = 25
     model_params['sequential_thresholding'] = False
     if torch.cuda.is_available():
         l = len(training_data['x'])
-        model_params, training_data, validation_data = get_test_params(max_data =5000)
+        model_params, training_data, validation_data = get_test_params()
         model_params['sequential_thresholding'] = False
         train_params = {'bag_epochs': 200, 'pretrain_epochs': 500, 'nbags': l//100, 'bag_size': 100,
                         'subtrain_epochs': 80, 'bag_sub_epochs':40, 'bag_learning_rate':.01, 'shuffle_threshold': 5}
         model_params['batch_size'] = 2000
         model_params['threshold_frequency'] = 25
-    torch_training.train_sindy(model_params, train_params, training_data, validation_data)
+    net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data)
+    Loss_df = pd.DataFrame.from_dict(Loss_dict, orient='columns')
+    Loss_df.to_csv('Losses.csv')
 
 
     #train_loader = get_loader(training_data, params, device = device)
@@ -91,7 +186,7 @@ def run():
 
     #plt.savefig('fig.png')
    # plt.show()
-
+    '''
 
 
 if __name__=='__main__':
