@@ -65,10 +65,6 @@ def process_bag_coeffs(Bag_coeffs, params, model):
 
     n_samples = Bag_coeffs.shape[0]
     avg_coeffs = (1/n_samples) * torch.sum(Bag_coeffs, dim = 0)
-    avg__inner_coeffs = np.zeros(Bag_coeffs.shape[1:])
-    print(f'At epoch {model.epoch}:')
-    print(torch.abs(avg_coeffs))
-    print('\n')
     for ix in range(x):
         for iy in range(y):
             cord_coeffs = Bag_coeffs[:,ix,iy].detach().cpu().numpy()

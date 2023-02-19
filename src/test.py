@@ -39,9 +39,14 @@ warnings.filterwarnings("ignore")
 def BA_small_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 120, 'pretrain_epochs': 100, 'nbags': int((1.5 * l) // 7), 'bag_size': 7,
+    if torch.cuda.is_available():
+        train_params = {'bag_epochs': 120, 'pretrain_epochs': 100, 'nbags': int((1.5 * l) // 70), 'bag_size': 70,
                     'subtrain_epochs': 20, 'bag_sub_epochs': 5, 'bag_learning_rate': .01, 'shuffle_threshold': 3}
-    model_params['batch_size'] = 7
+        model_params['batch_size'] = l
+    else:
+        train_params = {'bag_epochs': 120, 'pretrain_epochs': 100, 'nbags': int((1.5 * l) // 7), 'bag_size': 7,
+                        'subtrain_epochs': 20, 'bag_sub_epochs': 5, 'bag_learning_rate': .01, 'shuffle_threshold': 3}
+        model_params['batch_size'] = 7
     model_params['threshold_frequency'] = 25
     net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
@@ -50,7 +55,7 @@ def BA_small_test(model_params, training_data, validation_data):
 def BA_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 88, 'pretrain_epochs': 200, 'nbags':  int((1.5 * l) // 250), 'bag_size': 250,
+    train_params = {'bag_epochs': 88, 'pretrain_epochs': 200, 'nbags':  ls, 'bag_size': 250,
                     'subtrain_epochs': 80, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 5}
     model_params['batch_size'] = 8000
     model_params['threshold_frequency'] = 25
@@ -74,7 +79,10 @@ def A_small_test(model_params, training_data, validation_data):
     l = len(training_data['x'])
     train_params = {'bag_epochs': 0, 'pretrain_epochs': 2500, 'nbags': int(1.5 * l // 300), 'bag_size': 300,
                     'subtrain_epochs': 80, 'bag_sub_epochs': 4, 'bag_learning_rate': .01, 'shuffle_threshold': 5}
-    model_params['batch_size'] = 7
+    if torch.cuda.is_available():
+        model_params['batch_size'] = l
+    else:
+        model_params['batch_size'] = 7
     model_params['threshold_frequency'] = 25
     net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
