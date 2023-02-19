@@ -86,11 +86,11 @@ def Meta_test(runs = 20, small = False):
     Meta_A_dict = {}
     for run_ix in range(runs):
         if small:
-            model_params, training_data, validation_data = get_test_params()
+            model_params, training_data, validation_data = get_test_params(max_data=250)
             Anet, ALoss_dict = A_small_test(model_params, training_data, validation_data)
             BAnet, BALoss_dict = BA_small_test(model_params, training_data, validation_data)
         else:
-            model_params, training_data, validation_data = get_test_params()
+            model_params, training_data, validation_data = get_test_params(max_data=10000)
             Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
             print('Halfway done!')
             BAnet, BALoss_dict = BA_test(model_params, training_data, validation_data)
