@@ -39,7 +39,7 @@ warnings.filterwarnings("ignore")
 def BA_small_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 120, 'pretrain_epochs': 100, 'nbags': (1.5 * l) // 7, 'bag_size': 7,
+    train_params = {'bag_epochs': 120, 'pretrain_epochs': 100, 'nbags': int((1.5 * l) // 7), 'bag_size': 7,
                     'subtrain_epochs': 20, 'bag_sub_epochs': 5, 'bag_learning_rate': .01, 'shuffle_threshold': 3}
     model_params['batch_size'] = 7
     model_params['threshold_frequency'] = 25
@@ -50,7 +50,7 @@ def BA_small_test(model_params, training_data, validation_data):
 def BA_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 88, 'pretrain_epochs': 200, 'nbags':  (1.5 * l) // 250, 'bag_size': 250,
+    train_params = {'bag_epochs': 88, 'pretrain_epochs': 200, 'nbags':  int((1.5 * l) // 250), 'bag_size': 250,
                     'subtrain_epochs': 80, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 5}
     model_params['batch_size'] = 8000
     model_params['threshold_frequency'] = 25
