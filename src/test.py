@@ -186,7 +186,7 @@ def run():
     plt.ylabel('Loss')
     plt.title('A v BA loss')
     plt.savefig('med_exp_loss.png')
-    '''
+
 
 
 
@@ -250,7 +250,7 @@ def run():
 
     #plt.savefig('fig.png')
    # plt.show()
-
+    '''
 
 if __name__=='__main__':
     run()
