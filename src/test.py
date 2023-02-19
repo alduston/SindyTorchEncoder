@@ -40,7 +40,7 @@ def BA_small_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
     if torch.cuda.is_available():
-        train_params = {'bag_epochs': 200, 'pretrain_epochs': 100, 'nbags': int((1.5 * l) // 75), 'bag_size': 75,
+        train_params = {'bag_epochs': 165, 'pretrain_epochs': 100, 'nbags': int((1.5 * l) // 75), 'bag_size': 75,
                     'subtrain_epochs': 30, 'bag_sub_epochs': 8, 'bag_learning_rate': .01, 'shuffle_threshold': 3}
         model_params['batch_size'] = l
     else:
@@ -135,122 +135,39 @@ def Meta_test(runs = 5, small = False):
 
 
 def run():
-    '''
-    Meta_A_df = pd.read_csv('Meta_A_df.csv')
-    Meta_BA_df = pd.read_csv('Meta_BA_df.csv')
-    plt.plot(Meta_A_df['epoch'], Meta_A_df['active_coeffs_avg'], label='A_test')
-    plt.plot(Meta_BA_df['epoch'], Meta_BA_df['active_coeffs_avg'], label='BA_test')
-    plt.legend()
-    plt.xlabel('epoch')
-    plt.ylabel('# active_coeffs')
-    plt.title('A v BA coeffcount')
-    plt.savefig('small_exp_cnum1.png')
-
-    torch_training.clear_plt()
-
-    Meta_A_df['avg_loss'] = Meta_A_df['decoder_avg'] + Meta_A_df['sindy_x_avg']
-    Meta_BA_df['avg_loss'] = Meta_BA_df['decoder_avg'] + Meta_BA_df['sindy_x_avg']
-
-    plt.plot(Meta_A_df['epoch'], Meta_A_df['avg_loss'], label='A_test')
-    plt.plot(Meta_BA_df['epoch'], Meta_BA_df['avg_loss'], label='BA_test')
-    plt.legend()
-    plt.xlabel('epoch')
-    plt.ylabel('Loss')
-    plt.title('A v BA loss')
-    plt.savefig('small_exp_loss1.png')
-    '''
 
     if torch.cuda.is_available():
         #Meta_A_df, Meta_BA_df = Meta_test(runs=6, small=False)
-        Meta_A_df, Meta_BA_df = Meta_test(runs=4, small=True)
+        Meta_A_df_nn, Meta_BA_df_nn = Meta_test(runs=4, small=True)
     else:
-        Meta_A_df, Meta_BA_df = Meta_test(runs=2, small=True)
+        #Meta_A_df, Meta_BA_df = Meta_test(runs=2, small=True)
+        Meta_A_df = pd.read_csv('Meta_A_df.csv')
+        Meta_BA_df = pd.read_csv('Meta_BA_df.csv')
+    for i in [0,1,2,3]:
+        plt.plot(Meta_A_df_nn['epoch'], Meta_A_df_nn[f'active_coeffs_{i}'], label = 'A_test')
+        plt.plot(Meta_BA_df_nn['epoch'], Meta_BA_df_nn[f'active_coeffs_{i}'], label='BA_test')
+        plt.legend()
+        plt.xlabel('epoch')
+        plt.ylabel('# active_coeffs')
+        plt.title(f'A v BA coeffcount run {i}')
+        plt.savefig(f'plots/med_exp_ncum_nn{i}.png')
 
-    plt.plot(Meta_A_df['epoch'], Meta_A_df['active_coeffs_avg'], label = 'A_test')
-    plt.plot(Meta_BA_df['epoch'], Meta_BA_df['active_coeffs_avg'], label='BA_test')
-    plt.legend()
-    plt.xlabel('epoch')
-    plt.ylabel('# active_coeffs')
-    plt.title('A v BA coeffcount')
-    plt.savefig('med_exp_ncum.png')
+        torch_training.clear_plt()
 
-    torch_training.clear_plt()
+        Meta_A_df[f'avg_loss_{i}'] = Meta_A_df_nn[f'decoder_{i}'] + Meta_A_df_nn[f'sindy_x_{i}']
+        Meta_BA_df[f'avg_loss_{i}'] = Meta_BA_df_nn[f'decoder_{i}'] + Meta_BA_df_nn[f'sindy_x_{i}']
 
-    Meta_A_df['avg_loss'] = Meta_A_df['decoder_avg'] + Meta_A_df['sindy_x_avg']
-    Meta_BA_df['avg_loss'] = Meta_BA_df['decoder_avg'] + Meta_BA_df['sindy_x_avg']
+        plt.plot(Meta_A_df_nn['epoch'], Meta_A_df_nn[f'decoder_{i}'], label='A_test')
+        plt.plot(Meta_BA_df_nn['epoch'], Meta_BA_df_nn[f'decoder_{i}'], label='BA_test')
+        plt.legend()
+        plt.xlabel('epoch')
+        plt.ylabel('Loss')
+        plt.title(f'A v BA decoder loss run {i}')
+        plt.savefig(f'plots/med_exp_decode_loss_nn{i}.png')
 
-    plt.plot(Meta_A_df['epoch'], Meta_A_df['avg_loss'], label='A_test')
-    plt.plot(Meta_BA_df['epoch'], Meta_BA_df['avg_loss'], label='BA_test')
-    plt.legend()
-    plt.xlabel('epoch')
-    plt.ylabel('Loss')
-    plt.title('A v BA loss')
-    plt.savefig('med_exp_loss.png')
-
-
-
-
-
-
-    '''
-    model_params,training_data, validation_data = get_test_params(max_data = 500)
-    net, Loss_dict = BA_small_test
-
-    train_params = {'bag_epochs': 25, 'pretrain_epochs': 200, 'nbags': 100, 'bag_size':7,
-                    'subtrain_epochs': 50, 'bag_sub_epochs':20, 'bag_learning_rate':.01, 'shuffle_threshold': 3}
-    model_params['batch_size'] = 7
-    model_params['threshold_frequency'] = 25
-    model_params['sequential_thresholding'] = False
-    if torch.cuda.is_available():
-        l = len(training_data['x'])
-        model_params, training_data, validation_data = get_test_params()
-        model_params['sequential_thresholding'] = False
-        train_params = {'bag_epochs': 200, 'pretrain_epochs': 500, 'nbags': l//100, 'bag_size': 100,
-                        'subtrain_epochs': 80, 'bag_sub_epochs':40, 'bag_learning_rate':.01, 'shuffle_threshold': 5}
-        model_params['batch_size'] = 2000
-        model_params['threshold_frequency'] = 25
-    net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data)
-    Loss_df = pd.DataFrame.from_dict(Loss_dict, orient='columns')
-    Loss_df.to_csv('Losses.csv')
+        torch_training.clear_plt()
 
 
-    #train_loader = get_loader(training_data, params, device = device)
-    #test_loader = get_loader(validation_data, params, device = device)
-
-    #net = SindyNet(params).to(device)
-    #optimizer = torch.optim.Adam(net.parameters(), lr = params['learning_rate'])
-
-    #for epoch in range(params['max_epochs']):
-        #total_loss, total_loss_dict = torch_training.train_one_epoch(net, train_loader, optimizer)
-        #if not epoch % print_freq:
-            #pass
-            #print([f'Epoch: {epoch}, Active coeffs: {net.num_active_coeffs}'] + [f'{key}: {val.cpu().detach().numpy()} \n' for (key,val) in total_loss_dict.items()])
-
-    #x = training_data['x'][:2]
-    #z = net.forward(torch.tensor(x,dtype = torch.float32, device = device))[1]
-    #Z_sim = [z]
-    #for i in range(2, len(training_data['x'])//50):
-        #dz_predict = net.sindy_predict(Z_sim[-1])
-        #v = Z_sim[-1] + dz_predict * delta_t
-        #Z_sim.append(v)
-
-    #Z_real = []
-    #for x in training_data['x'][:len(Z_sim)]:
-        #x_decode, z = net.forward(torch.tensor(x,dtype = torch.float32, device = device))
-        #Z_real.append(z)
-
-    #Z_sim_cords = [z.cpu().detach().numpy()[0][0] for z in Z_sim]
-    #Z_cords = [z.cpu().detach().numpy()[0] for z in Z_real]
-
-
-    #print(Z_sim_cords[:5])
-    #print(Z_cords[:5])
-    #plt.plot(Z_sim_cords, color='blue')
-    #plt.plot(Z_cords, color='red')
-
-    #plt.savefig('fig.png')
-   # plt.show()
-    '''
 
 if __name__=='__main__':
     run()
