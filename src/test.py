@@ -51,7 +51,7 @@ def BA_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
     train_params = {'bag_epochs': 88, 'pretrain_epochs': 200, 'nbags': l // 250, 'bag_size': 250,
-                    'subtrain_epochs': 50, 'bag_sub_epochs': 10, 'bag_learning_rate': .01, 'shuffle_threshold': 5}
+                    'subtrain_epochs': 50, 'bag_sub_epochs': 12, 'bag_learning_rate': .01, 'shuffle_threshold': 5}
     model_params['batch_size'] = 2000
     model_params['threshold_frequency'] = 25
     net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data, printout = True)
