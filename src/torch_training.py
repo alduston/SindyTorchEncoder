@@ -65,9 +65,18 @@ def process_bag_coeffs(Bag_coeffs, params, model):
 
     n_samples = Bag_coeffs.shape[0]
     avg_coeffs = (1/n_samples) * torch.sum(Bag_coeffs, dim = 0)
+    avg__inner_coeffs = np.zeros(Bag_coeffs.shape[1:])
+    print(f'At epoch {model.epoch}:')
+    print(torch.abs(avg_coeffs))
+    print('\n')
     for ix in range(x):
         for iy in range(y):
-             new_mask[ix, iy] = 1 if torch.abs(avg_coeffs[ix, iy]) > .1 else 0
+            cord_coeffs = Bag_coeffs[:,ix,iy].detach().cpu().numpy()
+            q3, q1 = np.percentile(cord_coeffs , [75, 25])
+            inner_cord_coeffs = cord_coeffs[np.where((cord_coeffs>= q1) &  (cord_coeffs<= q3))]
+            new_mask[ix, iy] = 1 if np.abs(np.mean(inner_cord_coeffs)) > .1 else 0
+
+            #new_mask[ix, iy] = 1 if torch.abs(avg_coeffs[ix, iy]) > .1 else 0
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = params['device'])
     #avg_coeffs = torch.tensor(avg_coeffs, dtype = torch.float32, device = params['device'])
     return new_mask#, avg_coeffs
