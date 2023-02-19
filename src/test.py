@@ -40,7 +40,7 @@ def BA_small_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
     train_params = {'bag_epochs': 5, 'pretrain_epochs': 100, 'nbags': l // 10, 'bag_size': 7,
-                    'subtrain_epochs': 20, 'bag_sub_epochs': 10, 'bag_learning_rate': .01, 'shuffle_threshold': 3}
+                    'subtrain_epochs': 20, 'bag_sub_epochs': 4, 'bag_learning_rate': .01, 'shuffle_threshold': 3}
     model_params['batch_size'] = 7
     model_params['threshold_frequency'] = 25
     net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
@@ -50,8 +50,8 @@ def BA_small_test(model_params, training_data, validation_data):
 def BA_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 88, 'pretrain_epochs': 500, 'nbags': l // 250, 'bag_size': 250,
-                    'subtrain_epochs': 80, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 5}
+    train_params = {'bag_epochs': 88, 'pretrain_epochs': 200, 'nbags': l // 250, 'bag_size': 250,
+                    'subtrain_epochs': 50, 'bag_sub_epochs': 10, 'bag_learning_rate': .01, 'shuffle_threshold': 5}
     model_params['batch_size'] = 2000
     model_params['threshold_frequency'] = 25
     net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data, printout = True)
@@ -73,7 +73,7 @@ def A_small_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
     train_params = {'bag_epochs': 0, 'pretrain_epochs': 200, 'nbags': l // 300, 'bag_size': 300,
-                    'subtrain_epochs': 80, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 5}
+                    'subtrain_epochs': 80, 'bag_sub_epochs': 4, 'bag_learning_rate': .01, 'shuffle_threshold': 5}
     model_params['batch_size'] = 7
     model_params['threshold_frequency'] = 25
     net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data, printout = True)
@@ -87,8 +87,8 @@ def Meta_test(runs = 5, small = False):
     for run_ix in range(runs):
         if small:
             model_params, training_data, validation_data = get_test_params(max_data=250)
-            Anet, ALoss_dict = A_small_test(model_params, training_data, validation_data)
             BAnet, BALoss_dict = BA_small_test(model_params, training_data, validation_data)
+            Anet, ALoss_dict = A_small_test(model_params, training_data, validation_data)
         else:
             model_params, training_data, validation_data = get_test_params(max_data=8000)
             BAnet, BALoss_dict = BA_test(model_params, training_data, validation_data)

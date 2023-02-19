@@ -48,7 +48,8 @@ def get_bag_coeffs(bag_model, bag_data, params, train_params):
     bag_model.train()
     optimizer = torch.optim.Adam([bag_model.sindy_coeffs], lr=train_params['bag_learning_rate'])
     for epoch in range(epochs):
-        train_one_bagstep(bag_model, bag_data, optimizer)
+        loss = train_one_bagstep(bag_model, bag_data, optimizer)
+        print(f'Loss as step {epoch} was {loss}')
     return bag_model.active_coeffs()
 
 
