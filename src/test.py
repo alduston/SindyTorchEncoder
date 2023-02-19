@@ -50,7 +50,7 @@ def BA_small_test(model_params, training_data, validation_data):
 def BA_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 200, 'pretrain_epochs': 500, 'nbags': l // 100, 'bag_size': 100,
+    train_params = {'bag_epochs': 120, 'pretrain_epochs': 500, 'nbags': l // 100, 'bag_size': 100,
                     'subtrain_epochs': 80, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 5}
     model_params['batch_size'] = 2000
     model_params['threshold_frequency'] = 25
