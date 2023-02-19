@@ -150,7 +150,7 @@ def validate_one_epoch(model, data_loader):
 
 
 def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_freq = inf, test_loader = [], printout = False):
-    loss_dict = {'epoch': [], 'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': []}
+    loss_dict = {'epoch': [], 'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': [], 'active_coeffs': []}
     pretrain_epochs = train_params[f'{mode}_epochs']
     optimizer = torch.optim.Adam(net.parameters(), lr= model_params['learning_rate'])
     for epoch in range(pretrain_epochs):
@@ -166,13 +166,14 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
                     for key,val in test_loss_dict.items():
                         loss_dict[key].append(float(val.detach().cpu()))
                     loss_dict['epoch'].append(float(net.epoch.detach().cpu()))
+                    loss_dict['active_coeffs'].append(net.num_active_coeffs)
                     if printout:
                         print(f'TEST Epoch {net.epoch}: Active coeffs: {net.num_active_coeffs}, {[f"test_{key}: {val.cpu().detach().numpy()}" for (key, val) in test_loss_dict.items()]}')
     return net, loss_dict
 
 
 def train_sindy(model_params, train_params, training_data, validation_data, printout = False):
-    Loss_dict = {'epoch': [], 'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': []}
+    Loss_dict = {'epoch': [], 'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': [], 'active_coeffs': []}
     if torch.cuda.is_available():
         device = 'cuda:0'
     else:

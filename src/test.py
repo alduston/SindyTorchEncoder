@@ -39,8 +39,8 @@ warnings.filterwarnings("ignore")
 def BA_small_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 5, 'pretrain_epochs': 100, 'nbags': l // 10, 'bag_size': 7,
-                    'subtrain_epochs': 20, 'bag_sub_epochs': 4, 'bag_learning_rate': .01, 'shuffle_threshold': 3}
+    train_params = {'bag_epochs': 45, 'pretrain_epochs': 100, 'nbags': l // 7, 'bag_size': 7,
+                    'subtrain_epochs': 20, 'bag_sub_epochs': 5, 'bag_learning_rate': .01, 'shuffle_threshold': 3}
     model_params['batch_size'] = 7
     model_params['threshold_frequency'] = 25
     net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
@@ -72,7 +72,7 @@ def A_test(model_params, training_data, validation_data):
 def A_small_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 200, 'nbags': l // 300, 'bag_size': 300,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 1000, 'nbags': l // 300, 'bag_size': 300,
                     'subtrain_epochs': 80, 'bag_sub_epochs': 4, 'bag_learning_rate': .01, 'shuffle_threshold': 5}
     model_params['batch_size'] = 7
     model_params['threshold_frequency'] = 25
@@ -86,7 +86,7 @@ def Meta_test(runs = 5, small = False):
     Meta_A_dict = {}
     for run_ix in range(runs):
         if small:
-            model_params, training_data, validation_data = get_test_params(max_data=250)
+            model_params, training_data, validation_data = get_test_params(max_data=1000)
             BAnet, BALoss_dict = BA_small_test(model_params, training_data, validation_data)
             Anet, ALoss_dict = A_small_test(model_params, training_data, validation_data)
         else:
@@ -128,9 +128,36 @@ def Meta_test(runs = 5, small = False):
 
 def run():
     if torch.cuda.is_available():
-        Meta_test(runs=6, small=False)
+        #Meta_A_df, Meta_BA_df = Meta_test(runs=6, small=False)
+        Meta_A_df, Meta_BA_df = Meta_test(runs=2, small=True)
     else:
-        Meta_test(runs=2, small=True)
+        Meta_A_df, Meta_BA_df = Meta_test(runs=1, small=True)
+
+    plt.plot(Meta_A_df['epoch'], Meta_A_df['active_coeffs_avg'], label = 'A_test')
+    plt.plot(Meta_BA_df['epoch'], Meta_BA_df['active_coeffs_avg'], label='BA_test')
+    plt.legend()
+    plt.xlabel('epoch')
+    plt.ylabel('# active_coeffs')
+    plt.title('A v BA coeffcount')
+    plt.savefig('small_exp.png')
+
+    torch_training.clear_plt()
+
+    Meta_A_df['avg_loss'] = Meta_A_df['decoder_avg'] + Meta_A_df['sindy_x_avg']
+    Meta_BA_df['avg_loss'] = Meta_BA_df['decoder_avg'] + Meta_BA_df['sindy_x_avg']
+
+    plt.plot(Meta_A_df['epoch'], Meta_A_df['avg_loss'], label='A_test')
+    plt.plot(Meta_BA_df['epoch'], Meta_BA_df['avg_loss'], label='BA_test')
+    plt.legend()
+    plt.xlabel('epoch')
+    plt.ylabel('Loss')
+    plt.title('A v BA loss')
+    plt.savefig('small_exp.png')
+
+
+
+
+
 
     '''
     model_params,training_data, validation_data = get_test_params(max_data = 500)
