@@ -92,6 +92,7 @@ def Meta_test(runs = 20, small = False):
         else:
             model_params, training_data, validation_data = get_test_params()
             Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
+            print('Halfway done!')
             BAnet, BALoss_dict = BA_test(model_params, training_data, validation_data)
 
         for key,val in ALoss_dict.items():
