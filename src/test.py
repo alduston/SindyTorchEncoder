@@ -86,9 +86,13 @@ def Meta_test(runs = 20, small = False):
     Meta_A_dict = {}
     for run_ix in range(runs):
         if small:
-            model_params, training_data, validation_data = get_test_params(max_data = 100)
+            model_params, training_data, validation_data = get_test_params()
             Anet, ALoss_dict = A_small_test(model_params, training_data, validation_data)
             BAnet, BALoss_dict = BA_small_test(model_params, training_data, validation_data)
+        else:
+            model_params, training_data, validation_data = get_test_params()
+            Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
+            BAnet, BALoss_dict = BA_test(model_params, training_data, validation_data)
 
         for key,val in ALoss_dict.items():
             if key== 'epoch' and not run_ix:
@@ -124,9 +128,9 @@ def Meta_test(runs = 20, small = False):
 
 def run():
     if torch.cuda.is_available():
-        Meta_test(runs=2, small=False)
+        Meta_test(runs=1, small=False)
     else:
-        Meta_test(runs=3, small=True)
+        Meta_test(runs=2, small=True)
 
     '''
     model_params,training_data, validation_data = get_test_params(max_data = 500)
