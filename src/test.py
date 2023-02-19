@@ -43,7 +43,7 @@ def BA_small_test(model_params, training_data, validation_data):
                     'subtrain_epochs': 20, 'bag_sub_epochs': 10, 'bag_learning_rate': .01, 'shuffle_threshold': 3}
     model_params['batch_size'] = 7
     model_params['threshold_frequency'] = 25
-    net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data)
+    net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
 
@@ -54,7 +54,7 @@ def BA_test(model_params, training_data, validation_data):
                     'subtrain_epochs': 80, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 5}
     model_params['batch_size'] = 2000
     model_params['threshold_frequency'] = 25
-    net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data)
+    net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
 
 
@@ -91,9 +91,10 @@ def Meta_test(runs = 20, small = False):
             BAnet, BALoss_dict = BA_small_test(model_params, training_data, validation_data)
         else:
             model_params, training_data, validation_data = get_test_params(max_data=10000)
+            BAnet, BALoss_dict = BA_test(model_params, training_data, validation_data)
+            print('Halfway done!')
             Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
             print('Halfway done!')
-            BAnet, BALoss_dict = BA_test(model_params, training_data, validation_data)
 
         for key,val in ALoss_dict.items():
             if key== 'epoch' and not run_ix:
