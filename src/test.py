@@ -56,7 +56,7 @@ def BA_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
     train_params = {'bag_epochs': 88, 'pretrain_epochs': 200, 'nbags':  int((1.5 * l) // 250), 'bag_size': 250,
-                    'subtrain_epochs': 80, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 5}
+                    'subtrain_epochs': 60, 'bag_sub_epochs': 20, 'bag_learning_rate': .01, 'shuffle_threshold': 5}
     model_params['batch_size'] = 8000
     model_params['threshold_frequency'] = 25
     net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data, printout = True)
@@ -135,13 +135,12 @@ def Meta_test(runs = 5, small = False):
 
 
 def run():
-    Meta_A_df, Meta_BA_df = Meta_test(runs=1, small=True)
 
     if torch.cuda.is_available():
         #Meta_A_df, Meta_BA_df = Meta_test(runs=6, small=False)
-        Meta_A_df_N, Meta_BA_df_N = Meta_test(runs=3, small=True)
+        Meta_A_df_ip, Meta_BA_df_ip = Meta_test(runs=4, small=False)
     else:
-        #Meta_A_df, Meta_BA_df = Meta_test(runs=2, small=True)
+        Meta_A_df_ip, Meta_BA_df_ip = Meta_test(runs=3, small=True)
         Meta_A_df_N = pd.read_csv('Meta_A_df_N.csv')
         Meta_BA_df_N = pd.read_csv('Meta_BA_df_N.csv')
         for i in [0,1,2]:

@@ -67,18 +67,24 @@ def f_check(tensor, ix, iy):
     return torch.abs(tensor[ix, iy]) < .1
 
 
-def process_bag_coeffs(Bag_coeffs, params, model):
+def process_bag_coeffs(Bag_coeffs, params, model, minboost = True):
     new_mask = np.zeros(Bag_coeffs.shape[1:])
     x,y = new_mask.shape
 
     n_samples = Bag_coeffs.shape[0]
     avg_coeffs = (1/n_samples) * torch.sum(Bag_coeffs, dim = 0)
+    min_ix = []
+    min_ip = 1
     for ix in range(x):
         for iy in range(y):
             coeffs_vec = Bag_coeffs[:,ix,iy]
+            ip = sum([abs(val) > .1 for val in coeffs_vec])/len(coeffs_vec)
+            if ip < min_ip:
+                min_ix = [ix,iy]
             new_mask[ix, iy] = 1 if ip > .5 else 0
-            #new_mask[ix, iy] = 1 if torch.abs(avg_coeffs[ix, iy]) > .1 else 0
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = params['device'])
+    if minboost:
+        avg_coeffs[min_ix] *= .6
     return new_mask, avg_coeffs
 
 
@@ -97,7 +103,6 @@ def train_bag_epochs(model, bag_loader, params, train_params):
         bag_model = deepcopy(model)
         perturbation = .05 * torch.randn(bag_model.sindy_coeffs.shape, device = params['device'])
         bag_model.sindy_coeffs = torch.nn.Parameter(bag_model.sindy_coeffs + perturbation, requires_grad = True)
-
         bag_coeffs = get_bag_coeffs(bag_model, bag_data, params, train_params)
         Bag_coeffs.append(bag_coeffs)
     Bag_coeffs = torch.stack(Bag_coeffs)
