@@ -42,7 +42,7 @@ def BA_small_test(model_params, training_data, validation_data):
     if torch.cuda.is_available():
         train_params = {'bag_epochs': 165, 'pretrain_epochs': 50, 'nbags': int((1.5 * l) // 75), 'bag_size': 75,
                     'subtrain_epochs': 70, 'bag_sub_epochs': 10, 'bag_learning_rate': .01, 'shuffle_threshold': 3}
-        model_params['batch_size'] = l
+        model_params['batch_size'] = l/10
     else:
         train_params = {'bag_epochs': 120, 'pretrain_epochs': 50, 'nbags': int((1.5 * l) // 7), 'bag_size': 7,
                         'subtrain_epochs': 30, 'bag_sub_epochs': 5, 'bag_learning_rate': .01, 'shuffle_threshold': 3}
