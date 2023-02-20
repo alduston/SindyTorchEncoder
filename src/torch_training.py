@@ -10,6 +10,7 @@ from scipy.stats import ttest_1samp
 import matplotlib.pyplot as plt
 from scipy import stats as st
 import random
+import os
 
 
 def clear_plt():
@@ -49,7 +50,6 @@ def get_bag_coeffs(bag_model, bag_data, params, train_params):
     optimizer = torch.optim.Adam([bag_model.sindy_coeffs], lr=train_params['bag_learning_rate'])
     for epoch in range(epochs):
         loss = train_one_bagstep(bag_model, bag_data, optimizer)
-        print(f'Loss at epoch {epoch+1} was {loss}')
     return bag_model.active_coeffs()
 
 
@@ -59,6 +59,8 @@ def frac_round(vec,val):
     vec *= .05
     return vec
 
+def f_check(tensor, ix, iy):
+    return torch.abs(tensor[ix, iy]) < .1
 
 def process_bag_coeffs(Bag_coeffs, params, model):
     new_mask = np.zeros(Bag_coeffs.shape[1:])
@@ -66,18 +68,16 @@ def process_bag_coeffs(Bag_coeffs, params, model):
 
     n_samples = Bag_coeffs.shape[0]
     avg_coeffs = (1/n_samples) * torch.sum(Bag_coeffs, dim = 0)
+    vars = []
     for ix in range(x):
         for iy in range(y):
-            cord_coeffs = Bag_coeffs[:,ix,iy].detach().cpu().numpy()
-            #cord_coeffs = np.abs(Bag_coeffs[:, ix, iy].detach().cpu().numpy())
-            q3, q1 = np.percentile(cord_coeffs , [90, 10])
-            inner_cord_coeffs = cord_coeffs[np.where((cord_coeffs>= q1) &  (cord_coeffs<= q3))]
-            new_mask[ix, iy] = 1 if np.abs(np.mean(inner_cord_coeffs)) > .1 else 0
-
-            #new_mask[ix, iy] = 1 if torch.abs(avg_coeffs[ix, iy]) > .1 else 0
+            coeffs_vec = Bag_coeffs[:,ix,iy]
+            if model.coefficient_mask[ix,iy]:
+                vars.append(torch.var(coeffs_vec).detach().cpu())
+            new_mask[ix, iy] = 1 if torch.abs(avg_coeffs[ix, iy]) > .1 else 0
+    print(f'Avg init var of coeffs at epoch {model.epoch} was {np.mean(vars)}')
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = params['device'])
-    #avg_coeffs = torch.tensor(avg_coeffs, dtype = torch.float32, device = params['device'])
-    return new_mask#, avg_coeffs
+    return new_mask
 
 
 def get_choice_tensor(shape, prob, device):
@@ -93,7 +93,7 @@ def train_bag_epochs(model, bag_loader, params, train_params):
     Bag_coeffs = []
     for batch_index, bag_data in enumerate(bag_loader):
         bag_model = deepcopy(model)
-        perturbation = .05 * torch.randn(bag_model.sindy_coeffs.shape, device = params['device'])
+        perturbation = .0 * torch.randn(bag_model.sindy_coeffs.shape, device = params['device'])
         bag_model.sindy_coeffs = torch.nn.Parameter(bag_model.sindy_coeffs + perturbation, requires_grad = True)
         #perturbation = torch.randn(bag_model.sindy_coeffs.shape, device=params['device'])
         #bag_model.sindy_coeffs = torch.nn.Parameter(perturbation, requires_grad=True)
@@ -102,7 +102,11 @@ def train_bag_epochs(model, bag_loader, params, train_params):
     Bag_coeffs = torch.stack(Bag_coeffs)
     new_mask = process_bag_coeffs(Bag_coeffs, params, model)
     coefficient_mask = new_mask * model.coefficient_mask
-    #model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad = True)
+   # print(reset_tensor)
+    #print(model.sindy_coeffs)
+    #reset = torch.tensor(reset_tensor, dtype=torch.float32, device= params['device'])
+    #model.sindy_coeffs = torch.nn.Parameter(reset, requires_grad = True)
+
     model.coefficient_mask = coefficient_mask
     model.num_active_coeffs = torch.sum(model.coefficient_mask).cpu().detach().numpy()
     return model
@@ -159,6 +163,7 @@ def validate_one_epoch(model, data_loader):
 
 
 def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_freq = inf, test_loader = [], printout = False):
+
     loss_dict = {'epoch': [], 'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': [], 'active_coeffs': []}
     pretrain_epochs = train_params[f'{mode}_epochs']
     optimizer = torch.optim.Adam(net.parameters(), lr= model_params['learning_rate'])
@@ -169,7 +174,8 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
         if not isinf(print_freq):
             if not epoch % print_freq:
                 if printout:
-                    print(f'TRAIN Epoch {net.epoch}: Active coeffs: {net.num_active_coeffs}, {[f"{key}: {val.cpu().detach().numpy()}" for (key, val) in total_loss_dict.items()]}')
+                    pass
+                    #print(f'TRAIN Epoch {net.epoch}: Active coeffs: {net.num_active_coeffs}, {[f"{key}: {val.cpu().detach().numpy()}" for (key, val) in total_loss_dict.items()]}')
                 if len(test_loader):
                     test_loss, test_loss_dict = validate_one_epoch(net, test_loader)
                     for key,val in test_loss_dict.items():
@@ -177,7 +183,8 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
                     loss_dict['epoch'].append(float(net.epoch.detach().cpu()))
                     loss_dict['active_coeffs'].append(net.num_active_coeffs)
                     if printout:
-                        print(f'TEST Epoch {net.epoch}: Active coeffs: {net.num_active_coeffs}, {[f"test_{key}: {val.cpu().detach().numpy()}" for (key, val) in test_loss_dict.items()]}')
+                        pass
+                        #print(f'TEST Epoch {net.epoch}: Active coeffs: {net.num_active_coeffs}, {[f"test_{key}: {val.cpu().detach().numpy()}" for (key, val) in test_loss_dict.items()]}')
     return net, loss_dict
 
 
@@ -192,8 +199,15 @@ def train_sindy(model_params, train_params, training_data, validation_data, prin
     test_loader = get_loader(validation_data, model_params, device=device)
 
     net = SindyNet(model_params).to(device)
+    x, y = net.sindy_coeffs.shape
+    coeff_trajectories = {}
+    for ix in range(x):
+        for iy in range(y):
+            coeff_trajectories[f'{ix}_{iy}_trajectory'] = []
+    net.coeff_trajectories = coeff_trajectories
     net, loss_dict = subtrain_sindy(net, train_loader, model_params, train_params,
                          mode = 'pretrain', print_freq = 50, test_loader = test_loader, printout= printout)
+
     for key, val in loss_dict.items():
         Loss_dict[key] += val
 
