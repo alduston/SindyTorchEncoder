@@ -93,7 +93,7 @@ def train_bag_epochs(model, bag_loader, params, train_params):
     Bag_coeffs = []
     for batch_index, bag_data in enumerate(bag_loader):
         bag_model = deepcopy(model)
-        perturbation = 0 * torch.randn(bag_model.sindy_coeffs.shape, device = params['device'])
+        perturbation = .05 * torch.randn(bag_model.sindy_coeffs.shape, device = params['device'])
         bag_model.sindy_coeffs = torch.nn.Parameter(bag_model.sindy_coeffs + perturbation, requires_grad = True)
         #perturbation = torch.randn(bag_model.sindy_coeffs.shape, device=params['device'])
         #bag_model.sindy_coeffs = torch.nn.Parameter(perturbation, requires_grad=True)

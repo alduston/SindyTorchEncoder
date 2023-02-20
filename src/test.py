@@ -126,10 +126,10 @@ def Meta_test(runs = 5, small = False):
         Meta_BA_dict[f'{key}_avg'] = (1 / runs) * BAavg
 
     Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
-    Meta_A_df.to_csv('Meta_A_df.csv')
+    Meta_A_df.to_csv('Meta_A_df_N.csv')
 
     Meta_BA_df = pd.DataFrame.from_dict(Meta_BA_dict, orient='columns')
-    Meta_BA_df.to_csv('Meta_BA_df.csv')
+    Meta_BA_df.to_csv('Meta_BA_df_N.csv')
 
     return Meta_A_df, Meta_BA_df
 
@@ -138,34 +138,34 @@ def run():
     #Meta_A_df_nn, Meta_BA_df_nn = Meta_test(runs=4, small=True)
     if torch.cuda.is_available():
         #Meta_A_df, Meta_BA_df = Meta_test(runs=6, small=False)
-        Meta_A_df_nn, Meta_BA_df_nn = Meta_test(runs=3, small=True)
+        Meta_A_df_N, Meta_BA_df_N = Meta_test(runs=3, small=True)
     else:
         #Meta_A_df, Meta_BA_df = Meta_test(runs=2, small=True)
-        Meta_A_df = pd.read_csv('Meta_A_df.csv')
-        Meta_BA_df = pd.read_csv('Meta_BA_df.csv')
-    for i in [0,1,2]:
-        plt.plot(Meta_A_df_nn['epoch'], Meta_A_df_nn[f'active_coeffs_{i}'], label = 'A_test')
-        plt.plot(Meta_BA_df_nn['epoch'], Meta_BA_df_nn[f'active_coeffs_{i}'], label='BA_test')
-        plt.legend()
-        plt.xlabel('epoch')
-        plt.ylabel('# active_coeffs')
-        plt.title(f'A v BA coeffcount run {i}')
-        plt.savefig(f'plots/med_exp_ncum_nn{i}.png')
+        Meta_A_df_N = pd.read_csv('Meta_A_df_N.csv')
+        Meta_BA_df_N = pd.read_csv('Meta_BA_df_N.csv')
+        for i in [0,1,2]:
+            plt.plot(Meta_A_df_N['epoch'], Meta_A_df_N[f'active_coeffs_{i}'], label = 'A_test')
+            plt.plot(Meta_BA_df_N['epoch'], Meta_BA_df_N[f'active_coeffs_{i}'], label='BA_test')
+            plt.legend()
+            plt.xlabel('epoch')
+            plt.ylabel('# active_coeffs')
+            plt.title(f'A v BA coeffcount run {i}')
+            plt.savefig(f'plots/med_exp_ncum_N{i}.png')
 
-        torch_training.clear_plt()
+            torch_training.clear_plt()
 
-        Meta_A_df[f'avg_loss_{i}'] = Meta_A_df_nn[f'decoder_{i}'] + Meta_A_df_nn[f'sindy_x_{i}']
-        Meta_BA_df[f'avg_loss_{i}'] = Meta_BA_df_nn[f'decoder_{i}'] + Meta_BA_df_nn[f'sindy_x_{i}']
+            Meta_A_df_N[f'avg_loss_{i}'] = Meta_A_df_N[f'decoder_{i}'] + Meta_A_df_N[f'sindy_x_{i}']
+            Meta_BA_df_N[f'avg_loss_{i}'] = Meta_BA_df_N[f'decoder_{i}'] + Meta_BA_df_N[f'sindy_x_{i}']
 
-        plt.plot(Meta_A_df_nn['epoch'], Meta_A_df_nn[f'decoder_{i}'], label='A_test')
-        plt.plot(Meta_BA_df_nn['epoch'], Meta_BA_df_nn[f'decoder_{i}'], label='BA_test')
-        plt.legend()
-        plt.xlabel('epoch')
-        plt.ylabel('Loss')
-        plt.title(f'A v BA decoder loss run {i}')
-        plt.savefig(f'plots/med_exp_decode_loss_nn{i}.png')
+            plt.plot(Meta_A_df_N['epoch'], Meta_A_df_N[f'avg_loss_{i}'], label='A_test')
+            plt.plot(Meta_BA_df_N['epoch'], Meta_BA_df_N[f'avg_loss_{i}'], label='BA_test')
+            plt.legend()
+            plt.xlabel('epoch')
+            plt.ylabel('Loss')
+            plt.title(f'A v BA decoder loss run {i}')
+            plt.savefig(f'plots/med_exp_decode_loss_N{i}.png')
 
-        torch_training.clear_plt()
+            torch_training.clear_plt()
 
 
 
