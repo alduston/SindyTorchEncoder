@@ -62,8 +62,10 @@ def frac_round(vec,val):
     vec *= .05
     return vec
 
+
 def f_check(tensor, ix, iy):
     return torch.abs(tensor[ix, iy]) < .1
+
 
 def process_bag_coeffs(Bag_coeffs, params, model):
     new_mask = np.zeros(Bag_coeffs.shape[1:])
@@ -71,16 +73,13 @@ def process_bag_coeffs(Bag_coeffs, params, model):
 
     n_samples = Bag_coeffs.shape[0]
     avg_coeffs = (1/n_samples) * torch.sum(Bag_coeffs, dim = 0)
-    vars = []
     for ix in range(x):
         for iy in range(y):
             coeffs_vec = Bag_coeffs[:,ix,iy]
-            if model.coefficient_mask[ix,iy]:
-                vars.append(torch.var(coeffs_vec).detach().cpu())
-            new_mask[ix, iy] = 1 if torch.abs(avg_coeffs[ix, iy]) > .1 else 0
-    print(f'Avg init var of coeffs at epoch {model.epoch} was {np.mean(vars)}')
+            new_mask[ix, iy] = 1 if ip > .5 else 0
+            #new_mask[ix, iy] = 1 if torch.abs(avg_coeffs[ix, iy]) > .1 else 0
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = params['device'])
-    return new_mask
+    return new_mask, avg_coeffs
 
 
 def get_choice_tensor(shape, prob, device):
@@ -98,17 +97,13 @@ def train_bag_epochs(model, bag_loader, params, train_params):
         bag_model = deepcopy(model)
         perturbation = .05 * torch.randn(bag_model.sindy_coeffs.shape, device = params['device'])
         bag_model.sindy_coeffs = torch.nn.Parameter(bag_model.sindy_coeffs + perturbation, requires_grad = True)
-        #perturbation = torch.randn(bag_model.sindy_coeffs.shape, device=params['device'])
-        #bag_model.sindy_coeffs = torch.nn.Parameter(perturbation, requires_grad=True)
+
         bag_coeffs = get_bag_coeffs(bag_model, bag_data, params, train_params)
         Bag_coeffs.append(bag_coeffs)
     Bag_coeffs = torch.stack(Bag_coeffs)
-    new_mask = process_bag_coeffs(Bag_coeffs, params, model)
+    new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, params, model)
     coefficient_mask = new_mask * model.coefficient_mask
-   # print(reset_tensor)
-    #print(model.sindy_coeffs)
-    #reset = torch.tensor(reset_tensor, dtype=torch.float32, device= params['device'])
-    #model.sindy_coeffs = torch.nn.Parameter(reset, requires_grad = True)
+    model.sindy_coeffs = torch.nn.Parameter(coefficient_mask * avg_coeffs, requires_grad=True)
 
     model.coefficient_mask = coefficient_mask
     model.num_active_coeffs = torch.sum(model.coefficient_mask).cpu().detach().numpy()
@@ -178,7 +173,7 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
             if not epoch % print_freq:
                 if printout:
                     pass
-                    #print(f'TRAIN Epoch {net.epoch}: Active coeffs: {net.num_active_coeffs}, {[f"{key}: {val.cpu().detach().numpy()}" for (key, val) in total_loss_dict.items()]}')
+                    print(f'TRAIN Epoch {net.epoch}: Active coeffs: {net.num_active_coeffs}, {[f"{key}: {val.cpu().detach().numpy()}" for (key, val) in total_loss_dict.items()]}')
                 if len(test_loader):
                     test_loss, test_loss_dict = validate_one_epoch(net, test_loader)
                     for key,val in test_loss_dict.items():
@@ -187,7 +182,7 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
                     loss_dict['active_coeffs'].append(net.num_active_coeffs)
                     if printout:
                         pass
-                        #print(f'TEST Epoch {net.epoch}: Active coeffs: {net.num_active_coeffs}, {[f"test_{key}: {val.cpu().detach().numpy()}" for (key, val) in test_loss_dict.items()]}')
+                        print(f'TEST Epoch {net.epoch}: Active coeffs: {net.num_active_coeffs}, {[f"test_{key}: {val.cpu().detach().numpy()}" for (key, val) in test_loss_dict.items()]}')
     return net, loss_dict
 
 
@@ -220,7 +215,7 @@ def train_sindy(model_params, train_params, training_data, validation_data, prin
         for epoch in range(train_params['bag_epochs']):
             if epoch and not epoch%shuffle_threshold:
                 bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
-            net  = train_bag_epochs(net, train_loader, model_params, train_params)
+            net  = train_bag_epochs(net, bag_loader, model_params, train_params)
             net, loss_dict = subtrain_sindy(net, train_loader, model_params,train_params,
                                             mode='subtrain', print_freq = 50, test_loader = test_loader, printout= printout)
             for key, val in loss_dict.items():

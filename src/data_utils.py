@@ -19,10 +19,6 @@ def make_samples(tensors, n_samples, sample_size, device):
     samples = [[] for tensor in tensors]
     indexes = list(range(0,tensors[0].shape[0]))
     for i in range(n_samples):
-        #sub_index = random.choices(indexes, k = 1)[0]
-        #if sub_index + sample_size > indexes[-1]:
-            #sub_index = indexes[-1] - sample_size
-        #sub_indexes = list(range(sub_index, sub_index + sample_size))
         sub_indexes = random.choices(indexes, k = sample_size)
         for i,tensor in enumerate(tensors):
             sample = torch.index_select(tensor, 0, torch.tensor(sub_indexes, device = device))
