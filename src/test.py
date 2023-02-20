@@ -94,7 +94,7 @@ def Meta_test(runs = 5, small = False):
     Meta_A_dict = {}
     for run_ix in range(runs):
         if small:
-            model_params, training_data, validation_data = get_test_params(max_data=300)
+            model_params, training_data, validation_data = get_test_params(max_data=1000)
             BAnet, BALoss_dict = BA_small_test(model_params, training_data, validation_data)
             Anet, ALoss_dict = A_small_test(model_params, training_data, validation_data)
         else:
@@ -136,7 +136,7 @@ def Meta_test(runs = 5, small = False):
 
 def run():
     Meta_A_df, Meta_BA_df = Meta_test(runs=1, small=True)
-    
+
     if torch.cuda.is_available():
         #Meta_A_df, Meta_BA_df = Meta_test(runs=6, small=False)
         Meta_A_df_N, Meta_BA_df_N = Meta_test(runs=3, small=True)
