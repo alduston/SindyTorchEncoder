@@ -82,7 +82,6 @@ def process_bag_coeffs(Bag_coeffs, params, model, minboost = False):
             if 0 < ip < min_ip:
                 min_ix = [ix,iy]
             new_mask[ix, iy] = 1 if ip > .5 else 0
-            print(ip)
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = params['device'])
     if minboost:
         avg_coeffs[min_ix] *= .6
@@ -102,7 +101,7 @@ def train_bag_epochs(model, bag_loader, params, train_params):
     Bag_coeffs = []
     for batch_index, bag_data in enumerate(bag_loader):
         bag_model = deepcopy(model)
-        perturbation = .05 * torch.randn(bag_model.sindy_coeffs.shape, device = params['device'])
+        perturbation = .005 * torch.randn(bag_model.sindy_coeffs.shape, device = params['device'])
         bag_model.sindy_coeffs = torch.nn.Parameter(bag_model.sindy_coeffs + perturbation, requires_grad = True)
         bag_coeffs = get_bag_coeffs(bag_model, bag_data, params, train_params)
         Bag_coeffs.append(bag_coeffs)
@@ -226,6 +225,10 @@ def train_sindy(model_params, train_params, training_data, validation_data, prin
                                             mode='subtrain', print_freq = 50, test_loader = test_loader, printout= printout)
             for key, val in loss_dict.items():
                 Loss_dict[key] += val
+    net, loss_dict = subtrain_sindy(net, train_loader, model_params, train_params,
+                                    mode='refinement', print_freq=50, test_loader=test_loader, printout=printout)
+    for key, val in loss_dict.items():
+        Loss_dict[key] += val
     return net, Loss_dict
 
 
