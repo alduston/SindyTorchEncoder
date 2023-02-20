@@ -136,7 +136,7 @@ def Meta_test(runs = 5, small = False):
 
 def run():
     Meta_A_df, Meta_BA_df = Meta_test(runs=1, small=True)
-
+    
     if torch.cuda.is_available():
         #Meta_A_df, Meta_BA_df = Meta_test(runs=6, small=False)
         Meta_A_df_N, Meta_BA_df_N = Meta_test(runs=3, small=True)

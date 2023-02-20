@@ -35,7 +35,10 @@ def train_one_step(model, data, optimizer, mode = None):
 def train_one_bagstep(model, data, optimizer):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
-        loss = model.bag_loss(x = data['x_bag'], dx = data['dx_bag'])
+        try:
+            loss = model.bag_loss(x = data['x_bag'], dx = data['dx_bag'])
+        except KeyError:
+            loss = model.bag_loss(x=data['x'], dx=data['dx'])
     else:
         pass
         #loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'])
@@ -93,7 +96,7 @@ def train_bag_epochs(model, bag_loader, params, train_params):
     Bag_coeffs = []
     for batch_index, bag_data in enumerate(bag_loader):
         bag_model = deepcopy(model)
-        perturbation = .0 * torch.randn(bag_model.sindy_coeffs.shape, device = params['device'])
+        perturbation = .05 * torch.randn(bag_model.sindy_coeffs.shape, device = params['device'])
         bag_model.sindy_coeffs = torch.nn.Parameter(bag_model.sindy_coeffs + perturbation, requires_grad = True)
         #perturbation = torch.randn(bag_model.sindy_coeffs.shape, device=params['device'])
         #bag_model.sindy_coeffs = torch.nn.Parameter(perturbation, requires_grad=True)
@@ -217,7 +220,7 @@ def train_sindy(model_params, train_params, training_data, validation_data, prin
         for epoch in range(train_params['bag_epochs']):
             if epoch and not epoch%shuffle_threshold:
                 bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
-            net  = train_bag_epochs(net, bag_loader, model_params, train_params)
+            net  = train_bag_epochs(net, train_loader, model_params, train_params)
             net, loss_dict = subtrain_sindy(net, train_loader, model_params,train_params,
                                             mode='subtrain', print_freq = 50, test_loader = test_loader, printout= printout)
             for key, val in loss_dict.items():
