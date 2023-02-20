@@ -98,7 +98,7 @@ def Meta_test(runs = 5, small = False):
             BAnet, BALoss_dict = BA_small_test(model_params, training_data, validation_data)
             Anet, ALoss_dict = A_small_test(model_params, training_data, validation_data)
         else:
-            model_params, training_data, validation_data = get_test_params(max_data=8000)
+            model_params, training_data, validation_data = get_test_params(max_data=5000)
             BAnet, BALoss_dict = BA_test(model_params, training_data, validation_data)
             Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
 
@@ -135,22 +135,37 @@ def Meta_test(runs = 5, small = False):
 
 
 def run():
-
     if torch.cuda.is_available():
         #Meta_A_df, Meta_BA_df = Meta_test(runs=6, small=False)
-        Meta_A_df_ip, Meta_BA_df_ip = Meta_test(runs=4, small=False)
+        Meta_A_df_ip, Meta_BA_df_ip = Meta_test(runs=1, small=False)
     else:
-        Meta_A_df_ip, Meta_BA_df_ip = Meta_test(runs=3, small=True)
+        #Meta_A_df_ip, Meta_BA_df_ip = Meta_test(runs=3, small=True)
         Meta_A_df_N = pd.read_csv('Meta_A_df_N.csv')
         Meta_BA_df_N = pd.read_csv('Meta_BA_df_N.csv')
-        for i in [0,1,2]:
+
+        plt.plot(Meta_A_df_N['epoch'], Meta_A_df_N[f'active_coeffs_avg'], label='A_test')
+        plt.plot(Meta_BA_df_N['epoch'], Meta_BA_df_N[f'active_coeffs_avg'], label='BA_test')
+        plt.xlabel('epoch')
+        plt.ylabel('# active_coeffs')
+        plt.title(f'A v BA avg coeffcount')
+        plt.savefig(f'plots/med_exp_ncum_ip_avg.png')
+        torch_training.clear_plt()
+
+        #plt.plot(Meta_A_df_N['epoch'], Meta_A_df_N[f'active_coeffs_avg'], label='A_test')
+        #plt.xlabel('epoch')
+        #plt.ylabel('# active_coeffs')
+        #plt.title(f'A v BA avg coeffcount')
+        #plt.savefig(f'plots/med_exp_ncum_ip_avg.png')
+        #torch_training.clear_plt()
+
+        for i in [0,1,2,3]:
             plt.plot(Meta_A_df_N['epoch'], Meta_A_df_N[f'active_coeffs_{i}'], label = 'A_test')
             plt.plot(Meta_BA_df_N['epoch'], Meta_BA_df_N[f'active_coeffs_{i}'], label='BA_test')
             plt.legend()
             plt.xlabel('epoch')
             plt.ylabel('# active_coeffs')
             plt.title(f'A v BA coeffcount run {i}')
-            plt.savefig(f'plots/med_exp_ncum_N{i}.png')
+            plt.savefig(f'plots/med_exp_ncum_ip{i}.png')
 
             torch_training.clear_plt()
 
@@ -161,9 +176,9 @@ def run():
             plt.plot(Meta_BA_df_N['epoch'], Meta_BA_df_N[f'avg_loss_{i}'], label='BA_test')
             plt.legend()
             plt.xlabel('epoch')
-            plt.ylabel('Loss')
+            plt.ylabel('Log loss')
             plt.title(f'A v BA decoder loss run {i}')
-            plt.savefig(f'plots/med_exp_decode_loss_N{i}.png')
+            plt.savefig(f'plots/med_exp_decode_loss_ip{i}.png')
 
             torch_training.clear_plt()
 

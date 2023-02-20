@@ -67,7 +67,7 @@ def f_check(tensor, ix, iy):
     return torch.abs(tensor[ix, iy]) < .1
 
 
-def process_bag_coeffs(Bag_coeffs, params, model, minboost = True):
+def process_bag_coeffs(Bag_coeffs, params, model, minboost = False):
     new_mask = np.zeros(Bag_coeffs.shape[1:])
     x,y = new_mask.shape
 
@@ -79,9 +79,10 @@ def process_bag_coeffs(Bag_coeffs, params, model, minboost = True):
         for iy in range(y):
             coeffs_vec = Bag_coeffs[:,ix,iy]
             ip = sum([abs(val) > .1 for val in coeffs_vec])/len(coeffs_vec)
-            if ip < min_ip:
+            if 0 < ip < min_ip:
                 min_ix = [ix,iy]
             new_mask[ix, iy] = 1 if ip > .5 else 0
+            print(ip)
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = params['device'])
     if minboost:
         avg_coeffs[min_ix] *= .6
