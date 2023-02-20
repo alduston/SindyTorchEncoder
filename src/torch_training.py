@@ -49,6 +49,7 @@ def get_bag_coeffs(bag_model, bag_data, params, train_params):
     optimizer = torch.optim.Adam([bag_model.sindy_coeffs], lr=train_params['bag_learning_rate'])
     for epoch in range(epochs):
         loss = train_one_bagstep(bag_model, bag_data, optimizer)
+        print(f'Loss at epoch {epoch+1} was {loss}')
     return bag_model.active_coeffs()
 
 
@@ -67,8 +68,8 @@ def process_bag_coeffs(Bag_coeffs, params, model):
     avg_coeffs = (1/n_samples) * torch.sum(Bag_coeffs, dim = 0)
     for ix in range(x):
         for iy in range(y):
-            #cord_coeffs = Bag_coeffs[:,ix,iy].detach().cpu().numpy()
-            cord_coeffs = np.abs(Bag_coeffs[:, ix, iy].detach().cpu().numpy())
+            cord_coeffs = Bag_coeffs[:,ix,iy].detach().cpu().numpy()
+            #cord_coeffs = np.abs(Bag_coeffs[:, ix, iy].detach().cpu().numpy())
             q3, q1 = np.percentile(cord_coeffs , [90, 10])
             inner_cord_coeffs = cord_coeffs[np.where((cord_coeffs>= q1) &  (cord_coeffs<= q3))]
             new_mask[ix, iy] = 1 if np.abs(np.mean(inner_cord_coeffs)) > .1 else 0
@@ -92,10 +93,10 @@ def train_bag_epochs(model, bag_loader, params, train_params):
     Bag_coeffs = []
     for batch_index, bag_data in enumerate(bag_loader):
         bag_model = deepcopy(model)
-        #perturbation = .1 * torch.randn(bag_model.sindy_coeffs.shape, device = params['device'])
-        #bag_model.sindy_coeffs = torch.nn.Parameter(bag_model.sindy_coeffs + perturbation, requires_grad = True)
-        perturbation = torch.randn(bag_model.sindy_coeffs.shape, device=params['device'])
-        bag_model.sindy_coeffs = torch.nn.Parameter(perturbation, requires_grad=True)
+        perturbation = 0 * torch.randn(bag_model.sindy_coeffs.shape, device = params['device'])
+        bag_model.sindy_coeffs = torch.nn.Parameter(bag_model.sindy_coeffs + perturbation, requires_grad = True)
+        #perturbation = torch.randn(bag_model.sindy_coeffs.shape, device=params['device'])
+        #bag_model.sindy_coeffs = torch.nn.Parameter(perturbation, requires_grad=True)
         bag_coeffs = get_bag_coeffs(bag_model, bag_data, params, train_params)
         Bag_coeffs.append(bag_coeffs)
     Bag_coeffs = torch.stack(Bag_coeffs)

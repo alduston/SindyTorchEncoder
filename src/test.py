@@ -41,7 +41,7 @@ def BA_small_test(model_params, training_data, validation_data):
     l = len(training_data['x'])
     if torch.cuda.is_available():
         train_params = {'bag_epochs': 165, 'pretrain_epochs': 100, 'nbags': int((1.5 * l) // 75), 'bag_size': 75,
-                    'subtrain_epochs': 30, 'bag_sub_epochs': 20, 'bag_learning_rate': .01, 'shuffle_threshold': 3}
+                    'subtrain_epochs': 30, 'bag_sub_epochs': 10, 'bag_learning_rate': .01, 'shuffle_threshold': 3}
         model_params['batch_size'] = l
     else:
         train_params = {'bag_epochs': 120, 'pretrain_epochs': 200, 'nbags': int((1.5 * l) // 7), 'bag_size': 7,
@@ -135,15 +135,15 @@ def Meta_test(runs = 5, small = False):
 
 
 def run():
-    Meta_A_df_nn, Meta_BA_df_nn = Meta_test(runs=4, small=True)
+    #Meta_A_df_nn, Meta_BA_df_nn = Meta_test(runs=4, small=True)
     if torch.cuda.is_available():
         #Meta_A_df, Meta_BA_df = Meta_test(runs=6, small=False)
-        Meta_A_df_nn, Meta_BA_df_nn = Meta_test(runs=4, small=True)
+        Meta_A_df_nn, Meta_BA_df_nn = Meta_test(runs=3, small=True)
     else:
         #Meta_A_df, Meta_BA_df = Meta_test(runs=2, small=True)
         Meta_A_df = pd.read_csv('Meta_A_df.csv')
         Meta_BA_df = pd.read_csv('Meta_BA_df.csv')
-    for i in [0,1,2,3]:
+    for i in [0,1,2]:
         plt.plot(Meta_A_df_nn['epoch'], Meta_A_df_nn[f'active_coeffs_{i}'], label = 'A_test')
         plt.plot(Meta_BA_df_nn['epoch'], Meta_BA_df_nn[f'active_coeffs_{i}'], label='BA_test')
         plt.legend()
