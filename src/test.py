@@ -55,9 +55,9 @@ def BA_small_test(model_params, training_data, validation_data):
 def BA_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 114, 'pretrain_epochs': 200, 'nbags':  int((1.5 * l) // 250), 'bag_size': 250,
+    train_params = {'bag_epochs': 98, 'pretrain_epochs': 200, 'nbags':  int((1.5 * l) // 250), 'bag_size': 250,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 20, 'bag_learning_rate': .01, 'shuffle_threshold': 5,
-                    'refinement_epochs': 1000}
+                    'refinement_epochs': 2000}
     model_params['batch_size'] = 5000
     model_params['threshold_frequency'] = 25
     net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data, printout = True)
@@ -130,10 +130,10 @@ def Meta_test(runs = 5, small = False):
         Meta_BA_dict[f'{key}_avg'] = (1 / runs) * BAavg
 
     Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
-    Meta_A_df.to_csv('../Meta_A_df_ST4.csv')
+    Meta_A_df.to_csv('../Meta_A_df_AN.csv')
 
     Meta_BA_df = pd.DataFrame.from_dict(Meta_BA_dict, orient='columns')
-    Meta_BA_df.to_csv('../Meta_BA_df_ST4.csv')
+    Meta_BA_df.to_csv('../Meta_BA_df_AN.csv')
 
     return Meta_A_df, Meta_BA_df
 
@@ -164,7 +164,7 @@ def Meta_BA_test(runs = 10, small = False):
         Meta_BA_dict[f'{key}_avg'] = (1 / runs) * BAavg
 
     Meta_BA_df = pd.DataFrame.from_dict(Meta_BA_dict, orient='columns')
-    Meta_BA_df.to_csv('../data/Meta_BA_df_N.csv')
+    Meta_BA_df.to_csv('../data/Meta_BA_df.csv')
 
     return Meta_BA_df
 
@@ -177,8 +177,8 @@ def run():
         #Meta_BA_test = Meta_BA_test(runs = 10, small = False)
 
     else:
-        Meta_A_df = pd.read_csv('../data/Meta_A_df_ST4.csv')
-        Meta_BA_df = pd.read_csv('../data/Meta_BA_df_ST4.csv')
+        Meta_A_df = pd.read_csv('../data/Meta_A_df_AN.csv')
+        Meta_BA_df = pd.read_csv('../data/Meta_BA_df_AN.csv')
 
         plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_avg'], label='A_test')
         plt.plot(Meta_BA_df['epoch'], Meta_BA_df[f'active_coeffs_avg'], label='BA_test')
