@@ -96,7 +96,6 @@ def get_choice_tensor(shape, prob, device):
     return vals
 
 
-
 def train_bag_epochs(model, bag_loader, params, train_params):
     Bag_coeffs = []
     for batch_index, bag_data in enumerate(bag_loader):
@@ -212,6 +211,7 @@ def train_sindy(model_params, train_params, training_data, validation_data, prin
                                             mode='subtrain', print_freq = 50, test_loader = test_loader,
                                             printout= printout,  Loss_dict = Loss_dict)
     if train_params['refinement_epochs']:
+        net.params['sequential_thresholding'] = False
         net, loss_dict,Loss_dict = subtrain_sindy(net, train_loader, model_params, train_params,
                                     mode='refinement', print_freq=50, test_loader=test_loader,
                                     printout=printout, Loss_dict = Loss_dict)
