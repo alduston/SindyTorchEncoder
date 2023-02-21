@@ -177,28 +177,28 @@ def run():
         #Meta_BA_test = Meta_BA_test(runs = 10, small = False)
 
     else:
-        Meta_A_df = pd.read_csv('../data/Meta_A_df_ST2.csv')
-        Meta_BA_df = pd.read_csv('../data/Meta_BA_df_ST2.csv')
+        Meta_A_df = pd.read_csv('../data/Meta_A_df_ST4.csv')
+        Meta_BA_df = pd.read_csv('../data/Meta_BA_df_ST4.csv')
 
         plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_avg'], label='A_test')
         plt.plot(Meta_BA_df['epoch'], Meta_BA_df[f'active_coeffs_avg'], label='BA_test')
         plt.xlabel('epoch')
         plt.ylabel('# active_coeffs')
         plt.title(f'A v BA avg coeffcount')
-        plt.savefig(f'../plots/exp_ncum_avg_ST2.png')
+        plt.savefig(f'../plots/exp_ncum_avg_ST4.png')
         torch_training.clear_plt()
 
 
         avg_loss_A = np.zeros(len(Meta_A_df[f'decoder_{0}']))
         avg_loss_BA = np.zeros(len(Meta_BA_df[f'decoder_{0}']))
-        for i in [0,1,2,3,4]:
+        for i in [0,1]:
             plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_{i}'], label = 'A_test')
             plt.plot(Meta_BA_df['epoch'], Meta_BA_df[f'active_coeffs_{i}'], label='BA_test')
             plt.legend()
             plt.xlabel('epoch')
             plt.ylabel('# active_coeffs')
             plt.title(f'A v BA coeffcount run {i}')
-            plt.savefig(f'../plots/exp_ncum_ST2{i}.png')
+            plt.savefig(f'../plots/exp_ncum_ST4{i}.png')
 
             torch_training.clear_plt()
 
@@ -214,19 +214,19 @@ def run():
             plt.xlabel('epoch')
             plt.ylabel('Log loss')
             plt.title(f'A v BA loss run {i}')
-            plt.savefig(f'../plots/exp_loss_ST2{i}.png')
+            plt.savefig(f'../plots/exp_loss_ST4{i}.png')
 
             torch_training.clear_plt()
 
-    avg_loss_A  *= .2
-    avg_loss_BA *= .2
+    avg_loss_A  *= .5
+    avg_loss_BA *= .5
     plt.plot(Meta_A_df['epoch'], np.log(avg_loss_A), label='A_test')
     plt.plot(Meta_BA_df['epoch'], np.log(avg_loss_BA), label='BA_test')
     plt.legend()
     plt.xlabel('epoch')
     plt.ylabel('Log loss')
     plt.title(f'A v BA avg loss')
-    plt.savefig(f'../plots/exp_avg_loss_ST2.png')
+    plt.savefig(f'../plots/exp_avg_loss_ST4.png')
     torch_training.clear_plt()
 
 
