@@ -102,9 +102,11 @@ def Meta_test(runs = 5, small = False):
             Anet, ALoss_dict = A_small_test(model_params, training_data, validation_data)
         else:
             model_params, training_data, validation_data = get_test_params(max_data=5000)
-            BAnet, BALoss_dict = BA_test(model_params, training_data, validation_data)
             model_params['loss_weight_sindy_regularization'] = 1e-3
             Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
+            model_params['loss_weight_sindy_regularization'] = 1e-5
+            BAnet, BALoss_dict = BA_test(model_params, training_data, validation_data)
+
 
         for key,val in ALoss_dict.items():
             if key== 'epoch' and not run_ix:
