@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="3ae723a2-2f1b-4b45-8b78-c1f489f4fd16" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Docs/.paper_supplements.pdf.icloud" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/pendulum/.model1.data-00000-of-00001.icloud" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/pendulum/.model2.data-00000-of-00001.icloud" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/rd/.model1.data-00000-of-00001.icloud" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/rd/.model2.data-00000-of-00001.icloud" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/rd/analyze_rd_model1.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/examples/rd/analyze_rd_model1.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/rd/analyze_rd_model2.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/examples/rd/analyze_rd_model2.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/rd/example_reactiondiffusion.py" beforeDir="false" afterPath="$PROJECT_DIR$/examples/rd/example_reactiondiffusion.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/rd/model1.index" beforeDir="false" afterPath="$PROJECT_DIR$/examples/rd/model1.index" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/rd/model1.meta" beforeDir="false" afterPath="$PROJECT_DIR$/examples/rd/model1.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/rd/model1_params.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/examples/rd/model1_params.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/rd/model2.index" beforeDir="false" afterPath="$PROJECT_DIR$/examples/rd/model2.index" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/rd/model2.meta" beforeDir="false" afterPath="$PROJECT_DIR$/examples/rd/model2.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/rd/model2_params.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/examples/rd/model2_params.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/rd/train_reactiondiffusion.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/examples/rd/train_reactiondiffusion.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rd_solver/reaction_diffusion_rhs.m" beforeDir="false" afterPath="$PROJECT_DIR$/rd_solver/reaction_diffusion_rhs.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/torch_autoencoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/torch_autoencoder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/torch_training.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/torch_training.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="JupyterTrust" id="38485f3e-437c-432f-a3b1-485f52322f49" />
+  <component name="ProjectId" id="2KBqdVCV4ID0y8SdoLlyHlfylSI" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.test">
+    <configuration name="equivalence_test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Sindy_encoder" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/equivalence_test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Sindy_encoder" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="test2" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Sindy_encoder" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/test2.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="torch_training" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Sindy_encoder" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/torch_training.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.test" />
+        <item itemvalue="Python.torch_training" />
+        <item itemvalue="Python.equivalence_test" />
+        <item itemvalue="Python.test2" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3ae723a2-2f1b-4b45-8b78-c1f489f4fd16" name="Default Changelist" comment="" />
+      <created>1673458410710</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1673458410710</updated>
+      <workItem from="1673458413708" duration="700000" />
+      <workItem from="1673461804238" duration="1241000" />
+      <workItem from="1673632752497" duration="15139000" />
+      <workItem from="1673649890868" duration="22801000" />
+      <workItem from="1673675832874" duration="5428000" />
+      <workItem from="1673717743001" duration="3360000" />
+      <workItem from="1673721227958" duration="615000" />
+      <workItem from="1673722054775" duration="12037000" />
+      <workItem from="1673886721550" duration="34000" />
+      <workItem from="1674089326775" duration="8932000" />
+      <workItem from="1674348807298" duration="25696000" />
+      <workItem from="1675105012596" duration="332000" />
+      <workItem from="1675110282390" duration="833000" />
+      <workItem from="1676582907599" duration="19967000" />
+      <workItem from="1676606004232" duration="1311000" />
+      <workItem from="1676607856888" duration="8122000" />
+      <workItem from="1676617662309" duration="1008000" />
+      <workItem from="1676655153096" duration="8590000" />
+      <workItem from="1676780885633" duration="10217000" />
+      <workItem from="1676825584835" duration="493000" />
+      <workItem from="1676827386784" duration="7302000" />
+      <workItem from="1676846717857" duration="4091000" />
+      <workItem from="1676853971140" duration="1913000" />
+      <workItem from="1676861956206" duration="6120000" />
+      <workItem from="1676869083667" duration="2588000" />
+      <workItem from="1676876846481" duration="5173000" />
+      <workItem from="1676913348534" duration="1423000" />
+      <workItem from="1676918592731" duration="4859000" />
+      <workItem from="1676937257196" duration="1864000" />
+      <workItem from="1676940470097" duration="2485000" />
+      <workItem from="1676952374853" duration="6000" />
+      <workItem from="1676952382846" duration="1000" />
+      <workItem from="1676952846934" duration="16000" />
+      <workItem from="1676953170650" duration="723000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="486" y="209" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1673656467871">
+      <screen x="0" y="25" width="1440" height="815" />
+    </state>
+    <state x="486" y="209" key="#com.intellij.fileTypes.FileTypeChooser/0.25.1440.815@0.25.1440.815" timestamp="1673656467871" />
+    <state x="412" y="213" key="FileChooserDialogImpl" timestamp="1673635993647">
+      <screen x="0" y="25" width="1440" height="815" />
+    </state>
+    <state x="412" y="213" key="FileChooserDialogImpl/0.25.1440.815@0.25.1440.815" timestamp="1673635993647" />
+    <state width="1385" height="158" key="GridCell.Tab.0.bottom" timestamp="1676952371823">
+      <screen x="0" y="25" width="1440" height="798" />
+    </state>
+    <state width="1385" height="158" key="GridCell.Tab.0.bottom/0.25.1440.798@0.25.1440.798" timestamp="1676952371823" />
+    <state width="1398" height="245" key="GridCell.Tab.0.bottom/0.25.1440.799@0.25.1440.799" timestamp="1676878543531" />
+    <state width="1609" height="158" key="GridCell.Tab.0.bottom/0.25.1440.801@0.25.1440.801" timestamp="1676939961287" />
+    <state width="1661" height="213" key="GridCell.Tab.0.bottom/0.25.1440.805@0.25.1440.805" timestamp="1676830520102" />
+    <state width="1079" height="213" key="GridCell.Tab.0.bottom/0.25.1440.807@0.25.1440.807" timestamp="1676791257361" />
+    <state width="1398" height="258" key="GridCell.Tab.0.bottom/0.25.1440.815@0.25.1440.815" timestamp="1674414536230" />
+    <state width="1385" height="158" key="GridCell.Tab.0.center" timestamp="1676952371822">
+      <screen x="0" y="25" width="1440" height="798" />
+    </state>
+    <state width="1385" height="158" key="GridCell.Tab.0.center/0.25.1440.798@0.25.1440.798" timestamp="1676952371822" />
+    <state width="1398" height="245" key="GridCell.Tab.0.center/0.25.1440.799@0.25.1440.799" timestamp="1676878543530" />
+    <state width="1609" height="158" key="GridCell.Tab.0.center/0.25.1440.801@0.25.1440.801" timestamp="1676939961286" />
+    <state width="1661" height="213" key="GridCell.Tab.0.center/0.25.1440.805@0.25.1440.805" timestamp="1676830520101" />
+    <state width="1079" height="213" key="GridCell.Tab.0.center/0.25.1440.807@0.25.1440.807" timestamp="1676791257360" />
+    <state width="1398" height="258" key="GridCell.Tab.0.center/0.25.1440.815@0.25.1440.815" timestamp="1674414536230" />
+    <state width="1385" height="158" key="GridCell.Tab.0.left" timestamp="1676952371822">
+      <screen x="0" y="25" width="1440" height="798" />
+    </state>
+    <state width="1385" height="158" key="GridCell.Tab.0.left/0.25.1440.798@0.25.1440.798" timestamp="1676952371822" />
+    <state width="1398" height="245" key="GridCell.Tab.0.left/0.25.1440.799@0.25.1440.799" timestamp="1676878543530" />
+    <state width="1609" height="158" key="GridCell.Tab.0.left/0.25.1440.801@0.25.1440.801" timestamp="1676939961286" />
+    <state width="1661" height="213" key="GridCell.Tab.0.left/0.25.1440.805@0.25.1440.805" timestamp="1676830520100" />
+    <state width="1079" height="213" key="GridCell.Tab.0.left/0.25.1440.807@0.25.1440.807" timestamp="1676791257360" />
+    <state width="1398" height="258" key="GridCell.Tab.0.left/0.25.1440.815@0.25.1440.815" timestamp="1674414536229" />
+    <state width="1385" height="158" key="GridCell.Tab.0.right" timestamp="1676952371823">
+      <screen x="0" y="25" width="1440" height="798" />
+    </state>
+    <state width="1385" height="158" key="GridCell.Tab.0.right/0.25.1440.798@0.25.1440.798" timestamp="1676952371823" />
+    <state width="1398" height="245" key="GridCell.Tab.0.right/0.25.1440.799@0.25.1440.799" timestamp="1676878543531" />
+    <state width="1609" height="158" key="GridCell.Tab.0.right/0.25.1440.801@0.25.1440.801" timestamp="1676939961287" />
+    <state width="1661" height="213" key="GridCell.Tab.0.right/0.25.1440.805@0.25.1440.805" timestamp="1676830520101" />
+    <state width="1079" height="213" key="GridCell.Tab.0.right/0.25.1440.807@0.25.1440.807" timestamp="1676791257361" />
+    <state width="1398" height="258" key="GridCell.Tab.0.right/0.25.1440.815@0.25.1440.815" timestamp="1674414536230" />
+    <state width="1398" height="251" key="GridCell.Tab.1.bottom" timestamp="1676677116210">
+      <screen x="0" y="25" width="1440" height="798" />
+    </state>
+    <state width="1398" height="251" key="GridCell.Tab.1.bottom/0.25.1440.798@0.25.1440.798" timestamp="1676677116210" />
+    <state width="1398" height="258" key="GridCell.Tab.1.bottom/0.25.1440.815@0.25.1440.815" timestamp="1674414536231" />
+    <state width="1398" height="251" key="GridCell.Tab.1.center" timestamp="1676677116210">
+      <screen x="0" y="25" width="1440" height="798" />
+    </state>
+    <state width="1398" height="251" key="GridCell.Tab.1.center/0.25.1440.798@0.25.1440.798" timestamp="1676677116210" />
+    <state width="1398" height="258" key="GridCell.Tab.1.center/0.25.1440.815@0.25.1440.815" timestamp="1674414536230" />
+    <state width="1398" height="251" key="GridCell.Tab.1.left" timestamp="1676677116210">
+      <screen x="0" y="25" width="1440" height="798" />
+    </state>
+    <state width="1398" height="251" key="GridCell.Tab.1.left/0.25.1440.798@0.25.1440.798" timestamp="1676677116210" />
+    <state width="1398" height="258" key="GridCell.Tab.1.left/0.25.1440.815@0.25.1440.815" timestamp="1674414536230" />
+    <state width="1398" height="251" key="GridCell.Tab.1.right" timestamp="1676677116210">
+      <screen x="0" y="25" width="1440" height="798" />
+    </state>
+    <state width="1398" height="251" key="GridCell.Tab.1.right/0.25.1440.798@0.25.1440.798" timestamp="1676677116210" />
+    <state width="1398" height="258" key="GridCell.Tab.1.right/0.25.1440.815@0.25.1440.815" timestamp="1674414536231" />
+    <state x="208" y="85" key="SettingsEditor" timestamp="1676953237584">
+      <screen x="0" y="25" width="1440" height="798" />
+    </state>
+    <state x="208" y="85" key="SettingsEditor/0.25.1440.798@0.25.1440.798" timestamp="1676953237584" />
+    <state x="208" y="86" key="SettingsEditor/0.25.1440.815@0.25.1440.815" timestamp="1673656335518" />
+    <state x="91" y="125" width="1349" height="556" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1673663343726">
+      <screen x="0" y="25" width="1440" height="815" />
+    </state>
+    <state x="91" y="125" width="1349" height="556" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.25.1440.815@0.25.1440.815" timestamp="1673663343726" />
+    <state x="557" y="214" key="refactoring.ChangeSignatureDialog" timestamp="1676951858141">
+      <screen x="0" y="25" width="1440" height="798" />
+    </state>
+    <state x="557" y="214" key="refactoring.ChangeSignatureDialog/0.25.1440.798@0.25.1440.798" timestamp="1676951858141" />
+    <state x="439" y="161" width="670" height="663" key="search.everywhere.popup" timestamp="1676838531317">
+      <screen x="0" y="25" width="1440" height="799" />
+    </state>
+    <state x="439" y="161" width="670" height="663" key="search.everywhere.popup/0.25.1440.799@0.25.1440.799" timestamp="1676838531317" />
+    <state x="439" y="164" width="670" height="676" key="search.everywhere.popup/0.25.1440.815@0.25.1440.815" timestamp="1674371106618" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tf_model/src/tf_training.py</url>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/SindyTorchEnconder$equivalence_test.coverage" NAME="equivalence_test Coverage Results" MODIFIED="1673733406365" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/SindyTorchEnconder$test2.coverage" NAME="test2 Coverage Results" MODIFIED="1673652923043" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/SindyTorchEnconder$torch_training.coverage" NAME="torch_training Coverage Results" MODIFIED="1676591407597" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/Sindy_encoder$main.coverage" NAME="main Coverage Results" MODIFIED="1673462194826" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/SindyTorchEnconder$main.coverage" NAME="main Coverage Results" MODIFIED="1673636444323" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/SindyTorchEnconder$data_utils.coverage" NAME="data_utils Coverage Results" MODIFIED="1676591399748" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/SindyTorchEnconder$test.coverage" NAME="test Coverage Results" MODIFIED="1676941381510" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+  </component>
+</project>

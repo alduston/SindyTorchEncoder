@@ -285,7 +285,8 @@ class SindyNet(nn.Module):
         x_decode, z = self.forward(x)
         sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx)
         sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
-        reg_loss = 10 * self.sindy_reg_loss()
+        #reg_loss = 10 * self.sindy_reg_loss()
+        reg_loss =  self.sindy_reg_loss()
 
         loss_refinement = sindy_z_loss + sindy_x_loss
         loss = loss_refinement + reg_loss

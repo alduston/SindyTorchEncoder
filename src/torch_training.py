@@ -159,25 +159,17 @@ def validate_one_epoch(model, data_loader):
     return  total_loss, total_loss_dict
 
 
-
-#def bagtrain_sindy(net, bag_loader, model_params, train_params, print_freq = inf):
-    #optimizer = torch.optim.Adam(net.bag_parameters(), lr=model_params['learning_rate'])
-    #bag_params = 0
-
-
-def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_freq = inf, test_loader = [], printout = False):
+def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_freq = inf,
+                   test_loader = [], printout = False, Loss_dict = {}):
 
     loss_dict = {'epoch': [], 'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': [], 'active_coeffs': []}
     pretrain_epochs = train_params[f'{mode}_epochs']
     optimizer = torch.optim.Adam(net.parameters(), lr= model_params['learning_rate'])
     for epoch in range(pretrain_epochs):
         total_loss, total_loss_dict = train_one_epoch(net, train_loader, optimizer)
-        #choice_tensor = get_choice_tensor(net.sindy_coeffs.shape, 1 / (net.epoch**1.5), net.device)
-        #net.coefficient_mask = torch.max(net.coefficient_mask, choice_tensor)
         if not isinf(print_freq):
             if not epoch % print_freq:
                 if printout:
-                    pass
                     print(f'TRAIN Epoch {net.epoch}: Active coeffs: {net.num_active_coeffs}, {[f"{key}: {val.cpu().detach().numpy()}" for (key, val) in total_loss_dict.items()]}')
                 if len(test_loader):
                     test_loss, test_loss_dict = validate_one_epoch(net, test_loader)
@@ -186,8 +178,11 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
                     loss_dict['epoch'].append(float(net.epoch.detach().cpu()))
                     loss_dict['active_coeffs'].append(net.num_active_coeffs)
                     if printout:
-                        pass
                         print(f'TEST Epoch {net.epoch}: Active coeffs: {net.num_active_coeffs}, {[f"test_{key}: {val.cpu().detach().numpy()}" for (key, val) in test_loss_dict.items()]}')
+    if len(Loss_dict.keys()):
+        for key, val in loss_dict.items():
+            Loss_dict[key] += val
+        return net, loss_dict, Loss_dict
     return net, loss_dict
 
 
@@ -202,17 +197,9 @@ def train_sindy(model_params, train_params, training_data, validation_data, prin
     test_loader = get_loader(validation_data, model_params, device=device)
 
     net = SindyNet(model_params).to(device)
-    x, y = net.sindy_coeffs.shape
-    coeff_trajectories = {}
-    for ix in range(x):
-        for iy in range(y):
-            coeff_trajectories[f'{ix}_{iy}_trajectory'] = []
-    net.coeff_trajectories = coeff_trajectories
-    net, loss_dict = subtrain_sindy(net, train_loader, model_params, train_params,
-                         mode = 'pretrain', print_freq = 50, test_loader = test_loader, printout= printout)
-
-    for key, val in loss_dict.items():
-        Loss_dict[key] += val
+    net, loss_dict, Loss_dict = subtrain_sindy(net, train_loader, model_params, train_params,
+                         mode = 'pretrain', print_freq = 50, test_loader = test_loader,
+                         printout= printout, Loss_dict = Loss_dict)
 
     if train_params['bag_epochs']:
         bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
@@ -221,76 +208,13 @@ def train_sindy(model_params, train_params, training_data, validation_data, prin
             if epoch and not epoch%shuffle_threshold:
                 bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
             net  = train_bag_epochs(net, bag_loader, model_params, train_params)
-            net, loss_dict = subtrain_sindy(net, train_loader, model_params,train_params,
-                                            mode='subtrain', print_freq = 50, test_loader = test_loader, printout= printout)
-            for key, val in loss_dict.items():
-                Loss_dict[key] += val
-    net, loss_dict = subtrain_sindy(net, train_loader, model_params, train_params,
-                                    mode='refinement', print_freq=50, test_loader=test_loader, printout=printout)
-    for key, val in loss_dict.items():
-        Loss_dict[key] += val
+            net, loss_dict,Loss_dict = subtrain_sindy(net, train_loader, model_params,train_params,
+                                            mode='subtrain', print_freq = 50, test_loader = test_loader,
+                                            printout= printout,  Loss_dict = Loss_dict)
+    if train_params['refinement_epochs']:
+        net, loss_dict,Loss_dict = subtrain_sindy(net, train_loader, model_params, train_params,
+                                    mode='refinement', print_freq=50, test_loader=test_loader,
+                                    printout=printout, Loss_dict = Loss_dict)
     return net, Loss_dict
 
 
-
-def print_progress(sess, i, loss, losses, train_dict, validation_dict, x_norm, sindy_predict_norm):
-    """
-    Print loss function values to keep track of the training progress.
-
-    Arguments:
-        sess - the tensorflow session
-        i - the training iteration
-        loss - tensorflow object representing the total loss function used in training
-        losses - tuple of the individual losses that make up the total loss
-        train_dict - feed dictionary of training data
-        validation_dict - feed dictionary of validation data
-        x_norm - float, the mean square value of the input
-        sindy_predict_norm - float, the mean square value of the time derivatives of the input.
-        Can be first or second order time derivatives depending on the model order.
-
-    Returns:
-        Tuple of losses calculated on the validation set.
-    """
-    training_loss_vals = sess.run((loss,) + tuple(losses.values()), feed_dict=train_dict)
-    validation_loss_vals = sess.run((loss,) + tuple(losses.values()), feed_dict=validation_dict)
-    print("Epoch %d" % i)
-    print("   training loss {0}, {1}".format(training_loss_vals[0],
-                                             training_loss_vals[1:]))
-    print("   validation loss {0}, {1}".format(validation_loss_vals[0],
-                                               validation_loss_vals[1:]))
-    decoder_losses = sess.run((losses['decoder'], losses['sindy_x']), feed_dict=validation_dict)
-    loss_ratios = (decoder_losses[0]/x_norm, decoder_losses[1]/sindy_predict_norm)
-    print("decoder loss ratio: %f, decoder SINDy loss  ratio: %f" % loss_ratios)
-    return validation_loss_vals
-
-
-def create_feed_dictionary(data, params, idxs=None):
-    """
-    Create the feed dictionary for passing into tensorflow.
-
-    Arguments:
-        data - Dictionary object containing the data to be passed in. Must contain input data x,
-        along the first (and possibly second) order time derivatives dx (ddx).
-        params - Dictionary object containing model and training parameters. The relevant
-        parameters are model_order (which determines whether the SINDy model predicts first or
-        second order time derivatives), sequential_thresholding (which indicates whether or not
-        coefficient thresholding is performed), coefficient_mask (optional if sequential
-        thresholding is performed; 0/1 mask that selects the relevant coefficients in the SINDy
-        model), and learning rate (float that determines the learning rate).
-        idxs - Optional array of indices that selects which examples from the dataset are passed
-        in to tensorflow. If None, all examples are used.
-
-    Returns:
-        feed_dict - Dictionary object containing the relevant data to pass to tensorflow.
-    """
-    if idxs is None:
-        idxs = np.arange(data['x'].shape[0])
-    feed_dict = {}
-    feed_dict['x:0'] = data['x'][idxs]
-    feed_dict['dx:0'] = data['dx'][idxs]
-    if params['model_order'] == 2:
-        feed_dict['ddx:0'] = data['ddx'][idxs]
-    if params['sequential_thresholding']:
-        feed_dict['coefficient_mask:0'] = params['coefficient_mask']
-    feed_dict['learning_rate:0'] = params['learning_rate']
-    return feed_dict
