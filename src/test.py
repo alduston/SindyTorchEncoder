@@ -103,7 +103,7 @@ def Meta_test(runs = 5, small = False):
         else:
             model_params, training_data, validation_data = get_test_params(max_data=5000)
             BAnet, BALoss_dict = BA_test(model_params, training_data, validation_data)
-            model_params['loss_weight_sindy_regularization'] = 1e-4
+            model_params['loss_weight_sindy_regularization'] = 1e-3
             Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
 
         for key,val in ALoss_dict.items():
@@ -130,10 +130,10 @@ def Meta_test(runs = 5, small = False):
         Meta_BA_dict[f'{key}_avg'] = (1 / runs) * BAavg
 
     Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
-    Meta_A_df.to_csv('../Meta_A_df_ST2.csv')
+    Meta_A_df.to_csv('../Meta_A_df_ST3.csv')
 
     Meta_BA_df = pd.DataFrame.from_dict(Meta_BA_dict, orient='columns')
-    Meta_BA_df.to_csv('../Meta_BA_df_ST2.csv')
+    Meta_BA_df.to_csv('../Meta_BA_df_ST3.csv')
 
     return Meta_A_df, Meta_BA_df
 
