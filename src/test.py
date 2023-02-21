@@ -102,9 +102,6 @@ def Meta_test(runs = 5, small = False):
             Anet, ALoss_dict = A_small_test(model_params, training_data, validation_data)
         else:
             model_params, training_data, validation_data = get_test_params(max_data=5000)
-            model_params['loss_weight_sindy_regularization'] = 1e-3
-            Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
-            model_params['loss_weight_sindy_regularization'] = 1e-5
             BAnet, BALoss_dict = BA_test(model_params, training_data, validation_data)
 
 
@@ -132,10 +129,10 @@ def Meta_test(runs = 5, small = False):
         Meta_BA_dict[f'{key}_avg'] = (1 / runs) * BAavg
 
     Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
-    Meta_A_df.to_csv('../Meta_A_df_ST3.csv')
+    Meta_A_df.to_csv('../Meta_A_df_ST4.csv')
 
     Meta_BA_df = pd.DataFrame.from_dict(Meta_BA_dict, orient='columns')
-    Meta_BA_df.to_csv('../Meta_BA_df_ST3.csv')
+    Meta_BA_df.to_csv('../Meta_BA_df_ST4.csv')
 
     return Meta_A_df, Meta_BA_df
 
@@ -172,21 +169,22 @@ def Meta_BA_test(runs = 10, small = False):
 
 
 def run():
+    #Meta_test(runs=1, small=True)
     if torch.cuda.is_available():
-        Meta_A_df, Meta_BA_df = Meta_test(runs=5, small=False)
+        Meta_A_df, Meta_BA_df = Meta_test(runs=2, small=False)
         #Meta_A_df_ip, Meta_BA_df_ip = Meta_test(runs=2, small=False)
         #Meta_BA_test = Meta_BA_test(runs = 10, small = False)
 
     else:
-        Meta_A_df = pd.read_csv('../data/Meta_A_df_ST.csv')
-        Meta_BA_df = pd.read_csv('../data/Meta_BA_df_ST.csv')
+        Meta_A_df = pd.read_csv('../data/Meta_A_df_ST2.csv')
+        Meta_BA_df = pd.read_csv('../data/Meta_BA_df_ST2.csv')
 
         plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_avg'], label='A_test')
         plt.plot(Meta_BA_df['epoch'], Meta_BA_df[f'active_coeffs_avg'], label='BA_test')
         plt.xlabel('epoch')
         plt.ylabel('# active_coeffs')
         plt.title(f'A v BA avg coeffcount')
-        plt.savefig(f'../plots/exp_ncum_avg_ST.png')
+        plt.savefig(f'../plots/exp_ncum_avg_ST2.png')
         torch_training.clear_plt()
 
 
@@ -199,7 +197,7 @@ def run():
             plt.xlabel('epoch')
             plt.ylabel('# active_coeffs')
             plt.title(f'A v BA coeffcount run {i}')
-            plt.savefig(f'../plots/exp_ncum_ST{i}.png')
+            plt.savefig(f'../plots/exp_ncum_ST2{i}.png')
 
             torch_training.clear_plt()
 
@@ -215,7 +213,7 @@ def run():
             plt.xlabel('epoch')
             plt.ylabel('Log loss')
             plt.title(f'A v BA loss run {i}')
-            plt.savefig(f'../plots/exp_loss_ST{i}.png')
+            plt.savefig(f'../plots/exp_loss_ST2{i}.png')
 
             torch_training.clear_plt()
 
@@ -227,7 +225,7 @@ def run():
     plt.xlabel('epoch')
     plt.ylabel('Log loss')
     plt.title(f'A v BA avg loss')
-    plt.savefig(f'../plots/exp_avg_loss_ST.png')
+    plt.savefig(f'../plots/exp_avg_loss_ST2.png')
     torch_training.clear_plt()
 
 
