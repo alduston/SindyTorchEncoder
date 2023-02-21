@@ -130,10 +130,10 @@ def Meta_test(runs = 5, small = False):
         Meta_BA_dict[f'{key}_avg'] = (1 / runs) * BAavg
 
     Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
-    Meta_A_df.to_csv('../Meta_A_df_ST.csv')
+    Meta_A_df.to_csv('../Meta_A_df_ST2.csv')
 
     Meta_BA_df = pd.DataFrame.from_dict(Meta_BA_dict, orient='columns')
-    Meta_BA_df.to_csv('../Meta_BA_df_ST.csv')
+    Meta_BA_df.to_csv('../Meta_BA_df_ST2.csv')
 
     return Meta_A_df, Meta_BA_df
 

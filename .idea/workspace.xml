@@ -11,9 +11,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3ae723a2-2f1b-4b45-8b78-c1f489f4fd16" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/torch_training.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/torch_training.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -197,7 +195,7 @@
       <workItem from="1676952374853" duration="6000" />
       <workItem from="1676952382846" duration="1000" />
       <workItem from="1676952846934" duration="16000" />
-      <workItem from="1676953170650" duration="3563000" />
+      <workItem from="1676953170650" duration="3626000" />
     </task>
     <servers />
   </component>
