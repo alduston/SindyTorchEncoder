@@ -171,7 +171,7 @@ def Meta_BA_test(runs = 10, small = False):
 
 def run():
     if torch.cuda.is_available():
-        Meta_A_df, Meta_BA_df = Meta_test(runs=2, small=False)
+        Meta_A_df, Meta_BA_df = Meta_test(runs=5, small=False)
         #Meta_A_df_ip, Meta_BA_df_ip = Meta_test(runs=2, small=False)
         #Meta_BA_test = Meta_BA_test(runs = 10, small = False)
 
