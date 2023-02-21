@@ -103,6 +103,7 @@ def Meta_test(runs = 5, small = False):
         else:
             model_params, training_data, validation_data = get_test_params(max_data=5000)
             BAnet, BALoss_dict = BA_test(model_params, training_data, validation_data)
+            model_params['loss_weight_sindy_regularization'] = 5e-5
             Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
 
         for key,val in ALoss_dict.items():
@@ -129,10 +130,10 @@ def Meta_test(runs = 5, small = False):
         Meta_BA_dict[f'{key}_avg'] = (1 / runs) * BAavg
 
     Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
-    Meta_A_df.to_csv('../Meta_A_df.csv')
+    Meta_A_df.to_csv('../Meta_A_df_ST.csv')
 
     Meta_BA_df = pd.DataFrame.from_dict(Meta_BA_dict, orient='columns')
-    Meta_BA_df.to_csv('../Meta_BA_df.csv')
+    Meta_BA_df.to_csv('../Meta_BA_df_ST.csv')
 
     return Meta_A_df, Meta_BA_df
 
@@ -175,15 +176,15 @@ def run():
         #Meta_BA_test = Meta_BA_test(runs = 10, small = False)
 
     else:
-        Meta_A_df = pd.read_csv('../data/Meta_A_df_N.csv')
-        Meta_BA_df = pd.read_csv('../data/Meta_BA_df_N.csv')
+        Meta_A_df = pd.read_csv('../data/Meta_A_df_ST.csv')
+        Meta_BA_df = pd.read_csv('../data/Meta_BA_df_ST.csv')
 
         plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_avg'], label='A_test')
         plt.plot(Meta_BA_df['epoch'], Meta_BA_df[f'active_coeffs_avg'], label='BA_test')
         plt.xlabel('epoch')
         plt.ylabel('# active_coeffs')
         plt.title(f'A v BA avg coeffcount')
-        plt.savefig(f'../plots/exp_ncum_avg.png')
+        plt.savefig(f'../plots/exp_ncum_avg_ST.png')
         torch_training.clear_plt()
 
 
@@ -196,7 +197,7 @@ def run():
             plt.xlabel('epoch')
             plt.ylabel('# active_coeffs')
             plt.title(f'A v BA coeffcount run {i}')
-            plt.savefig(f'../plots/exp_ncum{i}.png')
+            plt.savefig(f'../plots/exp_ncum_ST{i}.png')
 
             torch_training.clear_plt()
 
@@ -212,7 +213,7 @@ def run():
             plt.xlabel('epoch')
             plt.ylabel('Log loss')
             plt.title(f'A v BA loss run {i}')
-            plt.savefig(f'../plots/exp_loss{i}.png')
+            plt.savefig(f'../plots/exp_loss_ST{i}.png')
 
             torch_training.clear_plt()
 
@@ -224,7 +225,7 @@ def run():
     plt.xlabel('epoch')
     plt.ylabel('Log loss')
     plt.title(f'A v BA avg loss')
-    plt.savefig(f'../plots/exp_avg_loss.png')
+    plt.savefig(f'../plots/exp_avg_loss_ST.png')
     torch_training.clear_plt()
 
 
