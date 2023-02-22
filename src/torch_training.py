@@ -288,13 +288,8 @@ def train_paralell_epoch(model, bag_loader):
 def crossval(model):
     sub_model_coeffs = model.sub_model_coeffs
     Bag_coeffs = torch.stack(tuple(sub_model_coeffs.values()))
-
     new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model)
-    avg = np.mean(avg_coeffs.detach().cpu().numpy())
-    for key,coeffs in sub_model_coeffs.items():
-        plt.imshow(coeffs/avg)
-        plt.savefig(f'../plots/coeff_hmaps/bag{key}_epoch{model.epoch}_hmap.png')
-        clear_plt()
+    
     model.coefficient_mask = new_mask * model.coefficient_mask
     model.num_active_coeffs = torch.sum(model.coefficient_mask).cpu().detach().numpy()
     return model
