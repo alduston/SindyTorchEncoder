@@ -123,7 +123,7 @@ def get_test_params(train_size = 100, max_data = 100000):
     params['refinement_epochs'] = 2000
     params['crossval_freq'] = 25
     params['test_freq'] = 50
-    params['update_freq'] = 10
+    params['update_freq'] = 50
 
     return params,training_data, validation_data
 

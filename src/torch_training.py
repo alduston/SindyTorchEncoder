@@ -265,7 +265,7 @@ def train_paralell_epoch(model, bag_loader):
 
     sub_model_coeffs = model.sub_model_coeffs
     sub_model_losses_dict = model.sub_model_losses_dict
-    update = bool((model.epoch + 1) % (model.params['update_freq']))
+    update = bool(not (model.epoch + 1) % (model.params['update_freq']))
     model.epoch += 1
     for idx, bag in enumerate(bag_loader):
         coeffs = sub_model_coeffs[f'{idx}']
@@ -281,9 +281,11 @@ def train_paralell_epoch(model, bag_loader):
             sub_losses_dict['active_coeffs'] = model.num_active_coeffs
 
             for key, val in losses.items():
+                if key == 'decoder':
+                    print(round(float(val.detach().cpu()),7))
                 sub_losses_dict[key].append(val)
             sub_model_losses_dict[f'{idx}'] = sub_losses_dict
-            print(f'{str_list_sum(["Train: "] + [f"{key.capitalize()}: {round(float(val[-1].detach().cpu()),9)}, " for key,val in sub_losses_dict.items()])}')
+            #print(f'{str_list_sum(["Train: "] + [f"{key.capitalize()}: {round(float(val[-1]),9)}, " for key,val in sub_losses_dict.items()])}')
     return model
 
 
