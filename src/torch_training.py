@@ -36,7 +36,10 @@ def train_one_step(model, data, optimizer, mode = None):
 def train_one_step_alt(model, data, optimizer, mode = None):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
-        loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'])
+        try:
+            loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'])
+        except KeyError:
+            loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'])
     else:
         loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'])
     loss.backward()
@@ -309,8 +312,8 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
     else:
         device = 'cpu'
 
-    train_bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
-    #train_bag_loader = get_loader(validation_data, model_params, device=device)
+    #train_bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
+    train_bag_loader = get_loader(validation_data, model_params, device=device)
     test_loader = get_loader(validation_data, model_params, device=device)
 
     net = SindyNet(model_params).to(device)
