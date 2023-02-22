@@ -104,7 +104,7 @@ def A_test(model_params, training_data, validation_data):
     l = len(training_data['x'])
     train_params = {'bag_epochs': 0, 'pretrain_epochs': 1000, 'nbags': l // 6, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                    'refinement_epochs': 1000}
+                    'refinement_epochs': 1500}
     model_params['batch_size'] = 5000
     model_params['threshold_frequency'] = 25
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
