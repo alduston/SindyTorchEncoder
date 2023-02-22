@@ -17,6 +17,7 @@ import pickle
 import warnings
 from data_utils import get_test_params,get_loader
 import matplotlib.pyplot as plt
+from copy import deepcopy, copy
 
 warnings.filterwarnings("ignore")
 
@@ -90,7 +91,7 @@ def PA_small_test(model_params, training_data, validation_data):
 def PA_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 500, 'nbags': 5, 'bag_size': int(l//3), 'refinement_epochs': 100}
+    train_params = {'bag_epochs': 7000, 'nbags': 5, 'bag_size': int(l//3), 'refinement_epochs': 1000}
     model_params['batch_size'] = int(l/2)
     model_params['threshold_frequency'] = 25
     model_params['crossval_freq'] = 25
@@ -101,9 +102,9 @@ def PA_test(model_params, training_data, validation_data):
 def A_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 500, 'nbags': l // 6, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 7000, 'nbags': l // 6, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                    'refinement_epochs': 100}
+                    'refinement_epochs': 1000}
     model_params['batch_size'] = int(l/2)
     model_params['threshold_frequency'] = 25
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
@@ -130,7 +131,7 @@ def Meta_test(runs = 5):
     Meta_PA_dict = {}
     Meta_A_dict = {}
     for run_ix in range(runs):
-        model_params, training_data, validation_data = get_test_params(max_data=1000)
+        model_params, training_data, validation_data = get_test_params(max_data=10000)
         PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data)
         Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
 
@@ -157,6 +158,11 @@ def Meta_test(runs = 5):
         Meta_A_dict[f'{key}_avg'] = (1/runs) * Aavg
         Meta_PA_dict[f'{key}_avg'] = (1 / runs) * PAavg
 
+    PA_keys = copy(list(Meta_PA_dict.keys()))
+    for key in PA_keys:
+        if key.startswith('total'):
+            Meta_PA_dict.pop(key,None)
+
     Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
     Meta_A_df.to_csv('../Meta_A_df.csv')
 
@@ -174,8 +180,9 @@ def run():
         #PA_test(model_params, training_data, validation_data)
 
     else:
-        model_params, training_data, validation_data = get_test_params(max_data=200)
-        Anet, PALoss_dict = A_test(model_params, training_data, validation_data)
+        Meta_test(runs=1)
+        #model_params, training_data, validation_data = get_test_params(max_data=200)
+        #Anet, PALoss_dict = PA_test(model_params, training_data, validation_data)
 
     #PAnet, PALoss_dict = PA_small_test(model_params, training_data, validation_data)
 
