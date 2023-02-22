@@ -134,9 +134,9 @@ def train_one_epoch(model, data_loader, optimizer, scheduler = None):
     return total_loss, total_loss_dict
 
 
-def validate_one_step(model, data):
+def validate_one_step(model, data, corr = False):
     if model.params['model_order'] == 1:
-        loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'])
+        loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], corr=corr)
     else:
         loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx=data['dxx'])
     return loss, loss_refinement, losses
@@ -225,7 +225,7 @@ def validate_paralell_epoch(model, data_loader, Loss_dict):
     model.eval()
     total_loss = 0
     total_loss_dict = {}
-    Bag_coeffs = model.sub_model_coeffs
+    Bag_coeffs = copy(model.sub_model_coeffs)
     n_bags = Bag_coeffs.shape[0]
     avg_coeffs = (1 / n_bags) * torch.sum(Bag_coeffs, dim=0)
     val_model = copy(model)
@@ -233,7 +233,7 @@ def validate_paralell_epoch(model, data_loader, Loss_dict):
 
     for batch_index, data in enumerate(data_loader):
         with torch.no_grad():
-            loss, loss_refinement, losses = validate_one_step(val_model, data)
+            loss, loss_refinement, losses = validate_one_step(val_model, data, corr = False)
             total_loss += loss
             if len(total_loss_dict.keys()):
                 for key in total_loss_dict.keys():
@@ -241,6 +241,8 @@ def validate_paralell_epoch(model, data_loader, Loss_dict):
             else:
                 for key, val in losses.items():
                     total_loss_dict[key] = val
+
+
 
     Loss_dict['epoch'].append(int(model.epoch))
     Loss_dict['active_coeffs'].append(int(torch.sum(val_model.coefficient_mask).cpu().detach()))
@@ -253,7 +255,7 @@ def validate_paralell_epoch(model, data_loader, Loss_dict):
 def train_parallel_step(model, data, optimizer, idx):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
-        loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'], idx = idx)
+        loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'],  idx = idx, corr=False)
     else:
         loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'], idx = idx)
     loss.backward()
@@ -300,7 +302,8 @@ def str_list_sum(str_list):
 
 
 def parallell_train_sindy(model_params, train_params, training_data, validation_data, printout = False):
-    Loss_dict = {'epoch': [], 'total': [], 'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': [], 'active_coeffs': []}
+    Loss_dict = {'epoch': [], 'total': [], 'decoder': [], 'sindy_x': [], 'reg': [],
+                 'corr':[], 'sindy_z': [], 'active_coeffs': []}
     if torch.cuda.is_available():
         device = 'cuda:0'
     else:
@@ -321,7 +324,7 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
         sub_model_coeffs.append(get_initialized_weights([library_dim, latent_dim], initializer,
                                        init_param = init_param, device = net.device))
         sub_model_losses_dict[f'{idx}'] = {'epoch': [], 'decoder': [], 'sindy_x': [],
-                                'reg': [], 'sindy_z': [], 'active_coeffs': []}
+                                'reg': [], 'corr':[], 'sindy_z': [], 'active_coeffs': []}
     sub_model_test_losses_dict = deepcopy(sub_model_losses_dict)
 
     sub_model_coeffs = torch.stack(sub_model_coeffs)
@@ -338,9 +341,9 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
         if not epoch % crossval_freq and epoch:
             crossval(net)
         if not epoch % test_freq:
-            net, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict)
+            validate_paralell_epoch(net, test_loader, Loss_dict)
             if printout:
-                print(f'{str_list_sum(["TEST: "] + [f"{key.capitalize()}: {round(val[-1],9)}, " for key,val in Loss_dict.items()])}')
+                print(f'{str_list_sum(["TEST: "] + [f"{key.capitalize()}: {round(val[-1],9) if len(val) else []}, " for key,val in Loss_dict.items()])}')
 
     net, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict)
     train_loader = get_loader(training_data, model_params, device=device)

@@ -245,13 +245,15 @@ class SindyNet(nn.Module):
 
 
     def sindy_corr_loss(self, idx = None):
-        if not idx:
-            return 0
+        if idx == None:
+           n_bags = self.sub_model_coeffs.shape[0]
+           idx_losses = [self.sindy_corr_loss(idx) for idx in range(n_bags)]
+           return (1/n_bags) * sum(idx_losses)
         else:
             sindy_coefficients = self.sub_model_coeffs[idx]
             coeff_norm = torch.linalg.norm(sindy_coefficients)
-            diffs = [sindy_coefficients - alt_coeffs for alt_coeffs in self.sub_model_coeffs.vals()]
-            diff_sum = torch.sum([torch.linalg.norm(diff)/coeff_norm for diff  in diffs])
+            diffs = [sindy_coefficients - alt_coeffs for alt_coeffs in self.sub_model_coeffs]
+            diff_sum = sum([torch.linalg.norm(diff)/coeff_norm for diff  in diffs])
             return self.params['loss_weight_correlation'] * diff_sum
 
 
@@ -295,13 +297,13 @@ class SindyNet(nn.Module):
         sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx, idx)
         sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx, idx)
         reg_loss = self.sindy_reg_loss(idx)
-        cor_loss = self.sindy_corr_loss(idx)
+        corr_loss = self.sindy_corr_loss(idx)
 
         loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss
         loss = loss_refinement + reg_loss
 
         losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss,
-                  'sindy_x': sindy_x_loss, 'reg':  reg_loss, 'cor': cor_loss}
+                  'sindy_x': sindy_x_loss, 'reg':  reg_loss, 'corr': corr_loss}
         return loss, loss_refinement, losses
 
     def loss(self, x, x_decode, z, dx, ddx=None):
@@ -313,8 +315,14 @@ class SindyNet(nn.Module):
         return self.loss(x, x_decode, z, dx, ddx)
 
 
-    def auto_Loss(self, x, dx, ddx=None, idx = None):
+    #def auto_Loss(self, x, dx, ddx=None, idx = None):
+        #x_decode, z = self.forward(x)
+        #return self.Loss(x, x_decode, z, dx, ddx, idx)
+
+    def auto_Loss(self, x, dx, ddx=None, idx=None, corr = False):
         x_decode, z = self.forward(x)
+        if corr:
+            return self.Loss_pcor(x, x_decode, z, dx, ddx, idx)
         return self.Loss(x, x_decode, z, dx, ddx, idx)
 
 
