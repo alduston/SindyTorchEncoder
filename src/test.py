@@ -90,8 +90,8 @@ def PA_small_test(model_params, training_data, validation_data):
 def PA_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 4000, 'nbags': 5, 'bag_size': int(l//3), 'refinement_epochs': 2000}
-    model_params['batch_size'] = l
+    train_params = {'bag_epochs': 500, 'nbags': 5, 'bag_size': int(l//3), 'refinement_epochs': 100}
+    model_params['batch_size'] = int(l/2)
     model_params['threshold_frequency'] = 25
     model_params['crossval_freq'] = 25
     net, Loss_dict = parallell_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
@@ -101,10 +101,10 @@ def PA_test(model_params, training_data, validation_data):
 def A_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 1000, 'nbags': l // 6, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 500, 'nbags': l // 6, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                    'refinement_epochs': 1500}
-    model_params['batch_size'] = 5000
+                    'refinement_epochs': 100}
+    model_params['batch_size'] = int(l/2)
     model_params['threshold_frequency'] = 25
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
@@ -125,58 +125,53 @@ def A_small_test(model_params, training_data, validation_data):
     return net, Loss_dict
 
 
-def Meta_test(runs = 5, small = False):
+def Meta_test(runs = 5):
     Keys = {'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': [], 'active_coeffs':[]}
-    Meta_BA_dict = {}
+    Meta_PA_dict = {}
     Meta_A_dict = {}
     for run_ix in range(runs):
-        if small:
-            model_params, training_data, validation_data = get_test_params(max_data=400)
-            BAnet, BALoss_dict = BA_small_test(model_params, training_data, validation_data)
-            Anet, ALoss_dict = A_small_test(model_params, training_data, validation_data)
-        else:
-            model_params, training_data, validation_data = get_test_params(max_data=5000)
-            BAnet, BALoss_dict = BA_test(model_params, training_data, validation_data)
-            Anet, ALoss_dict = A_small_test(model_params, training_data, validation_data)
-
+        model_params, training_data, validation_data = get_test_params(max_data=1000)
+        PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data)
+        Anet, ALoss_dict = A_small_test(model_params, training_data, validation_data)
 
         for key,val in ALoss_dict.items():
-            if key== 'epoch' and not run_ix:
+            if key=='epoch' and not run_ix:
                 if not run_ix:
                     Meta_A_dict[f'{key}'] = val
             else:
                 Meta_A_dict[f'{key}_{run_ix}'] = val
 
-        for key,val in BALoss_dict.items():
+        for key,val in PALoss_dict.items():
             if key== 'epoch' and not run_ix:
                 if not run_ix:
-                    Meta_BA_dict[f'{key}'] = val
+                    Meta_PA_dict[f'{key}'] = val
             else:
-                Meta_BA_dict[f'{key}_{run_ix}'] = val
+                Meta_PA_dict[f'{key}_{run_ix}'] = val
 
     for key in Keys:
-        BAavg = np.zeros(len(Meta_BA_dict[f'{key}_{0}']))
+        PAavg = np.zeros(len(Meta_PA_dict[f'{key}_{0}']))
         Aavg = np.zeros(len(Meta_A_dict[f'{key}_{0}']))
         for run_ix in range(runs):
-            BAavg += np.asarray(Meta_BA_dict[f'{key}_{run_ix}'])
+            PAavg += np.asarray(Meta_PA_dict[f'{key}_{run_ix}'])
             Aavg += np.asarray(Meta_A_dict[f'{key}_{run_ix}'])
         Meta_A_dict[f'{key}_avg'] = (1/runs) * Aavg
-        Meta_BA_dict[f'{key}_avg'] = (1 / runs) * BAavg
+        Meta_PA_dict[f'{key}_avg'] = (1 / runs) * PAavg
 
     Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
-    Meta_A_df.to_csv('../Meta_A_df_AN.csv')
+    Meta_A_df.to_csv('../Meta_A_df.csv')
 
-    Meta_BA_df = pd.DataFrame.from_dict(Meta_BA_dict, orient='columns')
-    Meta_BA_df.to_csv('../Meta_BA_df_AN.csv')
+    Meta_BA_df = pd.DataFrame.from_dict(Meta_PA_dict, orient='columns')
+    Meta_BA_df.to_csv('../Meta_PA_df.csv')
 
     return Meta_A_df, Meta_BA_df
 
 
 def run():
     if torch.cuda.is_available():
-        model_params, training_data, validation_data = get_test_params(max_data=5000)
+        Meta_test(runs=1)
+        #model_params, training_data, validation_data = get_test_params(max_data=5000)
         #A_test(model_params, training_data, validation_data)
-        PA_test(model_params, training_data, validation_data)
+        #PA_test(model_params, training_data, validation_data)
 
     else:
         model_params, training_data, validation_data = get_test_params(max_data=200)
