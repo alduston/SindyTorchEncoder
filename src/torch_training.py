@@ -36,7 +36,7 @@ def train_one_step(model, data, optimizer, mode = None):
 def train_one_step_alt(model, data, optimizer, mode = None):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
-        loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['x_bag'])
+        loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'])
     else:
         loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'])
     loss.backward()
