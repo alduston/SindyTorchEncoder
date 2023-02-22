@@ -259,7 +259,7 @@ def validate_paralell_epoch(model, data_loader, Loss_dict):
     return model, Loss_dict
 
 
-def train_paralell_epoch(model, bag_loader):
+def train_paralell_epoch(model, bag_loader, optimizer):
     model.eval()
     epoch_loss = 0
 
@@ -269,8 +269,7 @@ def train_paralell_epoch(model, bag_loader):
     model.epoch += 1
     for idx, bag in enumerate(bag_loader):
         coeffs = sub_model_coeffs[f'{idx}']
-        #model.sindy_coeffs = torch.nn.Parameter(coeffs, requires_grad=True)
-        optimizer = torch.optim.Adam(model.parameters(), lr=model.params['learning_rate'])
+        model.sindy_coeffs = torch.nn.Parameter(coeffs, requires_grad=True)
         loss, loss_refinement, losses = train_one_step_alt(model, bag, optimizer)
         epoch_loss += loss
         model.sub_model_coeffs[f'{idx}'] = deepcopy(model.sindy_coeffs.detach())
@@ -317,7 +316,6 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
     net = SindyNet(model_params).to(device)
     sub_model_coeffs = {}
     sub_model_losses_dict = {}
-
     for idx, bag in enumerate(train_bag_loader):
         library_dim = net.params['library_dim']
         latent_dim = net.params['latent_dim']
@@ -335,8 +333,9 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
 
     crossval_freq = net.params['crossval_freq']
     test_freq = net.params['test_freq']
+    optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'])
     for epoch in range(train_params['bag_epochs']):
-        train_paralell_epoch(net, train_bag_loader)
+        train_paralell_epoch(net, train_bag_loader,optimizer)
         if not epoch % crossval_freq and epoch:
             crossval(net)
         if not epoch % test_freq:

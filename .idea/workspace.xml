@@ -11,7 +11,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3ae723a2-2f1b-4b45-8b78-c1f489f4fd16" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/torch_training.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/torch_training.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -198,7 +197,7 @@
       <workItem from="1676952846934" duration="16000" />
       <workItem from="1676953170650" duration="8111000" />
       <workItem from="1677004446546" duration="1210000" />
-      <workItem from="1677021699582" duration="16862000" />
+      <workItem from="1677021699582" duration="17006000" />
     </task>
     <servers />
   </component>
@@ -314,7 +313,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/torch_training.py</url>
-          <line>316</line>
+          <line>315</line>
           <option name="timeStamp" value="13" />
         </line-breakpoint>
       </breakpoints>
