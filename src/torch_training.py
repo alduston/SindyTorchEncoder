@@ -309,8 +309,8 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
     else:
         device = 'cpu'
 
-    #train_bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
-    train_bag_loader = get_loader(validation_data, model_params, device=device)
+    train_bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
+    #train_bag_loader = get_loader(validation_data, model_params, device=device)
     test_loader = get_loader(validation_data, model_params, device=device)
 
     net = SindyNet(model_params).to(device)
