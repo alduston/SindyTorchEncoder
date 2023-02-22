@@ -86,7 +86,7 @@ def process_bag_coeffs(Bag_coeffs, model):
     n_samples = Bag_coeffs.shape[0]
     avg_coeffs = (1/n_samples) * torch.sum(Bag_coeffs, dim = 0)
 
-    ip_thresh = .5
+    ip_thresh = .8
     min_ip = 1
     for ix in range(x):
         for iy in range(y):
@@ -293,8 +293,6 @@ def crossval(model):
 
     model.coefficient_mask = new_mask * model.coefficient_mask
     model.num_active_coeffs = int(torch.sum(model.coefficient_mask).cpu().detach())
-    for key in model.sub_model_coeffs.keys():
-        model.sub_model_coeffs[key] = avg_coeffs
     return model
 
 
