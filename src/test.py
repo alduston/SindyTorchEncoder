@@ -132,7 +132,10 @@ def Meta_test(runs = 5):
     Meta_A_dict = {}
     for run_ix in range(runs):
         model_params, training_data, validation_data = get_test_params(max_data=10000)
+        model_params['loss_weight_sindy_regularization'] = 1e-4
         PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data)
+
+        model_params['loss_weight_sindy_regularization'] = 1e-5
         Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
 
         for key,val in ALoss_dict.items():
@@ -194,7 +197,7 @@ def run():
 
         avg_loss_A = np.zeros(len(Meta_A_df[f'decoder_{0}']))
         avg_loss_BA = np.zeros(len(Meta_PA_df[f'decoder_{0}']))
-        for i in [0]:
+        for i in [0,1,2,3,4]:
             plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_{i}'], label = 'A_test')
             plt.plot(Meta_PA_df['epoch'], Meta_PA_df[f'active_coeffs_{i}'], label='PA_test')
             plt.legend()
