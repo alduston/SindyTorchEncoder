@@ -132,7 +132,7 @@ def Meta_test(runs = 5):
     for run_ix in range(runs):
         model_params, training_data, validation_data = get_test_params(max_data=1000)
         PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data)
-        Anet, ALoss_dict = A_small_test(model_params, training_data, validation_data)
+        Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
 
         for key,val in ALoss_dict.items():
             if key=='epoch' and not run_ix:

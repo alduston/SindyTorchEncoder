@@ -180,7 +180,7 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
                     loss_dict['active_coeffs'].append(int(net.num_active_coeffs))
                     if printout:
                        print(f'{str_list_sum(["TEST: "] + [f"{key.capitalize()}: {round(val[-1],9)}, " for key,val in loss_dict.items()])}')
-                       
+
     if len(Loss_dict.keys()):
         for key, val in loss_dict.items():
             Loss_dict[key] += val
@@ -340,7 +340,7 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
         if not epoch % test_freq:
             net, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict)
             if printout:
-                print(f'{str_list_sum(["Test: "] + [f"{key.capitalize()}: {round(val[-1],9)}, " for key,val in Loss_dict.items()])}')
+                print(f'{str_list_sum(["TEST: "] + [f"{key.capitalize()}: {round(val[-1],9)}, " for key,val in Loss_dict.items()])}')
 
     net, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict)
     train_loader = get_loader(training_data, model_params, device=device)
