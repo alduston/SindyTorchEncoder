@@ -90,7 +90,7 @@ def PA_small_test(model_params, training_data, validation_data):
 def PA_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 6000, 'pretrain_epochs': 0, 'nbags': 8, 'bag_size': int(l//4), 'refinement_epochs': 2000}
+    train_params = {'bag_epochs': 6000, 'nbags': 5, 'bag_size': int(l//3), 'refinement_epochs': 2000}
     model_params['batch_size'] = l
     model_params['threshold_frequency'] = 25
     net, Loss_dict = parallell_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
@@ -173,11 +173,8 @@ def Meta_test(runs = 5, small = False):
 
 
 def run():
-    model_params, training_data, validation_data = get_test_params(max_data=400)
-    model_params['crossval_freq'] = 20
-    PA_test(model_params, training_data, validation_data)
     if torch.cuda.is_available():
-        model_params, training_data, validation_data = get_test_params(max_data=5000)
+        model_params, training_data, validation_data = get_test_params(max_data=10000)
         PA_test(model_params, training_data, validation_data)
 
     #PAnet, PALoss_dict = PA_small_test(model_params, training_data, validation_data)
