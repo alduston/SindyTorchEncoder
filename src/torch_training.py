@@ -87,11 +87,16 @@ def process_bag_coeffs(Bag_coeffs, model):
     avg_coeffs = (1/n_samples) * torch.sum(Bag_coeffs, dim = 0)
 
     ip_thresh = .5
+    min_ip = 1
     for ix in range(x):
         for iy in range(y):
             coeffs_vec = Bag_coeffs[:,ix,iy]
             ip = sum([abs(val) > .1 for val in coeffs_vec])/len(coeffs_vec)
             new_mask[ix, iy] = 1 if ip > ip_thresh else 0
+
+            if ip < min_ip:
+                min_ip = ip
+    print(min_ip)
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = model.params['device'])
     return new_mask, avg_coeffs
 
@@ -289,9 +294,9 @@ def crossval(model):
     sub_model_coeffs = model.sub_model_coeffs
     Bag_coeffs = torch.stack(tuple(sub_model_coeffs.values()))
     new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model)
-    
+
     model.coefficient_mask = new_mask * model.coefficient_mask
-    model.num_active_coeffs = torch.sum(model.coefficient_mask).cpu().detach().numpy()
+    model.num_active_coeffs = int(torch.sum(model.coefficient_mask).cpu().detach())
     return model
 
 
@@ -319,7 +324,7 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
         library_dim = net.params['library_dim']
         latent_dim = net.params['latent_dim']
         initializer, init_param = net.initializer()
-        sub_model_coeffs[f'{idx}'] = get_initialized_weights([library_dim, latent_dim], initializer,
+        sub_model_coeffs[f'{idx}'] = .5 * get_initialized_weights([library_dim, latent_dim], initializer,
                                        init_param = init_param, device = net.device)
         sub_model_losses_dict[f'{idx}'] = {'epoch': [], 'decoder': [], 'sindy_x': [],
                                 'reg': [], 'sindy_z': [], 'active_coeffs': []}
