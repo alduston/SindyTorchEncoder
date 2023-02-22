@@ -256,7 +256,7 @@ def validate_paralell_epoch(model, data_loader, Loss_dict):
     return model, Loss_dict
 
 
-def train_paralell_epoch(model, bag_loader, optimizer):
+def train_paralell_epoch(model, bag_loader):
     model.eval()
     epoch_loss = 0
 
@@ -268,10 +268,11 @@ def train_paralell_epoch(model, bag_loader, optimizer):
     for idx, bag in enumerate(bag_loader):
         coeffs = sub_model_coeffs[f'{idx}']
         model.sindy_coeffs = torch.nn.Parameter(coeffs, requires_grad=True)
+        optimizer = torch.optim.Adam(model.parameters(), lr=model.params['learning_rate'])
 
         loss, loss_refinement, losses = train_one_step_alt(model, bag, optimizer)
         epoch_loss += loss
-        model.sub_model_coeffs[f'{idx}'] = model.sindy_coeffs.detach()
+        model.sub_model_coeffs[f'{idx}'] = deepcopy(model.sindy_coeffs.detach())
 
         if update:
             sub_losses_dict = sub_model_losses_dict[f'{idx}']
@@ -283,15 +284,21 @@ def train_paralell_epoch(model, bag_loader, optimizer):
             sub_model_losses_dict[f'{idx}'] = sub_losses_dict
     return model
 
+
 def crossval(model):
     sub_model_coeffs = model.sub_model_coeffs
     Bag_coeffs = torch.stack(tuple(sub_model_coeffs.values()))
 
     new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model)
+    avg = np.mean(avg_coeffs.detach().cpu().numpy())
+    for key,coeffs in sub_model_coeffs.items():
+        plt.imshow(coeffs/avg)
+        plt.savefig(f'../plots/coeff_hmaps/bag{key}_epoch{model.epoch}_hmap.png')
+        clear_plt()
     model.coefficient_mask = new_mask * model.coefficient_mask
-    active_coeffs = torch.sum(model.coefficient_mask).cpu().detach().numpy()
     model.num_active_coeffs = torch.sum(model.coefficient_mask).cpu().detach().numpy()
     return model
+
 
 def str_list_sum(str_list):
     sum_str = ''
@@ -312,7 +319,6 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
     net = SindyNet(model_params).to(device)
     sub_model_coeffs = {}
     sub_model_losses_dict = {}
-    sub_model_test_losses_dict = {}
 
     for idx, bag in enumerate(train_bag_loader):
         library_dim = net.params['library_dim']
@@ -329,11 +335,10 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
     net.sub_model_losses_dict = sub_model_losses_dict
     net.sub_model_test_losses_dict = sub_model_test_losses_dict
 
-    optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'])
     crossval_freq = net.params['crossval_freq']
     test_freq = net.params['test_freq']
     for epoch in range(train_params['bag_epochs']):
-        train_paralell_epoch(net, train_bag_loader, optimizer)
+        train_paralell_epoch(net, train_bag_loader)
         if not epoch % crossval_freq and epoch:
             crossval(net)
         if not epoch % test_freq:
