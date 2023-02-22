@@ -111,7 +111,7 @@ def get_test_params(train_size = 100, max_data = 100000):
     # training parameters
     params['epoch_size'] = training_data['x'].shape[0]
     params['batch_size'] = min([params['epoch_size']//8, train_size])
-    params['threshold_frequency'] =  5
+    params['threshold_frequency'] = 5
     params['learning_rate'] = 1e-3
 
     params['data_path'] = os.getcwd() + '/'
@@ -120,9 +120,9 @@ def get_test_params(train_size = 100, max_data = 100000):
 
     # training time cutoffs
     params['max_epochs'] = 5000
-    params['refinement_epochs'] = 1000
+    params['refinement_epochs'] = 2000
     params['crossval_freq'] = 200
-    params['test_freq'] = 10
+    params['test_freq'] = 50
     params['update_freq'] = 10
 
     return params,training_data, validation_data

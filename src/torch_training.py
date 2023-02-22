@@ -263,10 +263,7 @@ def train_paralell_epoch(model, bag_loader, optimizer):
     sub_model_coeffs = model.sub_model_coeffs
     sub_model_losses_dict = model.sub_model_losses_dict
     update = bool((model.epoch + 1) % (model.params['update_freq']))
-
     model.epoch += 1
-    if update:
-        active_coeffs = torch.sum(model.coefficient_mask).cpu().detach().numpy()
 
     for idx, bag in enumerate(bag_loader):
         coeffs = sub_model_coeffs[f'{idx}']
@@ -279,12 +276,11 @@ def train_paralell_epoch(model, bag_loader, optimizer):
         if update:
             sub_losses_dict = sub_model_losses_dict[f'{idx}']
             sub_losses_dict['epoch'].append(model.epoch)
-            sub_losses_dict['active_coeffs'] = active_coeffs
+            sub_losses_dict['active_coeffs'] = model.num_active_coeffs
+
             for key, val in losses.items():
                 sub_losses_dict[key].append(val)
             sub_model_losses_dict[f'{idx}'] = sub_losses_dict
-
-    model.epoch += 1
     return model
 
 def crossval(model):
@@ -293,6 +289,8 @@ def crossval(model):
 
     new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model)
     model.coefficient_mask = new_mask * model.coefficient_mask
+    active_coeffs = torch.sum(model.coefficient_mask).cpu().detach().numpy()
+    model.num_active_coeffs = torch.sum(model.coefficient_mask).cpu().detach().numpy()
     return model
 
 def str_list_sum(str_list):
