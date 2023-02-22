@@ -283,7 +283,7 @@ def train_paralell_epoch(model, bag_loader):
             for key, val in losses.items():
                 sub_losses_dict[key].append(val)
             sub_model_losses_dict[f'{idx}'] = sub_losses_dict
-            print(f'{str_list_sum(["Train: "] + [f"{key.capitalize()}: {round(val[-1],9)}, " for key,val in sub_losses_dict.items()])}')
+            print(f'{str_list_sum(["Train: "] + [f"{key.capitalize()}: {round(float(val[-1].detach().cpu()),9)}, " for key,val in sub_losses_dict.items()])}')
     return model
 
 
