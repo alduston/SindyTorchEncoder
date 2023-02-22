@@ -341,7 +341,8 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
         if not epoch % test_freq:
             net, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict)
             if printout:
-                print(f'{str_list_sum(["Test: "] + [f"{key.capitalize()}: {round(val[-1],9)}, " for key,val in Loss_dict.items()])}')
+                pass
+                #print(f'{str_list_sum(["Test: "] + [f"{key.capitalize()}: {round(val[-1],9)}, " for key,val in Loss_dict.items()])}')
 
     net, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict)
     train_loader = get_loader(training_data, model_params, device=device)
