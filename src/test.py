@@ -91,7 +91,7 @@ def PA_small_test(model_params, training_data, validation_data):
 def PA_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 7800, 'nbags': 5, 'bag_size': int(l//3), 'refinement_epochs': 200}
+    train_params = {'bag_epochs': 7800, 'nbags': 8, 'bag_size': int(l//8), 'refinement_epochs': 200}
     model_params['batch_size'] = int(l/2)
     model_params['threshold_frequency'] = 25
     model_params['crossval_freq'] = 25
