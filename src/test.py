@@ -132,7 +132,7 @@ def Meta_test(runs = 5):
     Meta_A_dict = {}
     for run_ix in range(runs):
         model_params, training_data, validation_data = get_test_params(max_data=8000)
-        model_params['loss_weight_sindy_regularization'] = 1e-4
+        model_params['loss_weight_sindy_regularization'] = 5e-4
         PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data)
 
         model_params['loss_weight_sindy_regularization'] = 1e-5
