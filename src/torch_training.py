@@ -93,10 +93,8 @@ def process_bag_coeffs(Bag_coeffs, model):
             coeffs_vec = Bag_coeffs[:,ix,iy]
             ip = sum([abs(val) > .1 for val in coeffs_vec])/len(coeffs_vec)
             new_mask[ix, iy] = 1 if ip > ip_thresh else 0
-
             if ip < min_ip:
                 min_ip = ip
-    print(min_ip)
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = model.params['device'])
     return new_mask, avg_coeffs
 
@@ -269,12 +267,10 @@ def train_paralell_epoch(model, bag_loader):
     sub_model_losses_dict = model.sub_model_losses_dict
     update = bool((model.epoch + 1) % (model.params['update_freq']))
     model.epoch += 1
-
     for idx, bag in enumerate(bag_loader):
         coeffs = sub_model_coeffs[f'{idx}']
         model.sindy_coeffs = torch.nn.Parameter(coeffs, requires_grad=True)
         optimizer = torch.optim.Adam(model.parameters(), lr=model.params['learning_rate'])
-
         loss, loss_refinement, losses = train_one_step_alt(model, bag, optimizer)
         epoch_loss += loss
         model.sub_model_coeffs[f'{idx}'] = deepcopy(model.sindy_coeffs.detach())
