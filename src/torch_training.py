@@ -269,7 +269,7 @@ def train_paralell_epoch(model, bag_loader):
     model.epoch += 1
     for idx, bag in enumerate(bag_loader):
         coeffs = sub_model_coeffs[f'{idx}']
-        model.sindy_coeffs = torch.nn.Parameter(coeffs, requires_grad=True)
+        #model.sindy_coeffs = torch.nn.Parameter(coeffs, requires_grad=True)
         optimizer = torch.optim.Adam(model.parameters(), lr=model.params['learning_rate'])
         loss, loss_refinement, losses = train_one_step_alt(model, bag, optimizer)
         epoch_loss += loss
@@ -285,7 +285,6 @@ def train_paralell_epoch(model, bag_loader):
                     print(round(float(val.detach().cpu()),7))
                 sub_losses_dict[key].append(val)
             sub_model_losses_dict[f'{idx}'] = sub_losses_dict
-            #print(f'{str_list_sum(["Train: "] + [f"{key.capitalize()}: {round(float(val[-1]),9)}, " for key,val in sub_losses_dict.items()])}')
     return model
 
 
