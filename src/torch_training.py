@@ -177,9 +177,10 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
                     for key,val in test_loss_dict.items():
                         loss_dict[key].append(float(val.detach().cpu()))
                     loss_dict['epoch'].append(float(net.epoch.detach().cpu()))
-                    loss_dict['active_coeffs'].append(net.num_active_coeffs)
+                    loss_dict['active_coeffs'].append(int(net.num_active_coeffs))
                     if printout:
-                        print(f'{str_list_sum(["Test: "] + [f"{key.capitalize()}: {round(val[-1],9)}, " for key,val in loss_dict.items()])}')
+                       print(f'{str_list_sum(["TEST: "] + [f"{key.capitalize()}: {round(val[-1],9)}, " for key,val in loss_dict.items()])}')
+                       
     if len(Loss_dict.keys()):
         for key, val in loss_dict.items():
             Loss_dict[key] += val

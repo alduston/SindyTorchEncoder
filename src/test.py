@@ -175,10 +175,9 @@ def run():
 
     else:
         model_params, training_data, validation_data = get_test_params(max_data=200)
-        model_params['crossval_freq'] = 10
-        Anet, PALoss_dict = PA_small_test(model_params, training_data, validation_data)
+        Anet, PALoss_dict = A_test(model_params, training_data, validation_data)
 
-    PAnet, PALoss_dict = PA_small_test(model_params, training_data, validation_data)
+    #PAnet, PALoss_dict = PA_small_test(model_params, training_data, validation_data)
 
 
     '''
