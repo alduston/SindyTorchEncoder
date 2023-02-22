@@ -173,17 +173,17 @@ def Meta_test(runs = 5):
 
 
 def run():
-    model_params, training_data, validation_data = get_test_params(max_data=200)
-    PA_test(model_params, training_data, validation_data)
+    #model_params, training_data, validation_data = get_test_params(max_data=200)
+    #PA_test(model_params, training_data, validation_data)
     if torch.cuda.is_available():
-        Meta_test(runs=4)
+        Meta_test(runs=2)
         #model_params, training_data, validation_data = get_test_params(max_data=5000)
         #A_test(model_params, training_data, validation_data)
         #PA_test(model_params, training_data, validation_data)
 
     else:
-        Meta_A_df = pd.read_csv('../data/Meta_A_df.csv')
-        Meta_PA_df = pd.read_csv('../data/Meta_PAS_df.csv')
+        Meta_A_df = pd.read_csv('../data/Meta_A_df2.csv')
+        Meta_PA_df = pd.read_csv('../data/Meta_PAS_df2.csv')
 
         plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_avg'], label='A_test')
         plt.plot(Meta_PA_df['epoch'], Meta_PA_df[f'active_coeffs_avg'], label='PA_test')
@@ -197,7 +197,7 @@ def run():
 
         avg_loss_A = np.zeros(len(Meta_A_df[f'decoder_{0}']))
         avg_loss_BA = np.zeros(len(Meta_PA_df[f'decoder_{0}']))
-        for i in [0,1,2,3]:
+        for i in [0,1]:
             plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_{i}'], label = 'A_test')
             plt.plot(Meta_PA_df['epoch'], Meta_PA_df[f'active_coeffs_{i}'], label='PA_test')
             plt.legend()
@@ -224,8 +224,8 @@ def run():
 
             torch_training.clear_plt()
 
-    avg_loss_A  *= .2
-    avg_loss_BA *= .2
+    avg_loss_A  *= .5
+    avg_loss_BA *= .5
     plt.plot(Meta_A_df['epoch'], np.log(avg_loss_A), label='A_test')
     plt.plot(Meta_PA_df['epoch'], np.log(avg_loss_BA), label='PA_test')
     plt.legend()

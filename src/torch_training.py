@@ -233,7 +233,7 @@ def validate_paralell_epoch(model, data_loader, Loss_dict):
 
     for batch_index, data in enumerate(data_loader):
         with torch.no_grad():
-            loss, loss_refinement, losses = validate_one_step(val_model, data, corr = False)
+            loss, loss_refinement, losses = validate_one_step(val_model, data, corr = True)
             total_loss += loss
             if len(total_loss_dict.keys()):
                 for key in total_loss_dict.keys():
@@ -252,10 +252,10 @@ def validate_paralell_epoch(model, data_loader, Loss_dict):
     return val_model, Loss_dict
 
 
-def train_parallel_step(model, data, optimizer, idx):
+def train_parallel_step(model, data, optimizer, idx, corr = False):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
-        loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'],  idx = idx, corr=False)
+        loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'],  idx = idx, corr=corr)
     else:
         loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'], idx = idx)
     loss.backward()
@@ -271,7 +271,7 @@ def train_paralell_epoch(model, bag_loader, optimizer):
     update = bool(not (model.epoch + 1) % (model.params['update_freq']))
     model.epoch += 1
     for idx, bag in enumerate(bag_loader):
-        loss, loss_refinement, losses = train_parallel_step(model, bag, optimizer, idx)
+        loss, loss_refinement, losses = train_parallel_step(model, bag, optimizer, idx, corr = True)
         epoch_loss += loss
 
         if update:
@@ -291,7 +291,7 @@ def crossval(model):
 
     model.coefficient_mask = new_mask * model.coefficient_mask
     model.num_active_coeffs = int(torch.sum(model.coefficient_mask).cpu().detach())
-    model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
+    model.sindy_coeffs = torch.nn.Parameter(model.coefficient_mask * avg_coeffs, requires_grad=True)
     return model
 
 
