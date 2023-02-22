@@ -36,10 +36,7 @@ def train_one_step(model, data, optimizer, mode = None):
 def train_one_step_alt(model, data, optimizer, mode = None):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
-        try:
-            loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'])
-        except KeyError:
-            loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'])
+        loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'])
     else:
         loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'])
     loss.backward()
@@ -286,6 +283,7 @@ def train_paralell_epoch(model, bag_loader):
             for key, val in losses.items():
                 sub_losses_dict[key].append(val)
             sub_model_losses_dict[f'{idx}'] = sub_losses_dict
+            print(f'{str_list_sum(["Train: "] + [f"{key.capitalize()}: {round(val[-1],9)}, " for key,val in sub_losses_dict.items()])}')
     return model
 
 
@@ -312,8 +310,7 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
     else:
         device = 'cpu'
 
-    #train_bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
-    train_bag_loader = get_loader(validation_data, model_params, device=device)
+    train_bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
     test_loader = get_loader(validation_data, model_params, device=device)
 
     net = SindyNet(model_params).to(device)
