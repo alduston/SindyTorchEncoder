@@ -132,10 +132,7 @@ def Meta_test(runs = 5):
     Meta_A_dict = {}
     for run_ix in range(runs):
         model_params, training_data, validation_data = get_test_params(max_data=8000)
-        model_params['loss_weight_sindy_regularization'] = 1e-4
         PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data)
-
-        model_params['loss_weight_sindy_regularization'] = 1e-5
         Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
 
         for key,val in ALoss_dict.items():
@@ -177,7 +174,7 @@ def Meta_test(runs = 5):
 
 def run():
     if torch.cuda.is_available():
-        Meta_test(runs=2)
+        Meta_test(runs=5)
         #model_params, training_data, validation_data = get_test_params(max_data=5000)
         #A_test(model_params, training_data, validation_data)
         #PA_test(model_params, training_data, validation_data)
