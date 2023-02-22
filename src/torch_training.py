@@ -80,7 +80,7 @@ def process_bag_coeffs(Bag_coeffs, model):
     for ix in range(x):
         for iy in range(y):
             coeffs_vec = Bag_coeffs[:,ix,iy]
-            ip = sum([abs(val) > .05 for val in coeffs_vec])/len(coeffs_vec)
+            ip = sum([abs(val) > .075 for val in coeffs_vec])/len(coeffs_vec)
             new_mask[ix, iy] = 1 if ip > ip_thresh else 0
             if ip < min_ip:
                 min_ip = ip
