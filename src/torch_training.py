@@ -291,6 +291,7 @@ def crossval(model):
 
     model.coefficient_mask = new_mask * model.coefficient_mask
     model.num_active_coeffs = int(torch.sum(model.coefficient_mask).cpu().detach())
+    model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
     return model
 
 
@@ -339,7 +340,7 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
         train_paralell_epoch(net, train_bag_loader,optimizer)
 
         if not epoch % crossval_freq and epoch:
-            crossval(net)
+            net = crossval(net)
         if not epoch % test_freq:
             validate_paralell_epoch(net, test_loader, Loss_dict)
             if printout:
