@@ -6,7 +6,7 @@ from torch_autoencoder import SindyNet
 from data_utils import get_test_params,get_loader, get_bag_loader
 from sindy_utils import get_initialized_weights
 from math import inf, isinf
-from copy import deepcopy
+from copy import deepcopy, copy
 from scipy.stats import ttest_1samp
 import matplotlib.pyplot as plt
 from scipy import stats as st
@@ -26,17 +26,6 @@ def train_one_step(model, data, optimizer, mode = None):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
         loss, loss_refinement, losses = model.auto_Loss(x = data['x'], dx = data['dx'])
-    else:
-        loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'])
-    loss.backward()
-    optimizer.step()
-    return loss, loss_refinement, losses
-
-
-def train_one_step_alt(model, data, optimizer, mode = None):
-    optimizer.zero_grad()
-    if model.params['model_order'] == 1:
-        loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'])
     else:
         loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'])
     loss.backward()
@@ -234,15 +223,15 @@ def validate_paralell_epoch(model, data_loader, Loss_dict):
     model.eval()
     total_loss = 0
     total_loss_dict = {}
-    sub_model_coeffs = model.sub_model_coeffs
-    Bag_coeffs = torch.stack(tuple(sub_model_coeffs.values()))
+    Bag_coeffs = model.sub_model_coeffs
     n_bags = Bag_coeffs.shape[0]
     avg_coeffs = (1 / n_bags) * torch.sum(Bag_coeffs, dim=0)
-    model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
+    val_model = copy(model)
+    val_model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
 
     for batch_index, data in enumerate(data_loader):
         with torch.no_grad():
-            loss, loss_refinement, losses = validate_one_step(model, data)
+            loss, loss_refinement, losses = validate_one_step(val_model, data)
             total_loss += loss
             if len(total_loss_dict.keys()):
                 for key in total_loss_dict.keys():
@@ -252,27 +241,37 @@ def validate_paralell_epoch(model, data_loader, Loss_dict):
                     total_loss_dict[key] = val
 
     Loss_dict['epoch'].append(int(model.epoch))
-    Loss_dict['active_coeffs'].append(int(torch.sum(model.coefficient_mask).cpu().detach()))
+    Loss_dict['active_coeffs'].append(int(torch.sum(val_model.coefficient_mask).cpu().detach()))
     Loss_dict['total'].append(float(total_loss.cpu().detach()))
     for key, val in total_loss_dict.items():
         Loss_dict[key].append(float(val.detach().cpu()))
     return model, Loss_dict
 
 
+def train_parallel_step(model, data, optimizer, idx):
+    optimizer.zero_grad()
+    if model.params['model_order'] == 1:
+        loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'], idx = idx)
+    else:
+        loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'], idx = idx)
+    loss.backward()
+    optimizer.step()
+    return loss, loss_refinement, losses
+
+
 def train_paralell_epoch(model, bag_loader, optimizer):
     model.eval()
     epoch_loss = 0
 
-    sub_model_coeffs = model.sub_model_coeffs
+    #sub_model_coeffs = model.sub_model_coeffs
     sub_model_losses_dict = model.sub_model_losses_dict
     update = bool(not (model.epoch + 1) % (model.params['update_freq']))
     model.epoch += 1
     for idx, bag in enumerate(bag_loader):
-        coeffs = sub_model_coeffs[f'{idx}']
-        model.sindy_coeffs = torch.nn.Parameter(coeffs, requires_grad=True)
-        loss, loss_refinement, losses = train_one_step_alt(model, bag, optimizer)
+        #coeffs = sub_model_coeffs[f'{idx}']
+        loss, loss_refinement, losses = train_parallel_step(model, bag, optimizer, idx)
         epoch_loss += loss
-        model.sub_model_coeffs[f'{idx}'] = deepcopy(model.sindy_coeffs.detach())
+        #model.sub_model_coeffs[f'{idx}'] = deepcopy(model.sindy_coeffs.detach())
 
         if update:
             sub_losses_dict = sub_model_losses_dict[f'{idx}']
@@ -280,16 +279,13 @@ def train_paralell_epoch(model, bag_loader, optimizer):
             sub_losses_dict['active_coeffs'] = model.num_active_coeffs
 
             for key, val in losses.items():
-                if key == 'decoder':
-                    print(round(float(val.detach().cpu()),7))
                 sub_losses_dict[key].append(val)
             sub_model_losses_dict[f'{idx}'] = sub_losses_dict
     return model
 
 
 def crossval(model):
-    sub_model_coeffs = model.sub_model_coeffs
-    Bag_coeffs = torch.stack(tuple(sub_model_coeffs.values()))
+    Bag_coeffs = model.sub_model_coeffs
     new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model)
 
     model.coefficient_mask = new_mask * model.coefficient_mask
@@ -314,20 +310,20 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
     test_loader = get_loader(validation_data, model_params, device=device)
 
     net = SindyNet(model_params).to(device)
-    sub_model_coeffs = {}
+    sub_model_coeffs = []
     sub_model_losses_dict = {}
     for idx, bag in enumerate(train_bag_loader):
         library_dim = net.params['library_dim']
         latent_dim = net.params['latent_dim']
         initializer, init_param = net.initializer()
-        sub_model_coeffs[f'{idx}'] = .5 * get_initialized_weights([library_dim, latent_dim], initializer,
-                                       init_param = init_param, device = net.device)
+        sub_model_coeffs.append(get_initialized_weights([library_dim, latent_dim], initializer,
+                                       init_param = init_param, device = net.device))
         sub_model_losses_dict[f'{idx}'] = {'epoch': [], 'decoder': [], 'sindy_x': [],
                                 'reg': [], 'sindy_z': [], 'active_coeffs': []}
-
     sub_model_test_losses_dict = deepcopy(sub_model_losses_dict)
 
-    net.sub_model_coeffs = sub_model_coeffs
+    sub_model_coeffs = torch.stack(sub_model_coeffs)
+    net.sub_model_coeffs = torch.nn.Parameter(sub_model_coeffs, requires_grad=True)
     net.sub_model_losses_dict = sub_model_losses_dict
     net.sub_model_test_losses_dict = sub_model_test_losses_dict
 
@@ -341,8 +337,7 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
         if not epoch % test_freq:
             net, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict)
             if printout:
-                pass
-                #print(f'{str_list_sum(["Test: "] + [f"{key.capitalize()}: {round(val[-1],9)}, " for key,val in Loss_dict.items()])}')
+                print(f'{str_list_sum(["Test: "] + [f"{key.capitalize()}: {round(val[-1],9)}, " for key,val in Loss_dict.items()])}')
 
     net, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict)
     train_loader = get_loader(training_data, model_params, device=device)
