@@ -75,12 +75,12 @@ def process_bag_coeffs(Bag_coeffs, model):
     n_samples = Bag_coeffs.shape[0]
     avg_coeffs = (1/n_samples) * torch.sum(Bag_coeffs, dim = 0)
 
-    ip_thresh = .6
+    ip_thresh = .5
     min_ip = 1
     for ix in range(x):
         for iy in range(y):
             coeffs_vec = Bag_coeffs[:,ix,iy]
-            ip = sum([abs(val) > .075 for val in coeffs_vec])/len(coeffs_vec)
+            ip = sum([abs(val) > .1 for val in coeffs_vec])/len(coeffs_vec)
             new_mask[ix, iy] = 1 if ip > ip_thresh else 0
             if ip < min_ip:
                 min_ip = ip
