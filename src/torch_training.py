@@ -245,7 +245,7 @@ def validate_paralell_epoch(model, data_loader, Loss_dict):
     Loss_dict['total'].append(float(total_loss.cpu().detach()))
     for key, val in total_loss_dict.items():
         Loss_dict[key].append(float(val.detach().cpu()))
-    return model, Loss_dict
+    return val_model, Loss_dict
 
 
 def train_parallel_step(model, data, optimizer, idx):
@@ -298,6 +298,7 @@ def str_list_sum(str_list):
     for str in str_list:
         sum_str += str
     return sum_str
+
 
 def parallell_train_sindy(model_params, train_params, training_data, validation_data, printout = False):
     Loss_dict = {'epoch': [], 'total': [], 'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': [], 'active_coeffs': []}
