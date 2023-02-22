@@ -90,7 +90,7 @@ def PA_small_test(model_params, training_data, validation_data):
 def PA_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 6000, 'nbags': 1, 'bag_size': l, 'refinement_epochs': 2000}
+    train_params = {'bag_epochs': 1000, 'nbags': 1, 'bag_size': l, 'refinement_epochs': 2000}
     model_params['batch_size'] = l
     model_params['threshold_frequency'] = 25
     model_params['crossval_freq'] = 25
@@ -102,7 +102,7 @@ def PA_test(model_params, training_data, validation_data):
 def A_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 7000, 'nbags': l // 6, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 1000, 'nbags': l // 6, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
                     'refinement_epochs': 1000}
     model_params['batch_size'] = 5000
@@ -176,7 +176,9 @@ def Meta_test(runs = 5, small = False):
 def run():
     if torch.cuda.is_available():
         model_params, training_data, validation_data = get_test_params(max_data=5000)
+        A_test(model_params, training_data, validation_data)
         PA_test(model_params, training_data, validation_data)
+
     else:
         model_params, training_data, validation_data = get_test_params(max_data=200)
         model_params['crossval_freq'] = 10
