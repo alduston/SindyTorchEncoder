@@ -37,6 +37,10 @@ class SindyNet(nn.Module):
         self.coefficient_mask = torch.tensor(params['coefficient_mask'], dtype = torch.float32, device = self.device)
         self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
 
+        self.sub_model_coeffs = {}
+        self.sub_model_masks = {}
+        self.sub_model_losses_dict = {}
+
 
 
     def Encoder(self, params):
