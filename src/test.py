@@ -91,7 +91,7 @@ def PA_small_test(model_params, training_data, validation_data):
 def PA_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 7800, 'nbags': 6, 'bag_size': int(l//3), 'refinement_epochs': 200}
+    train_params = {'bag_epochs': 7800, 'nbags': 5, 'bag_size': int(l//3), 'refinement_epochs': 200}
     model_params['batch_size'] = int(l/2)
     model_params['threshold_frequency'] = 25
     model_params['crossval_freq'] = 25
@@ -170,7 +170,7 @@ def Meta_test(runs = 5):
     Meta_A_df.to_csv('../Meta_A_df.csv')
 
     Meta_BA_df = pd.DataFrame.from_dict(Meta_PA_dict, orient='columns')
-    Meta_BA_df.to_csv('../Meta_PA_df.csv')
+    Meta_BA_df.to_csv('../Meta_PAS_df.csv')
 
     return Meta_A_df, Meta_BA_df
 
@@ -184,14 +184,15 @@ def run():
 
     else:
         Meta_A_df = pd.read_csv('../data/Meta_A_df.csv')
-        Meta_PA_df = pd.read_csv('../data/Meta_PA_df.csv')
+        Meta_PA_df = pd.read_csv('../data/Meta_PAS_df.csv')
 
         plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_avg'], label='A_test')
         plt.plot(Meta_PA_df['epoch'], Meta_PA_df[f'active_coeffs_avg'], label='PA_test')
         plt.xlabel('epoch')
         plt.ylabel('# active_coeffs')
         plt.title(f'A v PA avg coeffcount')
-        plt.savefig(f'../plots/PA_exp_ncoeff_avg.png')
+        plt.savefig(f'../plots/PAS_exp_ncoeff_avg.png')
+        plt.legend()
         torch_training.clear_plt()
 
 
@@ -204,7 +205,7 @@ def run():
             plt.xlabel('epoch')
             plt.ylabel('# active_coeffs')
             plt.title(f'A v PA coeffcount run {i}')
-            plt.savefig(f'../plots/PA_exp_ncoeff{i}.png')
+            plt.savefig(f'../plots/PAS_exp_ncoeff{i}.png')
 
             torch_training.clear_plt()
 
@@ -220,7 +221,7 @@ def run():
             plt.xlabel('epoch')
             plt.ylabel('Log loss')
             plt.title(f'A v PA loss run {i}')
-            plt.savefig(f'../plots/PA_exp_loss{i}.png')
+            plt.savefig(f'../plots/PAS_exp_loss{i}.png')
 
             torch_training.clear_plt()
 
@@ -232,7 +233,7 @@ def run():
     plt.xlabel('epoch')
     plt.ylabel('Log loss')
     plt.title(f'A v PA avg loss')
-    plt.savefig(f'../plots/PA_exp_avg_loss.png')
+    plt.savefig(f'../plots/PAS_exp_avg_loss.png')
     torch_training.clear_plt()
 
 
