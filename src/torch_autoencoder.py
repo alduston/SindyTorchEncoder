@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import warnings
 from sindy_utils import z_derivative, z_derivative_order2,\
     get_initialized_weights, sindy_library_torch, sindy_library_torch_order2
@@ -236,8 +237,23 @@ class SindyNet(nn.Module):
 
 
     def sindy_reg_loss(self, idx = None):
-        sindy_coefficients = self.sindy_coeffs
+        if idx == None:
+            sindy_coefficients = self.sindy_coeffs
+        else:
+            sindy_coefficients = self.sub_model_coeffs[idx]
         return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sindy_coefficients))
+
+
+    def sindy_corr_loss(self, idx = None):
+        if not idx:
+            return 0
+        else:
+            sindy_coefficients = self.sub_model_coeffs[idx]
+            coeff_norm = torch.linalg.norm(sindy_coefficients)
+            diffs = [sindy_coefficients - alt_coeffs for alt_coeffs in self.sub_model_coeffs.vals()]
+            diff_sum = torch.sum([torch.linalg.norm(diff)/coeff_norm for diff  in diffs])
+            return self.params['loss_weight_correlation'] * diff_sum
+
 
 
     def sindy_z_loss(self, z, x, dx, ddx = None, idx = None):
@@ -274,6 +290,19 @@ class SindyNet(nn.Module):
                   'sindy_x': sindy_x_loss, 'reg':  reg_loss}
         return loss, loss_refinement, losses
 
+    def Loss_pcor(self, x, x_decode, z, dx, ddx = None, idx = None):
+        decoder_loss = self.decoder_loss(x, x_decode)
+        sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx, idx)
+        sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx, idx)
+        reg_loss = self.sindy_reg_loss(idx)
+        cor_loss = self.sindy_corr_loss(idx)
+
+        loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss
+        loss = loss_refinement + reg_loss
+
+        losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss,
+                  'sindy_x': sindy_x_loss, 'reg':  reg_loss, 'cor': cor_loss}
+        return loss, loss_refinement, losses
 
     def loss(self, x, x_decode, z, dx, ddx=None):
         return self.Loss(x, x_decode, z, dx, ddx)[0]
