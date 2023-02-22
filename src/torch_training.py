@@ -293,6 +293,8 @@ def crossval(model):
 
     model.coefficient_mask = new_mask * model.coefficient_mask
     model.num_active_coeffs = int(torch.sum(model.coefficient_mask).cpu().detach())
+    for key in model.sub_model_coeffs.keys():
+        model.sub_model_coeffs[key] = avg_coeffs
     return model
 
 
