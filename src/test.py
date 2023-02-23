@@ -135,7 +135,7 @@ def Meta_test(runs = 5):
         PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data)
         Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
 
-        PA_coeffs = (PAnet.coefficient_mask * torch.sum(PAnet.sub_model_coeffs))/(PAnet.sub_model_coeffs.shape[0]).detach().cpu().numpy()
+        PA_coeffs = ((PAnet.coefficient_mask * torch.sum(PAnet.sub_model_coeffs,0)) / (PAnet.sub_model_coeffs.shape[0])).detach().cpu().numpy()
         A_coeffs = Anet.sindy_coeffs.detach().cpu().numpy()
         pd.DataFrame(PA_coeffs).to_csv(f'../data/PAS_sindy_coeffs_{run_ix}.csv')
         pd.DataFrame(A_coeffs).to_csv(f'../data/A_sindy_coeffs_{run_ix}.csv')
@@ -171,16 +171,18 @@ def Meta_test(runs = 5):
             Meta_PA_dict.pop(key,None)
 
     Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
-    Meta_A_df.to_csv('../data/Meta_A_nice.csv')
+    Meta_A_df.to_csv('../data/Meta_A_Big.csv')
 
     Meta_PA_df = pd.DataFrame.from_dict(Meta_PA_dict, orient='columns')
-    Meta_PA_df.to_csv('../data/Meta_PAS_nice.csv')
+    Meta_PA_df.to_csv('../data/Meta_PAS_Big.csv')
 
     return Meta_A_df, Meta_PA_df
 
 
 def run():
     #plt.imshow(np.asarray(pd.read_csv('../data/hyak_data/')))
+    #model_params, training_data, validation_data = get_test_params(max_data=500)
+    #PA_test(model_params, training_data, validation_data)
     if torch.cuda.is_available():
         Meta_test(runs=2)
         #model_params, training_data, validation_data = get_test_params(max_data=5000)
