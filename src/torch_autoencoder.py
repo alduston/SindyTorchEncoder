@@ -238,12 +238,12 @@ class SindyNet(nn.Module):
 
     def sindy_reg_loss(self, idx = None, penalize_self = False):
         if idx == None:
-            coeffs = self.sindy_coeffs
+            sum_coeffs = torch.mean(torch.abs(self.sindy_coeffs))
         else:
             n_bags = self.sindy_coeffs.shape[0]
             #coeffs = (1/n_bags) * torch.sum(self.sub_model_coeffs, dim = 0)
-            coeffs = (1/n_bags) * torch.sum(self.sub_model_coeffs)
-        reg_loss = coeffs
+            sum_coeffs = (1/n_bags) * torch.sum(self.sub_model_coeffs)
+        reg_loss = sum_coeffs
         if penalize_self:
             sub_coeffs = self.sub_model_coeffs[idx]
             reg_loss +=  torch.mean(torch.abs(sub_coeffs))

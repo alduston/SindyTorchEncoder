@@ -180,8 +180,8 @@ def Meta_test(runs = 5):
 
 
 def run():
-    #model_params, training_data, validation_data = get_test_params(max_data=1000)
-    #PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data)
+    model_params, training_data, validation_data = get_test_params(max_data=1000)
+    PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data)
     if torch.cuda.is_available():
         Meta_test(runs=1)
 
