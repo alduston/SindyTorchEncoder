@@ -347,8 +347,8 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
 
     net, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict)
     train_loader = get_loader(training_data, model_params, device=device)
-    net, loss_dict, Loss_dict = subtrain_sindy(net, train_loader, model_params, train_params, mode='refinement',
-                                               print_freq=50, test_loader=test_loader, printout=printout, Loss_dict=Loss_dict)
+    #net, loss_dict, Loss_dict = subtrain_sindy(net, train_loader, model_params, train_params, mode='refinement',
+                                               #print_freq=50, test_loader=test_loader, printout=printout, Loss_dict=Loss_dict)
     return net, Loss_dict
 
 

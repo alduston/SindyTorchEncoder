@@ -135,8 +135,10 @@ def Meta_test(runs = 5):
         PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data)
         Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
 
-        pd.DataFrame(PAnet.sindy_coeffs.detach().cpu().numpy()).to_csv(f'../data/PAS_sindy_coeffs_{run_ix}.csv')
-        pd.DataFrame(PAnet.sindy_coeffs.detach().cpu().numpy()).to_csv(f'../data/A_sindy_coeffs_{run_ix}.csv')
+        PA_coeffs = (PAnet.coefficient_mask * torch.sum(PAnet.sub_model_coeffs))/(PAnet.sub_model_coeffs.shape[0]).detach().cpu().numpy()
+        A_coeffs = Anet.sindy_coeffs.detach().cpu().numpy()
+        pd.DataFrame(PA_coeffs).to_csv(f'../data/PAS_sindy_coeffs_{run_ix}.csv')
+        pd.DataFrame(Anet.sindy_coeffs.detach().cpu().numpy()).to_csv(f'../data/A_sindy_coeffs_{run_ix}.csv')
 
         for key,val in ALoss_dict.items():
             if key=='epoch':
@@ -178,6 +180,7 @@ def Meta_test(runs = 5):
 
 
 def run():
+    plt.imshow(np.asarray(pd.read_csv('../data/hyak_data/')))
     if torch.cuda.is_available():
         Meta_test(runs=10)
         #model_params, training_data, validation_data = get_test_params(max_data=5000)
