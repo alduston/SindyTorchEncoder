@@ -138,7 +138,7 @@ def Meta_test(runs = 5):
         PA_coeffs = (PAnet.coefficient_mask * torch.sum(PAnet.sub_model_coeffs))/(PAnet.sub_model_coeffs.shape[0]).detach().cpu().numpy()
         A_coeffs = Anet.sindy_coeffs.detach().cpu().numpy()
         pd.DataFrame(PA_coeffs).to_csv(f'../data/PAS_sindy_coeffs_{run_ix}.csv')
-        pd.DataFrame(Anet.sindy_coeffs.detach().cpu().numpy()).to_csv(f'../data/A_sindy_coeffs_{run_ix}.csv')
+        pd.DataFrame(A_coeffs).to_csv(f'../data/A_sindy_coeffs_{run_ix}.csv')
 
         for key,val in ALoss_dict.items():
             if key=='epoch':
