@@ -230,8 +230,8 @@ def run():
 
             torch_training.clear_plt()
 
-    avg_loss_A  *= .2
-    avg_loss_BA *= .2
+    avg_loss_A  *= .1
+    avg_loss_BA *= .1
     plt.plot(Meta_A_df['epoch'], np.log(avg_loss_A), label='A_test')
     plt.plot(Meta_PA_df['epoch'], np.log(avg_loss_BA), label='PA_test')
     plt.legend()
