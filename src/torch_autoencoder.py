@@ -246,7 +246,7 @@ class SindyNet(nn.Module):
 
         if penalize_self:
             sub_coeffs = self.sub_model_coeffs[idx]
-            reg_loss += self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sub_coeffs))
+            #reg_loss += self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sub_coeffs))
         return reg_loss
 
 
