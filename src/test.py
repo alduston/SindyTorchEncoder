@@ -91,7 +91,7 @@ def PA_small_test(model_params, training_data, validation_data):
 def PA_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 5000, 'nbags': 5, 'bag_size': int(l//5), 'refinement_epochs': 0}
+    train_params = {'bag_epochs': 5000, 'nbags': 12, 'bag_size': int(l//8), 'refinement_epochs': 0}
     model_params['batch_size'] = int(l/2)
     model_params['threshold_frequency'] = 25
     model_params['crossval_freq'] = 25
@@ -132,9 +132,8 @@ def Meta_test(runs = 5):
     Meta_A_dict = {}
     for run_ix in range(runs):
         model_params, training_data, validation_data = get_test_params(max_data=10000)
-        Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
         PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data)
-        #Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
+        Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
 
         pd.DataFrame(PAnet.sindy_coeffs.detach().cpu().numpy()).to_csv(f'../data/PAS_sindy_coeffs_{run_ix}.csv')
         pd.DataFrame(PAnet.sindy_coeffs.detach().cpu().numpy()).to_csv(f'../data/A_sindy_coeffs_{run_ix}.csv')
@@ -177,8 +176,6 @@ def Meta_test(runs = 5):
 
 
 def run():
-    model_params, training_data, validation_data = get_test_params(max_data=200)
-    PA_test(model_params, training_data, validation_data)
     if torch.cuda.is_available():
         Meta_test(runs=5)
         #model_params, training_data, validation_data = get_test_params(max_data=5000)
