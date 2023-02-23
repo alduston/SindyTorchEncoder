@@ -180,7 +180,7 @@ def Meta_test(runs = 5):
 
 
 def run():
-    plt.imshow(np.asarray(pd.read_csv('../data/hyak_data/')))
+    #plt.imshow(np.asarray(pd.read_csv('../data/hyak_data/')))
     if torch.cuda.is_available():
         Meta_test(runs=10)
         #model_params, training_data, validation_data = get_test_params(max_data=5000)
