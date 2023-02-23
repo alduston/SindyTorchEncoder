@@ -199,7 +199,7 @@
       <workItem from="1677004446546" duration="1210000" />
       <workItem from="1677021699582" duration="24465000" />
       <workItem from="1677083629762" duration="19406000" />
-      <workItem from="1677167786219" duration="6880000" />
+      <workItem from="1677167786219" duration="7703000" />
     </task>
     <servers />
   </component>
@@ -304,9 +304,10 @@
     </state>
     <state x="208" y="85" key="SettingsEditor/0.25.1440.798@0.25.1440.798" timestamp="1676953237584" />
     <state x="208" y="86" key="SettingsEditor/0.25.1440.815@0.25.1440.815" timestamp="1673656335518" />
-    <state x="83" y="123" width="1349" height="556" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1677136188887">
-      <screen x="0" y="25" width="1440" height="814" />
+    <state x="8" y="79" width="1432" height="550" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1677182733326">
+      <screen x="0" y="25" width="1440" height="805" />
     </state>
+    <state x="8" y="79" width="1432" height="550" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.25.1440.805@0.25.1440.805" timestamp="1677182733326" />
     <state x="83" y="123" width="1349" height="556" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.25.1440.814@0.25.1440.814" timestamp="1677136188887" />
     <state x="91" y="125" width="1349" height="556" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.25.1440.815@0.25.1440.815" timestamp="1673663343726" />
     <state x="557" y="214" key="refactoring.ChangeSignatureDialog" timestamp="1676951858141">
@@ -333,7 +334,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/torch_autoencoder.py</url>
-          <line>311</line>
+          <line>310</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
