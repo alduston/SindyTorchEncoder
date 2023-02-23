@@ -176,7 +176,7 @@ def run():
     #model_params, training_data, validation_data = get_test_params(max_data=200)
     #PA_test(model_params, training_data, validation_data)
     if torch.cuda.is_available():
-        Meta_test(runs=2)
+        Meta_test(runs=1)
         #model_params, training_data, validation_data = get_test_params(max_data=5000)
         #A_test(model_params, training_data, validation_data)
         #PA_test(model_params, training_data, validation_data)
