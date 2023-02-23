@@ -91,7 +91,7 @@ def PA_small_test(model_params, training_data, validation_data):
 def PA_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 7000, 'nbags': 7, 'bag_size': int(l//7), 'refinement_epochs': 0}
+    train_params = {'bag_epochs': 5000, 'nbags': 12, 'bag_size': int(l//8), 'refinement_epochs': 0}
     model_params['batch_size'] = int(l/2)
     model_params['threshold_frequency'] = 25
     model_params['crossval_freq'] = 25
@@ -102,7 +102,7 @@ def PA_test(model_params, training_data, validation_data):
 def A_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 6000, 'nbags': l // 6, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 4000, 'nbags': l // 6, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
                     'refinement_epochs': 1000}
     model_params['batch_size'] = int(l/2)
@@ -131,9 +131,12 @@ def Meta_test(runs = 5):
     Meta_PA_dict = {}
     Meta_A_dict = {}
     for run_ix in range(runs):
-        model_params, training_data, validation_data = get_test_params(max_data=8000)
+        model_params, training_data, validation_data = get_test_params(max_data=10000)
         PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data)
         Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
+
+        pd.DataFrame(PAnet.sindy_coeffs.detach().cpu().numpy()).to_csv(f'../data/PAS_sindy_coeffs_{run_ix}.csv')
+        pd.DataFrame(PAnet.sindy_coeffs.detach().cpu().numpy()).to_csv(f'../data/A_sindy_coeffs_{run_ix}.csv')
 
         for key,val in ALoss_dict.items():
             if key=='epoch':
@@ -164,19 +167,19 @@ def Meta_test(runs = 5):
             Meta_PA_dict.pop(key,None)
 
     Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
-    Meta_A_df.to_csv('../Meta_A_df3.csv')
+    Meta_A_df.to_csv('../data/Meta_A_df5.csv')
 
     Meta_BA_df = pd.DataFrame.from_dict(Meta_PA_dict, orient='columns')
-    Meta_BA_df.to_csv('../Meta_PAS_df3.csv')
+    Meta_BA_df.to_csv('../data/Meta_PAS_df5.csv')
 
     return Meta_A_df, Meta_BA_df
 
 
 def run():
-    #model_params, training_data, validation_data = get_test_params(max_data=200)
-    #PA_test(model_params, training_data, validation_data)
+    model_params, training_data, validation_data = get_test_params(max_data=200)
+    PA_test(model_params, training_data, validation_data)
     if torch.cuda.is_available():
-        Meta_test(runs=1)
+        Meta_test(runs=5)
         #model_params, training_data, validation_data = get_test_params(max_data=5000)
         #A_test(model_params, training_data, validation_data)
         #PA_test(model_params, training_data, validation_data)

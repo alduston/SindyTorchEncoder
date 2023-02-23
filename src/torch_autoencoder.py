@@ -236,14 +236,18 @@ class SindyNet(nn.Module):
         return self.params['loss_weight_decoder'] * criterion(x, x_pred)
 
 
-    def sindy_reg_loss(self, idx = None):
+    def sindy_reg_loss(self, idx = None, penalize_self = False):
         if idx == None:
             coeffs = self.sindy_coeffs
         else:
-            #sindy_coefficients = self.sub_model_coeffs[idx]
             n_bags = self.sindy_coeffs.shape[0]
             coeffs = (1/n_bags) * torch.sum(self.sub_model_coeffs)
-        return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(coeffs))
+        reg_loss = self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(coeffs))
+
+        if penalize_self:
+            sub_coeffs = self.sub_model_coeffs[idx]
+            reg_loss += self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sub_coeffs))
+        return reg_loss
 
 
     def sindy_corr_loss(self, idx = None):
@@ -257,7 +261,6 @@ class SindyNet(nn.Module):
             diffs = [sindy_coefficients - alt_coeffs for alt_coeffs in self.sub_model_coeffs]
             diff_sum = sum([torch.linalg.norm(diff)/coeff_norm for diff  in diffs])
             return self.params['loss_weight_correlation'] * diff_sum
-
 
 
     def sindy_z_loss(self, z, x, dx, ddx = None, idx = None):
@@ -294,19 +297,21 @@ class SindyNet(nn.Module):
                   'sindy_x': sindy_x_loss, 'reg':  reg_loss}
         return loss, loss_refinement, losses
 
+
     def Loss_pcor(self, x, x_decode, z, dx, ddx = None, idx = None):
         decoder_loss = self.decoder_loss(x, x_decode)
         sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx, idx)
         sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx, idx)
-        reg_loss = self.sindy_reg_loss(idx)
-        corr_loss = self.sindy_corr_loss(idx)
 
+        reg_loss = self.sindy_reg_loss(idx, penalize_self=True)
+        corr_loss = self.sindy_corr_loss(idx)
         loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss
         loss = loss_refinement + reg_loss
 
         losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss,
                   'sindy_x': sindy_x_loss, 'reg':  reg_loss, 'corr': corr_loss}
         return loss, loss_refinement, losses
+
 
     def loss(self, x, x_decode, z, dx, ddx=None):
         return self.Loss(x, x_decode, z, dx, ddx)[0]
@@ -316,10 +321,6 @@ class SindyNet(nn.Module):
         x_decode, z = self.forward(x)
         return self.loss(x, x_decode, z, dx, ddx)
 
-
-    #def auto_Loss(self, x, dx, ddx=None, idx = None):
-        #x_decode, z = self.forward(x)
-        #return self.Loss(x, x_decode, z, dx, ddx, idx)
 
     def auto_Loss(self, x, dx, ddx=None, idx=None, corr = False):
         x_decode, z = self.forward(x)

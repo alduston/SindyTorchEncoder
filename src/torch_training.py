@@ -233,7 +233,7 @@ def validate_paralell_epoch(model, data_loader, Loss_dict):
 
     for batch_index, data in enumerate(data_loader):
         with torch.no_grad():
-            loss, loss_refinement, losses = validate_one_step(val_model, data, corr = True)
+            loss, loss_refinement, losses = validate_one_step(val_model, data, corr = False)
             total_loss += loss
             if len(total_loss_dict.keys()):
                 for key in total_loss_dict.keys():
@@ -241,7 +241,6 @@ def validate_paralell_epoch(model, data_loader, Loss_dict):
             else:
                 for key, val in losses.items():
                     total_loss_dict[key] = val
-
 
 
     Loss_dict['epoch'].append(int(model.epoch))
@@ -271,7 +270,7 @@ def train_paralell_epoch(model, bag_loader, optimizer):
     update = bool(not (model.epoch + 1) % (model.params['update_freq']))
     model.epoch += 1
     for idx, bag in enumerate(bag_loader):
-        loss, loss_refinement, losses = train_parallel_step(model, bag, optimizer, idx, corr = True)
+        loss, loss_refinement, losses = train_parallel_step(model, bag, optimizer, idx, corr = False)
         epoch_loss += loss
 
         if update:
