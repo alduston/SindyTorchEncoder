@@ -241,13 +241,13 @@ class SindyNet(nn.Module):
             coeffs = self.sindy_coeffs
         else:
             n_bags = self.sindy_coeffs.shape[0]
-            #coeffs = (1/n_bags) * torch.sum(self.sub_model_coeffs, dim = 0) * self.coefficient_mask
-            coeffs = (1/n_bags) * torch.sum(torch.abs(self.sub_model_coeffs))
-        reg_loss = self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(coeffs))
+            #coeffs = (1/n_bags) * torch.sum(self.sub_model_coeffs, dim = 0)
+            coeffs = (1/n_bags) * torch.sum(self.sub_model_coeffs)
+        reg_loss = coeffs
         if penalize_self:
             sub_coeffs = self.sub_model_coeffs[idx]
-            reg_loss += self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sub_coeffs))
-        return reg_loss
+            reg_loss +=  torch.mean(torch.abs(sub_coeffs))
+        return reg_loss * self.params['loss_weight_sindy_regularization']
 
 
     def sindy_corr_loss(self, idx = None):
@@ -303,8 +303,7 @@ class SindyNet(nn.Module):
         sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx, idx)
         sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx, idx)
 
-        reg_loss = self.sindy_reg_loss(idx, penalize_self=True)
-        #corr_loss = self.sindy_corr_loss(idx)
+        reg_loss = self.sindy_reg_loss(idx, penalize_self=False)
         loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss
         loss = loss_refinement + reg_loss
 
