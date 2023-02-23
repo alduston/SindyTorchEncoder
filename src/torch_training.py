@@ -230,6 +230,9 @@ def validate_paralell_epoch(model, data_loader, Loss_dict):
     avg_coeffs = (1 / n_bags) * torch.sum(Bag_coeffs, dim=0)
     val_model = copy(model)
     val_model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
+    plt.imshow(val_model.sindy_coeffs.detach().cpu().numpy()) #* val_model.coefficient_mask.detach().cpu().numpy())
+    plt.savefig(f'../plots/coeff_hmaps/{val_model.epoch}_hmmap.png')
+    clear_plt()
 
     for batch_index, data in enumerate(data_loader):
         with torch.no_grad():

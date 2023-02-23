@@ -180,14 +180,10 @@ def Meta_test(runs = 5):
 
 
 def run():
-    #plt.imshow(np.asarray(pd.read_csv('../data/hyak_data/')))
-    #model_params, training_data, validation_data = get_test_params(max_data=500)
-    #PA_test(model_params, training_data, validation_data)
+    #model_params, training_data, validation_data = get_test_params(max_data=1000)
+    #PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data)
     if torch.cuda.is_available():
         Meta_test(runs=10)
-        #model_params, training_data, validation_data = get_test_params(max_data=5000)
-        #A_test(model_params, training_data, validation_data)
-        #PA_test(model_params, training_data, validation_data)
 
     else:
         Meta_A_df = pd.read_csv('../data/hyak_data/data/Meta_A_df5.csv')
