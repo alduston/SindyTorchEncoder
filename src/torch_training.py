@@ -234,7 +234,8 @@ def train_sindy(model_params, train_params, training_data, validation_data, prin
 def train_parallel_step(model, data, optimizer, idx, spooky = True):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
-        loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'],  idx = idx, spooky = spooky)
+        loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'],  idx = idx,
+                                                        spooky = spooky, reg = False)
     else:
         loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'], idx = idx)
     loss.backward()

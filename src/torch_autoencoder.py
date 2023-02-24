@@ -291,16 +291,20 @@ class SindyNet(nn.Module):
         return loss, loss_refinement, losses
 
 
-    def Loss(self, x, x_decode, z, dx, ddx = None, idx = None, spooky = False):
+    def Loss(self, x, x_decode, z, dx, ddx = None, idx = None, spooky = False, reg = True):
         decoder_loss = self.decoder_loss(x, x_decode)
         sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx, idx)
         sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx, idx)
         reg_loss = self.sindy_reg_loss(idx, penalize_self=True)
 
         loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss
-        loss = loss_refinement + reg_loss
+        loss = loss_refinement
         losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss,
-                  'sindy_x': sindy_x_loss, 'reg':  reg_loss}
+                  'sindy_x': sindy_x_loss, 'reg': 0}
+
+        if reg:
+            loss +=  reg_loss
+            losses['reg'] += reg_loss
         if spooky:
             spooky_loss = self.spooky_loss()
             loss += spooky_loss
