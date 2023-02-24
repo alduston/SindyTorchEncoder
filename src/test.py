@@ -170,7 +170,7 @@ def Meta_test(runs = 5):
     for key in PA_keys:
         if key.startswith('total'):
             Meta_PA_dict.pop(key,None)
-        if key.startswith('corr'):
+        if key.startswith('spooky'):
             Meta_PA_dict.pop(key,None)
 
     Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
