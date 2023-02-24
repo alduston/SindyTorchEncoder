@@ -316,9 +316,9 @@ class SindyNet(nn.Module):
         return self.Loss(x, x_decode, z, dx, ddx)[0]
 
 
-    def auto_Loss(self, x, dx, ddx=None, idx=None, spooky = False):
+    def auto_Loss(self, x, dx, ddx=None, idx=None, spooky = False, reg = True):
         x_decode, z = self.forward(x)
-        return self.Loss(x, x_decode, z, dx, ddx, idx,spooky)
+        return self.Loss(x, x_decode, z, dx, ddx, idx,spooky, reg)
 
 
     def bag_loss(self, x, dx, ddx=None):
