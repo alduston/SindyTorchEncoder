@@ -97,7 +97,7 @@ def PA_test(model_params, training_data, validation_data, run  = 0):
     model_params['threshold_frequency'] = 25
     model_params['crossval_freq'] = 25
     model_params['run'] = run
-    model_params['pretrain_epochs'] = 200
+    model_params['pretrain_epochs'] = 100
     net, Loss_dict = parallell_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
@@ -130,7 +130,7 @@ def A_small_test(model_params, training_data, validation_data):
     return net, Loss_dict
 
 
-def Meta_test(runs = 5):
+def Meta_test(runs = 15):
     Keys = {'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': [], 'active_coeffs':[]}
     Meta_PA_dict = {}
     Meta_A_dict = {}
@@ -175,21 +175,21 @@ def Meta_test(runs = 5):
             Meta_PA_dict.pop(key,None)
 
     Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
-    Meta_A_df.to_csv('../data/Meta_A_pretain.csv')
+    Meta_A_df.to_csv('../data/Meta_A_VICTORY.csv')
 
     Meta_PA_df = pd.DataFrame.from_dict(Meta_PA_dict, orient='columns')
-    Meta_PA_df.to_csv('../data/Meta_PAS_pretain.csv')
+    Meta_PA_df.to_csv('../data/Meta_PAS_VICTORY.csv')
 
     return Meta_A_df, Meta_PA_df
 
 
 def run():
     if torch.cuda.is_available():
-        Meta_test(runs=2)
+        Meta_A_df, Meta_PA_df = Meta_test(runs=15)
 
     else:
-        Meta_A_df = pd.read_csv('../data/Meta_A_Big.csv')
-        Meta_PA_df = pd.read_csv('../data/Meta_PAS_Big.csv')
+        Meta_A_df = pd.read_csv('../data/Meta_A_VICTORY.csv')
+        Meta_PA_df = pd.read_csv('../data/Meta_PAS_VICTORY.csv')
 
         plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_avg'], label='A_test')
         plt.plot(Meta_PA_df['epoch'], Meta_PA_df[f'active_coeffs_avg'], label='PA_test')
@@ -202,8 +202,11 @@ def run():
 
 
         avg_loss_A = np.zeros(len(Meta_A_df[f'decoder_{0}']))
-        avg_loss_BA = np.zeros(len(Meta_PA_df[f'decoder_{0}']))
-        for i in [0,1,2,3]:
+        avg_loss_PA = np.zeros(len(Meta_PA_df[f'decoder_{0}']))
+
+        avg_xloss_A = np.zeros(len(Meta_A_df[f'decoder_{0}']))
+        avg_xloss_PA = np.zeros(len(Meta_PA_df[f'decoder_{0}']))
+        for i in range(15):
             plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_{i}'], label = 'A_test')
             plt.plot(Meta_PA_df['epoch'], Meta_PA_df[f'active_coeffs_{i}'], label='PA_test')
             plt.legend()
@@ -218,7 +221,10 @@ def run():
             Meta_PA_df[f'avg_loss_{i}'] = Meta_PA_df[f'decoder_{i}'] + Meta_PA_df[f'sindy_x_{i}']
 
             avg_loss_A += Meta_A_df[f'avg_loss_{i}']
-            avg_loss_BA += Meta_PA_df[f'avg_loss_{i}']
+            avg_loss_PA += Meta_PA_df[f'avg_loss_{i}']
+
+            avg_xloss_A += Meta_A_df[f'sindy_x_{i}']
+            avg_xloss_PA += Meta_PA_df[f'sindy_x_{i}']
 
             plt.plot(Meta_A_df['epoch'], np.log(Meta_A_df[f'avg_loss_{i}']), label='A_test')
             plt.plot(Meta_PA_df['epoch'], np.log(Meta_PA_df[f'avg_loss_{i}']), label='PA_test')
@@ -230,15 +236,36 @@ def run():
 
             torch_training.clear_plt()
 
-    avg_loss_A  *= .25
-    avg_loss_BA *= .25
+            plt.plot(Meta_A_df['epoch'], np.log(Meta_A_df[f'sindy_x_{i}']), label='A_test')
+            plt.plot(Meta_PA_df['epoch'], np.log(Meta_PA_df[f'sindy_x_{i}']), label='PA_test')
+            plt.legend()
+            plt.xlabel('epoch')
+            plt.ylabel('Log loss')
+            plt.title(f'A v PA xloss run {i}')
+            plt.savefig(f'../plots/VICTORY_exp_dxloss{i}.png')
+
+            torch_training.clear_plt()
+
+    avg_loss_A  *= (1/15)
+    avg_loss_PA *= (1/15)
     plt.plot(Meta_A_df['epoch'], np.log(avg_loss_A), label='A_test')
-    plt.plot(Meta_PA_df['epoch'], np.log(avg_loss_BA), label='PA_test')
+    plt.plot(Meta_PA_df['epoch'], np.log(avg_loss_PA), label='PA_test')
     plt.legend()
     plt.xlabel('epoch')
     plt.ylabel('Log loss')
     plt.title(f'A v PA avg loss')
     plt.savefig(f'../plots/VICTORY_exp_avg_loss.png')
+    torch_training.clear_plt()
+
+    avg_xloss_A *= (1/15)
+    avg_xloss_PA *= (1/15)
+    plt.plot(Meta_A_df['epoch'], np.log(avg_xloss_A), label='A_test')
+    plt.plot(Meta_PA_df['epoch'], np.log(avg_xloss_PA), label='PA_test')
+    plt.legend()
+    plt.xlabel('epoch')
+    plt.ylabel('Log loss')
+    plt.title(f'A v PA avg dx/dt loss')
+    plt.savefig(f'../plots/VICTORY_exp_avg_dxloss.png')
     torch_training.clear_plt()
 
 

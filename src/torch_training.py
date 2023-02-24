@@ -173,11 +173,11 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
                 loss_dict[key].append(float(val.detach().cpu()))
                 loss_dict['epoch'].append(float(net.epoch.detach().cpu()))
                 loss_dict['active_coeffs'].append(int(net.num_active_coeffs))
-                if printout:
-                    print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in loss_dict.items()])}')
+            if printout:
+                print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in loss_dict.items()])}')
 
         total_loss, total_loss_dict = train_one_epoch(net, train_loader, optimizer)
-        if not (net.epoch % 250)-1:
+        if not (net.epoch % 1000)-1:
             plt.imshow(net.sindy_coeffs.detach().cpu().numpy(), vmin=0, vmax=1)
             run = net.params['run']
             plt.colorbar()
@@ -293,7 +293,7 @@ def validate_paralell_epoch(model, data_loader, Loss_dict):
     val_model = copy(model)
     val_model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
 
-    if not (model.epoch % 250)-1:
+    if not (model.epoch % 1000)-1:
         run =  model.params['run']
         plt.imshow(val_model.sindy_coeffs.detach().cpu().numpy(), vmin=0, vmax=1)
         plt.colorbar()
@@ -372,7 +372,7 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
             validate_paralell_epoch(net, test_loader, Loss_dict)
             if printout:
                 print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in Loss_dict.items()])}')
-        if not epoch % crossval_freq and epoch > net.params['pretrain_epochs']:
+        if not epoch % crossval_freq and epoch >= net.params['pretrain_epochs']:
             net = crossval(net)
         train_paralell_epoch(net, train_bag_loader, optimizer)
 
