@@ -90,6 +90,7 @@ def PA_small_test(model_params, training_data, validation_data):
 
 def PA_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
+    model_params['use_activation_mask'] = False
     l = len(training_data['x'])
     train_params = {'bag_epochs': 5000, 'nbags': 12, 'bag_size': int(l//8), 'refinement_epochs': 0}
     model_params['batch_size'] = int(l/2)
@@ -180,28 +181,26 @@ def Meta_test(runs = 5):
 
 
 def run():
-    #model_params, training_data, validation_data = get_test_params(max_data=1000)
-    #PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data)
     if torch.cuda.is_available():
-        Meta_test(runs=1)
+        Meta_test(runs=5)
 
     else:
-        Meta_A_df = pd.read_csv('../data/hyak_data/data/Meta_A_df5.csv')
-        Meta_PA_df = pd.read_csv('../data/hyak_data/data/Meta_PAS_df5.csv')
+        Meta_A_df = pd.read_csv('../data/Meta_A_BIG.csv')
+        Meta_PA_df = pd.read_csv('../data/Meta_PAS_BIG.csv')
 
         plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_avg'], label='A_test')
         plt.plot(Meta_PA_df['epoch'], Meta_PA_df[f'active_coeffs_avg'], label='PA_test')
         plt.xlabel('epoch')
         plt.ylabel('# active_coeffs')
         plt.title(f'A v PA avg coeffcount')
-        plt.savefig(f'../plots/PAS2_exp_ncoeff_avg.png')
+        plt.savefig(f'../plots/VICTORY_exp_ncoeff_avg.png')
         plt.legend()
         torch_training.clear_plt()
 
 
         avg_loss_A = np.zeros(len(Meta_A_df[f'decoder_{0}']))
         avg_loss_BA = np.zeros(len(Meta_PA_df[f'decoder_{0}']))
-        for i in [0,1]:
+        for i in [0]:
             plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_{i}'], label = 'A_test')
             plt.plot(Meta_PA_df['epoch'], Meta_PA_df[f'active_coeffs_{i}'], label='PA_test')
             plt.legend()

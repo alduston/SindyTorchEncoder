@@ -94,18 +94,10 @@ def get_test_params(train_size = 100, max_data = 100000):
 
     # loss function weighting
     params['loss_weight_decoder'] = 1.0
-    params['bag_loss_weight_decoder'] = 0
-
     params['loss_weight_sindy_z'] = 0.00
-    params['bag_loss_weight_sindy_z'] = 0.00
-
     params['loss_weight_sindy_x'] = 1e-4
-    params['bag_loss_weight_sindy_x'] = 1
-
     params['loss_weight_sindy_regularization'] = 1e-5
-    params['bag_loss_weight_sindy_regularization'] = .01
-
-    params['loss_weight_correlation'] = -1e-6
+    params['loss_weight_mystery'] = 1e-5
 
     params['activation'] = 'sigmoid'
     params['widths'] = [64,32]
@@ -124,8 +116,10 @@ def get_test_params(train_size = 100, max_data = 100000):
     params['max_epochs'] = 5000
     params['refinement_epochs'] = 2000
     params['crossval_freq'] = 50
-    params['test_freq'] = 50
+    params['test_freq'] = 100
+    params['train_print_freq'] = np.inf
     params['update_freq'] = 50
+    params['use_activation_mask'] = False
 
     return params,training_data, validation_data
 

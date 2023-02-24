@@ -11,7 +11,258 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3ae723a2-2f1b-4b45-8b78-c1f489f4fd16" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/A_sindy_coeffs_0.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/A_sindy_coeffs_0.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/Meta_A_big.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/Meta_A_big.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/Meta_PAS_big.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/Meta_PAS_big.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/PAS_sindy_coeffs_0.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/PAS_sindy_coeffs_0.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/ Meta_A_df.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/A_sindy_coeffs_0.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/A_sindy_coeffs_1.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/A_sindy_coeffs_2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/A_sindy_coeffs_3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/A_sindy_coeffs_4.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Losses.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_A_big.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_A_df.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_A_df2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_A_df3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_A_df5.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_A_df_N.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_A_df_N2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_A_df_ST.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_A_df_ST2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_A_df_ST3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_A_df_ST4.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_A_df_ip_nn.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_A_df_nn.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_BA_df.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_BA_df_N.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_BA_df_N2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_BA_df_ST.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_BA_df_ST2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_BA_df_ST3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_BA_df_ST4.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_BA_df_ip_nn.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_BA_df_nn.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_PAS_big.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_PAS_df2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_PAS_df3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/Meta_PA_df.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/PAS_sindy_coeffs_0.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/PAS_sindy_coeffs_1.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/PAS_sindy_coeffs_2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/PAS_sindy_coeffs_3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/PAS_sindy_coeffs_4.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/ Meta_A_df.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/A_sindy_coeffs_0.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/A_sindy_coeffs_1.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/A_sindy_coeffs_2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/A_sindy_coeffs_3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/A_sindy_coeffs_4.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Losses.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_A_df.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_A_df2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_A_df3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_A_df5.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_A_df_N.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_A_df_N2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_A_df_ST.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_A_df_ST2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_A_df_ST3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_A_df_ST4.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_A_df_ip_nn.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_A_df_nn.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_BA_df.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_BA_df_N.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_BA_df_N2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_BA_df_ST.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_BA_df_ST2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_BA_df_ST3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_BA_df_ST4.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_BA_df_ip_nn.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_BA_df_nn.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_PAS_df2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_PAS_df3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/Meta_PA_df.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/PAS_sindy_coeffs_0.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/PAS_sindy_coeffs_1.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/PAS_sindy_coeffs_2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/PAS_sindy_coeffs_3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/PAS_sindy_coeffs_4.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/hyak_data/data/med_exp_ncum.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data/med_exp_ncum.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/ Meta_A_df.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/A_sindy_coeffs_0.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/A_sindy_coeffs_1.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/A_sindy_coeffs_2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/A_sindy_coeffs_3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/A_sindy_coeffs_4.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Losses.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_A_df.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_A_df2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_A_df3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_A_df5.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_A_df_N.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_A_df_N2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_A_df_ST.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_A_df_ST2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_A_df_ST3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_A_df_ST4.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_A_df_ip_nn.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_A_df_nn.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_BA_df.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_BA_df_N.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_BA_df_N2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_BA_df_ST.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_BA_df_ST2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_BA_df_ST3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_BA_df_ST4.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_BA_df_ip_nn.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_BA_df_nn.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_PAS_df2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_PAS_df3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/Meta_PA_df.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/PAS_sindy_coeffs_0.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/PAS_sindy_coeffs_1.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/PAS_sindy_coeffs_2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/PAS_sindy_coeffs_3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/PAS_sindy_coeffs_4.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/hyak_data/data/med_exp_ncum.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PAS2_exp_avg_loss.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PAS2_exp_loss0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PAS2_exp_loss1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PAS2_exp_ncoeff0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PAS2_exp_ncoeff1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PAS2_exp_ncoeff_avg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PAS_exp_avg_loss.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PAS_exp_loss0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PAS_exp_loss1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PAS_exp_loss2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PAS_exp_loss3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PAS_exp_ncoeff0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PAS_exp_ncoeff1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PAS_exp_ncoeff2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PAS_exp_ncoeff3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PAS_exp_ncoeff_avg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PA_exp_avg_loss.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PA_exp_loss0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PA_exp_loss1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PA_exp_loss2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PA_exp_loss3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PA_exp_loss4.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PA_exp_ncoeff0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PA_exp_ncoeff1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PA_exp_ncoeff2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PA_exp_ncoeff3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PA_exp_ncoeff4.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/PA_exp_ncoeff_avg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1001_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1001_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/101_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/101_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1051_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1051_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1101_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1101_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1151_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1151_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1201_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1201_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1251_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1251_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1301_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1301_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1351_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1351_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1401_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1401_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1451_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1451_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1501_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1501_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/151_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/151_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1551_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1551_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1601_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1601_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1651_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1651_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1701_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1701_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1751_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1751_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1801_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1801_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1851_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1851_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1901_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1901_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1951_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1951_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/1_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/1_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/2001_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/2001_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/201_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/201_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/2051_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/2051_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/2101_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/2101_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/2151_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/2151_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/2201_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/2201_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/2251_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/2251_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/2301_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/2301_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/2351_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/2351_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/2401_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/2401_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/251_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/251_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/301_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/301_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/351_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/351_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/401_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/401_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/451_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/451_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/501_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/501_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/51_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/51_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/551_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/551_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/601_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/601_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/651_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/651_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/701_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/701_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/751_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/751_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/801_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/801_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/851_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/851_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/901_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/901_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/951_hmmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/951_hmmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_avg_loss.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_avg_loss_ST.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_avg_loss_ST2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_avg_loss_ST3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_avg_loss_ST4.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss4.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss_ST0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss_ST1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss_ST2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss_ST20.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss_ST21.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss_ST22.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss_ST23.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss_ST24.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss_ST3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss_ST30.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss_ST31.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss_ST32.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss_ST33.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss_ST34.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss_ST4.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss_ST40.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_loss_ST41.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum4.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_ST0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_ST1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_ST2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_ST20.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_ST21.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_ST22.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_ST23.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_ST24.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_ST3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_ST30.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_ST31.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_ST32.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_ST33.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_ST34.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_ST4.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_ST40.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_ST41.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_avg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_avg_ST.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_avg_ST2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_avg_ST3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/exp_ncum_avg_ST4.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/torch_autoencoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/torch_autoencoder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/torch_training.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/torch_training.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -199,7 +450,8 @@
       <workItem from="1677004446546" duration="1210000" />
       <workItem from="1677021699582" duration="24465000" />
       <workItem from="1677083629762" duration="19406000" />
-      <workItem from="1677167786219" duration="7703000" />
+      <workItem from="1677167786219" duration="12323000" />
+      <workItem from="1677194407325" duration="3760000" />
     </task>
     <servers />
   </component>
@@ -231,73 +483,77 @@
       <screen x="0" y="25" width="1440" height="815" />
     </state>
     <state x="412" y="213" key="FileChooserDialogImpl/0.25.1440.815@0.25.1440.815" timestamp="1673635993647" />
-    <state width="1398" height="193" key="GridCell.Tab.0.bottom" timestamp="1677181714349">
-      <screen x="0" y="25" width="1440" height="805" />
+    <state width="1581" height="255" key="GridCell.Tab.0.bottom" timestamp="1677198105144">
+      <screen x="0" y="25" width="1440" height="807" />
     </state>
     <state width="1438" height="194" key="GridCell.Tab.0.bottom/0.25.1440.798@0.25.1440.798" timestamp="1677084442891" />
     <state width="1438" height="193" key="GridCell.Tab.0.bottom/0.25.1440.799@0.25.1440.799" timestamp="1677119716623" />
     <state width="1472" height="208" key="GridCell.Tab.0.bottom/0.25.1440.801@0.25.1440.801" timestamp="1677056278619" />
-    <state width="1398" height="193" key="GridCell.Tab.0.bottom/0.25.1440.805@0.25.1440.805" timestamp="1677181714349" />
-    <state width="1398" height="212" key="GridCell.Tab.0.bottom/0.25.1440.807@0.25.1440.807" timestamp="1677174811212" />
+    <state width="1398" height="197" key="GridCell.Tab.0.bottom/0.25.1440.805@0.25.1440.805" timestamp="1677186625899" />
+    <state width="1581" height="255" key="GridCell.Tab.0.bottom/0.25.1440.807@0.25.1440.807" timestamp="1677198105144" />
     <state width="1398" height="212" key="GridCell.Tab.0.bottom/0.25.1440.809@0.25.1440.809" timestamp="1677172446985" />
     <state width="1438" height="193" key="GridCell.Tab.0.bottom/0.25.1440.814@0.25.1440.814" timestamp="1677136395708" />
     <state width="1398" height="258" key="GridCell.Tab.0.bottom/0.25.1440.815@0.25.1440.815" timestamp="1674414536230" />
-    <state width="1398" height="193" key="GridCell.Tab.0.center" timestamp="1677181714349">
-      <screen x="0" y="25" width="1440" height="805" />
+    <state width="1581" height="255" key="GridCell.Tab.0.center" timestamp="1677198105144">
+      <screen x="0" y="25" width="1440" height="807" />
     </state>
     <state width="1438" height="194" key="GridCell.Tab.0.center/0.25.1440.798@0.25.1440.798" timestamp="1677084442890" />
     <state width="1438" height="193" key="GridCell.Tab.0.center/0.25.1440.799@0.25.1440.799" timestamp="1677119716622" />
     <state width="1472" height="208" key="GridCell.Tab.0.center/0.25.1440.801@0.25.1440.801" timestamp="1677056278618" />
-    <state width="1398" height="193" key="GridCell.Tab.0.center/0.25.1440.805@0.25.1440.805" timestamp="1677181714349" />
-    <state width="1398" height="212" key="GridCell.Tab.0.center/0.25.1440.807@0.25.1440.807" timestamp="1677174811211" />
+    <state width="1398" height="197" key="GridCell.Tab.0.center/0.25.1440.805@0.25.1440.805" timestamp="1677186625898" />
+    <state width="1581" height="255" key="GridCell.Tab.0.center/0.25.1440.807@0.25.1440.807" timestamp="1677198105144" />
     <state width="1398" height="212" key="GridCell.Tab.0.center/0.25.1440.809@0.25.1440.809" timestamp="1677172446984" />
     <state width="1438" height="193" key="GridCell.Tab.0.center/0.25.1440.814@0.25.1440.814" timestamp="1677136395707" />
     <state width="1398" height="258" key="GridCell.Tab.0.center/0.25.1440.815@0.25.1440.815" timestamp="1674414536230" />
-    <state width="1398" height="193" key="GridCell.Tab.0.left" timestamp="1677181714348">
-      <screen x="0" y="25" width="1440" height="805" />
+    <state width="1581" height="255" key="GridCell.Tab.0.left" timestamp="1677198105143">
+      <screen x="0" y="25" width="1440" height="807" />
     </state>
     <state width="1438" height="194" key="GridCell.Tab.0.left/0.25.1440.798@0.25.1440.798" timestamp="1677084442889" />
     <state width="1438" height="193" key="GridCell.Tab.0.left/0.25.1440.799@0.25.1440.799" timestamp="1677119716622" />
     <state width="1472" height="208" key="GridCell.Tab.0.left/0.25.1440.801@0.25.1440.801" timestamp="1677056278618" />
-    <state width="1398" height="193" key="GridCell.Tab.0.left/0.25.1440.805@0.25.1440.805" timestamp="1677181714348" />
-    <state width="1398" height="212" key="GridCell.Tab.0.left/0.25.1440.807@0.25.1440.807" timestamp="1677174811211" />
+    <state width="1398" height="197" key="GridCell.Tab.0.left/0.25.1440.805@0.25.1440.805" timestamp="1677186625898" />
+    <state width="1581" height="255" key="GridCell.Tab.0.left/0.25.1440.807@0.25.1440.807" timestamp="1677198105143" />
     <state width="1398" height="212" key="GridCell.Tab.0.left/0.25.1440.809@0.25.1440.809" timestamp="1677172446984" />
     <state width="1438" height="193" key="GridCell.Tab.0.left/0.25.1440.814@0.25.1440.814" timestamp="1677136395707" />
     <state width="1398" height="258" key="GridCell.Tab.0.left/0.25.1440.815@0.25.1440.815" timestamp="1674414536229" />
-    <state width="1398" height="193" key="GridCell.Tab.0.right" timestamp="1677181714349">
-      <screen x="0" y="25" width="1440" height="805" />
+    <state width="1581" height="255" key="GridCell.Tab.0.right" timestamp="1677198105144">
+      <screen x="0" y="25" width="1440" height="807" />
     </state>
     <state width="1438" height="194" key="GridCell.Tab.0.right/0.25.1440.798@0.25.1440.798" timestamp="1677084442890" />
     <state width="1438" height="193" key="GridCell.Tab.0.right/0.25.1440.799@0.25.1440.799" timestamp="1677119716622" />
     <state width="1472" height="208" key="GridCell.Tab.0.right/0.25.1440.801@0.25.1440.801" timestamp="1677056278618" />
-    <state width="1398" height="193" key="GridCell.Tab.0.right/0.25.1440.805@0.25.1440.805" timestamp="1677181714349" />
-    <state width="1398" height="212" key="GridCell.Tab.0.right/0.25.1440.807@0.25.1440.807" timestamp="1677174811212" />
+    <state width="1398" height="197" key="GridCell.Tab.0.right/0.25.1440.805@0.25.1440.805" timestamp="1677186625899" />
+    <state width="1581" height="255" key="GridCell.Tab.0.right/0.25.1440.807@0.25.1440.807" timestamp="1677198105144" />
     <state width="1398" height="212" key="GridCell.Tab.0.right/0.25.1440.809@0.25.1440.809" timestamp="1677172446984" />
     <state width="1438" height="193" key="GridCell.Tab.0.right/0.25.1440.814@0.25.1440.814" timestamp="1677136395707" />
     <state width="1398" height="258" key="GridCell.Tab.0.right/0.25.1440.815@0.25.1440.815" timestamp="1674414536230" />
-    <state width="1438" height="228" key="GridCell.Tab.1.bottom" timestamp="1677096293869">
-      <screen x="0" y="25" width="1440" height="805" />
+    <state width="1398" height="197" key="GridCell.Tab.1.bottom" timestamp="1677188717131">
+      <screen x="0" y="25" width="1440" height="807" />
     </state>
     <state width="1385" height="213" key="GridCell.Tab.1.bottom/0.25.1440.798@0.25.1440.798" timestamp="1677034577738" />
-    <state width="1438" height="228" key="GridCell.Tab.1.bottom/0.25.1440.805@0.25.1440.805" timestamp="1677096293869" />
+    <state width="1398" height="197" key="GridCell.Tab.1.bottom/0.25.1440.805@0.25.1440.805" timestamp="1677186625900" />
+    <state width="1398" height="197" key="GridCell.Tab.1.bottom/0.25.1440.807@0.25.1440.807" timestamp="1677188717131" />
     <state width="1398" height="258" key="GridCell.Tab.1.bottom/0.25.1440.815@0.25.1440.815" timestamp="1674414536231" />
-    <state width="1438" height="228" key="GridCell.Tab.1.center" timestamp="1677096293869">
-      <screen x="0" y="25" width="1440" height="805" />
+    <state width="1398" height="197" key="GridCell.Tab.1.center" timestamp="1677188717131">
+      <screen x="0" y="25" width="1440" height="807" />
     </state>
     <state width="1385" height="213" key="GridCell.Tab.1.center/0.25.1440.798@0.25.1440.798" timestamp="1677034577738" />
-    <state width="1438" height="228" key="GridCell.Tab.1.center/0.25.1440.805@0.25.1440.805" timestamp="1677096293869" />
+    <state width="1398" height="197" key="GridCell.Tab.1.center/0.25.1440.805@0.25.1440.805" timestamp="1677186625899" />
+    <state width="1398" height="197" key="GridCell.Tab.1.center/0.25.1440.807@0.25.1440.807" timestamp="1677188717131" />
     <state width="1398" height="258" key="GridCell.Tab.1.center/0.25.1440.815@0.25.1440.815" timestamp="1674414536230" />
-    <state width="1438" height="228" key="GridCell.Tab.1.left" timestamp="1677096293868">
-      <screen x="0" y="25" width="1440" height="805" />
+    <state width="1398" height="197" key="GridCell.Tab.1.left" timestamp="1677188717130">
+      <screen x="0" y="25" width="1440" height="807" />
     </state>
     <state width="1385" height="213" key="GridCell.Tab.1.left/0.25.1440.798@0.25.1440.798" timestamp="1677034577738" />
-    <state width="1438" height="228" key="GridCell.Tab.1.left/0.25.1440.805@0.25.1440.805" timestamp="1677096293868" />
+    <state width="1398" height="197" key="GridCell.Tab.1.left/0.25.1440.805@0.25.1440.805" timestamp="1677186625899" />
+    <state width="1398" height="197" key="GridCell.Tab.1.left/0.25.1440.807@0.25.1440.807" timestamp="1677188717130" />
     <state width="1398" height="258" key="GridCell.Tab.1.left/0.25.1440.815@0.25.1440.815" timestamp="1674414536230" />
-    <state width="1438" height="228" key="GridCell.Tab.1.right" timestamp="1677096293869">
-      <screen x="0" y="25" width="1440" height="805" />
+    <state width="1398" height="197" key="GridCell.Tab.1.right" timestamp="1677188717131">
+      <screen x="0" y="25" width="1440" height="807" />
     </state>
     <state width="1385" height="213" key="GridCell.Tab.1.right/0.25.1440.798@0.25.1440.798" timestamp="1677034577738" />
-    <state width="1438" height="228" key="GridCell.Tab.1.right/0.25.1440.805@0.25.1440.805" timestamp="1677096293869" />
+    <state width="1398" height="197" key="GridCell.Tab.1.right/0.25.1440.805@0.25.1440.805" timestamp="1677186625900" />
+    <state width="1398" height="197" key="GridCell.Tab.1.right/0.25.1440.807@0.25.1440.807" timestamp="1677188717131" />
     <state width="1398" height="258" key="GridCell.Tab.1.right/0.25.1440.815@0.25.1440.815" timestamp="1674414536231" />
     <state x="208" y="85" key="SettingsEditor" timestamp="1676953237584">
       <screen x="0" y="25" width="1440" height="798" />
@@ -314,10 +570,11 @@
       <screen x="0" y="25" width="1440" height="798" />
     </state>
     <state x="557" y="214" key="refactoring.ChangeSignatureDialog/0.25.1440.798@0.25.1440.798" timestamp="1676951858141" />
-    <state x="439" y="161" width="670" height="663" key="search.everywhere.popup" timestamp="1676838531317">
-      <screen x="0" y="25" width="1440" height="799" />
+    <state x="439" y="162" width="670" height="670" key="search.everywhere.popup" timestamp="1677195085927">
+      <screen x="0" y="25" width="1440" height="807" />
     </state>
     <state x="439" y="161" width="670" height="663" key="search.everywhere.popup/0.25.1440.799@0.25.1440.799" timestamp="1676838531317" />
+    <state x="439" y="162" width="670" height="670" key="search.everywhere.popup/0.25.1440.807@0.25.1440.807" timestamp="1677195085927" />
     <state x="439" y="164" width="670" height="676" key="search.everywhere.popup/0.25.1440.815@0.25.1440.815" timestamp="1674371106618" />
   </component>
   <component name="XDebuggerManager">
@@ -329,23 +586,28 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/torch_training.py</url>
-          <line>319</line>
+          <line>343</line>
           <option name="timeStamp" value="13" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/torch_autoencoder.py</url>
-          <line>310</line>
+          <line>307</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/test.py</url>
-          <line>173</line>
+          <line>174</line>
           <option name="timeStamp" value="15" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/test.py</url>
-          <line>203</line>
+          <line>202</line>
           <option name="timeStamp" value="16" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/torch_training.py</url>
+          <line>234</line>
+          <option name="timeStamp" value="17" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -357,6 +619,6 @@
     <SUITE FILE_PATH="coverage/Sindy_encoder$main.coverage" NAME="main Coverage Results" MODIFIED="1673462194826" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/SindyTorchEnconder$main.coverage" NAME="main Coverage Results" MODIFIED="1673636444323" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/SindyTorchEnconder$data_utils.coverage" NAME="data_utils Coverage Results" MODIFIED="1676591399748" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
-    <SUITE FILE_PATH="coverage/SindyTorchEnconder$test.coverage" NAME="test Coverage Results" MODIFIED="1677181714339" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/SindyTorchEnconder$test.coverage" NAME="test Coverage Results" MODIFIED="1677198105137" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
   </component>
 </project>

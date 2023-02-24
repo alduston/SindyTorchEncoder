@@ -36,6 +36,10 @@ class SindyNet(nn.Module):
         self.sindy_coeffs = torch.nn.Parameter(self.sindy_coefficients(), requires_grad = True)
         #if self.params['sequential_thresholding']:
         self.coefficient_mask = torch.tensor(params['coefficient_mask'], dtype = torch.float32, device = self.device)
+
+        self.damping_mask = torch.tensor(params['coefficient_mask'], dtype=torch.float32, device=self.device)
+        self.activation_mask = torch.tensor(params['coefficient_mask'], dtype=torch.float32, device=self.device)
+
         self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
 
         self.sub_model_coeffs = {}
@@ -190,6 +194,8 @@ class SindyNet(nn.Module):
             if epoch and (epoch % self.params['threshold_frequency'] == 0):
                 self.coefficient_mask = torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
                 self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
+        if self.params['use_activation_mask']:
+            return torch.matmul(Theta, self.activation_mask * sindy_coefficients)
         return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
 
 
@@ -238,28 +244,16 @@ class SindyNet(nn.Module):
 
     def sindy_reg_loss(self, idx = None, penalize_self = False):
         if idx == None:
-            coeffs = self.sindy_coeffs
+            sub_coeffs = self.sindy_coeffs
         else:
-            n_bags = self.sindy_coeffs.shape[0]
-            coeffs = (1/n_bags) * torch.sum(self.sub_model_coeffs)
-        reg_loss = self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(coeffs))
-        if penalize_self:
             sub_coeffs = self.sub_model_coeffs[idx]
-            reg_loss += self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sub_coeffs))
-        return reg_loss
+        return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sub_coeffs))
 
 
-    def sindy_corr_loss(self, idx = None):
-        if idx == None:
-           n_bags = self.sub_model_coeffs.shape[0]
-           idx_losses = [self.sindy_corr_loss(idx) for idx in range(n_bags)]
-           return (1/n_bags) * sum(idx_losses)
-        else:
-            sindy_coefficients = self.sub_model_coeffs[idx]
-            coeff_norm = torch.linalg.norm(sindy_coefficients)
-            diffs = [sindy_coefficients - alt_coeffs for alt_coeffs in self.sub_model_coeffs]
-            diff_sum = sum([torch.linalg.norm(diff)/coeff_norm for diff  in diffs])
-            return self.params['loss_weight_correlation'] * diff_sum
+    def spooky_loss(self):
+        n_bags = self.sindy_coeffs.shape[0]
+        coeffs = (1/n_bags) * torch.sum(self.sub_model_coeffs)
+        return self.params['loss_weight_mystery'] * torch.mean(torch.abs(coeffs))
 
 
     def sindy_z_loss(self, z, x, dx, ddx = None, idx = None):
@@ -283,7 +277,7 @@ class SindyNet(nn.Module):
             return  self.params['loss_weight_sindy_x'] * torch.mean((ddx - ddx_decode) ** 2)
 
 
-    def Loss(self, x, x_decode, z, dx, ddx = None, idx = None):
+    def Loss(self, x, x_decode, z, dx, ddx = None, idx = None, spooky = False):
         decoder_loss = self.decoder_loss(x, x_decode)
         sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx, idx)
         sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx, idx)
@@ -297,17 +291,20 @@ class SindyNet(nn.Module):
         return loss, loss_refinement, losses
 
 
-    def Loss_pcor(self, x, x_decode, z, dx, ddx = None, idx = None):
+    def Loss(self, x, x_decode, z, dx, ddx = None, idx = None, spooky = False):
         decoder_loss = self.decoder_loss(x, x_decode)
         sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx, idx)
         sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx, idx)
-
         reg_loss = self.sindy_reg_loss(idx, penalize_self=True)
+
         loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss
         loss = loss_refinement + reg_loss
-
         losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss,
                   'sindy_x': sindy_x_loss, 'reg':  reg_loss}
+        if spooky:
+            spooky_loss = self.spooky_loss()
+            loss += spooky_loss
+            losses['spooky'] = spooky_loss
         return loss, loss_refinement, losses
 
 
@@ -315,16 +312,9 @@ class SindyNet(nn.Module):
         return self.Loss(x, x_decode, z, dx, ddx)[0]
 
 
-    def auto_loss(self, x, dx, ddx = None, mode = None):
+    def auto_Loss(self, x, dx, ddx=None, idx=None, spooky = False):
         x_decode, z = self.forward(x)
-        return self.loss(x, x_decode, z, dx, ddx)
-
-
-    def auto_Loss(self, x, dx, ddx=None, idx=None, corr = False):
-        x_decode, z = self.forward(x)
-        if corr:
-            return self.Loss_pcor(x, x_decode, z, dx, ddx, idx)
-        return self.Loss(x, x_decode, z, dx, ddx, idx)
+        return self.Loss(x, x_decode, z, dx, ddx, idx,spooky)
 
 
     def bag_loss(self, x, dx, ddx=None):
