@@ -97,7 +97,7 @@ def PA_test(model_params, training_data, validation_data, run  = 0):
     model_params['threshold_frequency'] = 25
     model_params['crossval_freq'] = 25
     model_params['run'] = run
-    model_params['pretrain_epochs'] = 400
+    model_params['pretrain_epochs'] = 200
     net, Loss_dict = parallell_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
@@ -139,10 +139,10 @@ def Meta_test(runs = 5):
         PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data, run = run_ix)
         Anet, ALoss_dict = A_test(model_params, training_data, validation_data, run = run_ix)
 
-        PA_coeffs = ((PAnet.coefficient_mask * torch.sum(PAnet.sub_model_coeffs,0)) / (PAnet.sub_model_coeffs.shape[0])).detach().cpu().numpy()
-        A_coeffs = Anet.sindy_coeffs.detach().cpu().numpy()
-        pd.DataFrame(PA_coeffs).to_csv(f'../data/PAS_sindy_coeffs_{run_ix}.csv')
-        pd.DataFrame(A_coeffs).to_csv(f'../data/A_sindy_coeffs_{run_ix}.csv')
+        #PA_coeffs = ((PAnet.coefficient_mask * torch.sum(PAnet.sub_model_coeffs,0)) / (PAnet.sub_model_coeffs.shape[0])).detach().cpu().numpy()
+        #A_coeffs = Anet.sindy_coeffs.detach().cpu().numpy()
+        #pd.DataFrame(PA_coeffs).to_csv(f'../data/PAS_sindy_coeffs_{run_ix}.csv')
+        #pd.DataFrame(A_coeffs).to_csv(f'../data/A_sindy_coeffs_{run_ix}.csv')
 
         for key,val in ALoss_dict.items():
             if key=='epoch':
