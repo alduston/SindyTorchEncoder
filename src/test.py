@@ -97,6 +97,7 @@ def PA_test(model_params, training_data, validation_data, run  = 0):
     model_params['threshold_frequency'] = 25
     model_params['crossval_freq'] = 25
     model_params['run'] = run
+    model_params['pretrain_epochs'] = 400
     net, Loss_dict = parallell_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
@@ -174,35 +175,35 @@ def Meta_test(runs = 5):
             Meta_PA_dict.pop(key,None)
 
     Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
-    Meta_A_df.to_csv('../data/Meta_A_BIG.csv')
+    Meta_A_df.to_csv('../data/Meta_A_pretain.csv')
 
     Meta_PA_df = pd.DataFrame.from_dict(Meta_PA_dict, orient='columns')
-    Meta_PA_df.to_csv('../data/Meta_PAS_BIG.csv')
+    Meta_PA_df.to_csv('../data/Meta_PAS_pretain.csv')
 
     return Meta_A_df, Meta_PA_df
 
 
 def run():
     if torch.cuda.is_available():
-        Meta_test(runs=4)
+        Meta_test(runs=2)
 
     else:
-        Meta_A_df = pd.read_csv('../data/Meta_A_BIG.csv')
-        Meta_PA_df = pd.read_csv('../data/Meta_PAS_BIG.csv')
+        Meta_A_df = pd.read_csv('../data/Meta_A_Big.csv')
+        Meta_PA_df = pd.read_csv('../data/Meta_PAS_Big.csv')
 
         plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_avg'], label='A_test')
         plt.plot(Meta_PA_df['epoch'], Meta_PA_df[f'active_coeffs_avg'], label='PA_test')
         plt.xlabel('epoch')
         plt.ylabel('# active_coeffs')
         plt.title(f'A v PA avg coeffcount')
-        plt.savefig(f'../plots/VICTORY_exp_ncoeff_avg.png')
         plt.legend()
+        plt.savefig(f'../plots/VICTORY_exp_ncoeff_avg.png')
         torch_training.clear_plt()
 
 
         avg_loss_A = np.zeros(len(Meta_A_df[f'decoder_{0}']))
         avg_loss_BA = np.zeros(len(Meta_PA_df[f'decoder_{0}']))
-        for i in [0]:
+        for i in [0,1,2,3]:
             plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_{i}'], label = 'A_test')
             plt.plot(Meta_PA_df['epoch'], Meta_PA_df[f'active_coeffs_{i}'], label='PA_test')
             plt.legend()

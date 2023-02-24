@@ -161,14 +161,21 @@ def validate_one_epoch(model, data_loader):
     return  total_loss, total_loss_dict
 
 
-def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_freq = inf,
+def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_freq = np.inf,
                    test_loader = [], printout = False, Loss_dict = {}):
-
     loss_dict = {'epoch': [], 'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': [],  'active_coeffs': []}
     train_epochs = train_params[f'{mode}_epochs']
     optimizer = torch.optim.Adam(net.parameters(), lr= model_params['learning_rate'])
-
     for epoch in range(train_epochs):
+        if not epoch % print_freq:
+            test_loss, test_loss_dict = validate_one_epoch(net, test_loader)
+            for key,val in test_loss_dict.items():
+                loss_dict[key].append(float(val.detach().cpu()))
+                loss_dict['epoch'].append(float(net.epoch.detach().cpu()))
+                loss_dict['active_coeffs'].append(int(net.num_active_coeffs))
+                if printout:
+                    print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in loss_dict.items()])}')
+
         total_loss, total_loss_dict = train_one_epoch(net, train_loader, optimizer)
         if not (net.epoch % 250)-1:
             plt.imshow(net.sindy_coeffs.detach().cpu().numpy(), vmin=0, vmax=1)
@@ -177,19 +184,6 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
             plt.savefig(f'../plots/coeff_hmaps/A_run{run}_{net.epoch}_hmap.png')
             clear_plt()
 
-        if not isinf(print_freq):
-            if not epoch % print_freq:
-                #if printout:
-                    #pass
-                    #print(f'TRAIN Epoch {net.epoch}: Active coeffs: {net.num_active_coeffs}, {[f"{key}: {val.cpu().detach().numpy()}" for (key, val) in total_loss_dict.items()]}')
-                if len(test_loader):
-                    test_loss, test_loss_dict = validate_one_epoch(net, test_loader)
-                    for key,val in test_loss_dict.items():
-                        loss_dict[key].append(float(val.detach().cpu()))
-                    loss_dict['epoch'].append(float(net.epoch.detach().cpu()))
-                    loss_dict['active_coeffs'].append(int(net.num_active_coeffs))
-                    if printout:
-                       print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in loss_dict.items()])}')
     if len(Loss_dict.keys()):
         for key, val in loss_dict.items():
             Loss_dict[key] += val
@@ -212,16 +206,16 @@ def train_sindy(model_params, train_params, training_data, validation_data, prin
                          mode = 'pretrain', print_freq = 50, test_loader = test_loader,
                          printout= printout, Loss_dict = Loss_dict)
 
-    if train_params['bag_epochs']:
-        bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
-        shuffle_threshold = train_params['shuffle_threshold']
-        for epoch in range(train_params['bag_epochs']):
-            if epoch and not epoch%shuffle_threshold:
-                bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
-            net  = train_bag_epochs(net, bag_loader, model_params, train_params)
-            net, loss_dict ,Loss_dict = subtrain_sindy(net, train_loader, model_params,train_params,
-                                            mode='subtrain', print_freq = 50, test_loader = test_loader,
-                                            printout= printout,  Loss_dict = Loss_dict)
+    #if train_params['bag_epochs']:
+        #bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
+        #shuffle_threshold = train_params['shuffle_threshold']
+        #for epoch in range(train_params['bag_epochs']):
+            #if epoch and not epoch%shuffle_threshold:
+                #bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
+            #net  = train_bag_epochs(net, bag_loader, model_params, train_params)
+            #net, loss_dict ,Loss_dict = subtrain_sindy(net, train_loader, model_params,train_params,
+                                            #mode='subtrain', print_freq = 50, test_loader = test_loader,
+                                            #printout= printout,  Loss_dict = Loss_dict)
     if train_params['refinement_epochs']:
         net.params['sequential_thresholding'] = False
         net, loss_dict,Loss_dict = subtrain_sindy(net, train_loader, model_params, train_params,
@@ -374,13 +368,13 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
     test_freq = net.params['test_freq']
     optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'])
     for epoch in range(train_params['bag_epochs']):
-        train_paralell_epoch(net, train_bag_loader,optimizer)
-        if not epoch % crossval_freq and epoch:
-            net = crossval(net)
         if not epoch % test_freq:
             validate_paralell_epoch(net, test_loader, Loss_dict)
             if printout:
                 print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in Loss_dict.items()])}')
+        if not epoch % crossval_freq and epoch > net.params['pretrain_epochs']:
+            net = crossval(net)
+        train_paralell_epoch(net, train_bag_loader, optimizer)
 
     net, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict)
     return net, Loss_dict
