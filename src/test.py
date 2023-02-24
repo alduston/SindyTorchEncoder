@@ -88,7 +88,7 @@ def PA_small_test(model_params, training_data, validation_data):
     return net, Loss_dict
 
 
-def PA_test(model_params, training_data, validation_data):
+def PA_test(model_params, training_data, validation_data, run  = 0):
     model_params['sequential_thresholding'] = False
     model_params['use_activation_mask'] = False
     l = len(training_data['x'])
@@ -96,11 +96,12 @@ def PA_test(model_params, training_data, validation_data):
     model_params['batch_size'] = int(l/2)
     model_params['threshold_frequency'] = 25
     model_params['crossval_freq'] = 25
+    model_params['run'] = run
     net, Loss_dict = parallell_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
 
-def A_test(model_params, training_data, validation_data):
+def A_test(model_params, training_data, validation_data, run = 0):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
     train_params = {'bag_epochs': 0, 'pretrain_epochs': 4500, 'nbags': l // 6, 'bag_size': 100,
@@ -108,6 +109,7 @@ def A_test(model_params, training_data, validation_data):
                     'refinement_epochs': 500}
     model_params['batch_size'] = int(l/2)
     model_params['threshold_frequency'] = 25
+    model_params['run'] = run
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
 
@@ -133,8 +135,8 @@ def Meta_test(runs = 5):
     Meta_A_dict = {}
     for run_ix in range(runs):
         model_params, training_data, validation_data = get_test_params(max_data=10000)
-        PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data)
-        Anet, ALoss_dict = A_test(model_params, training_data, validation_data)
+        PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data, run = run_ix)
+        Anet, ALoss_dict = A_test(model_params, training_data, validation_data, run = run_ix)
 
         PA_coeffs = ((PAnet.coefficient_mask * torch.sum(PAnet.sub_model_coeffs,0)) / (PAnet.sub_model_coeffs.shape[0])).detach().cpu().numpy()
         A_coeffs = Anet.sindy_coeffs.detach().cpu().numpy()
@@ -182,7 +184,7 @@ def Meta_test(runs = 5):
 
 def run():
     if torch.cuda.is_available():
-        Meta_test(runs=5)
+        Meta_test(runs=4)
 
     else:
         Meta_A_df = pd.read_csv('../data/Meta_A_BIG.csv')
@@ -227,8 +229,8 @@ def run():
 
             torch_training.clear_plt()
 
-    avg_loss_A  *= .1
-    avg_loss_BA *= .1
+    avg_loss_A  *= .25
+    avg_loss_BA *= .25
     plt.plot(Meta_A_df['epoch'], np.log(avg_loss_A), label='A_test')
     plt.plot(Meta_PA_df['epoch'], np.log(avg_loss_BA), label='PA_test')
     plt.legend()

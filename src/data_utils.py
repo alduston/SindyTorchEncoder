@@ -116,7 +116,7 @@ def get_test_params(train_size = 100, max_data = 100000):
     params['max_epochs'] = 5000
     params['refinement_epochs'] = 2000
     params['crossval_freq'] = 50
-    params['test_freq'] = 100
+    params['test_freq'] = 50
     params['train_print_freq'] = np.inf
     params['update_freq'] = 50
     params['use_activation_mask'] = False

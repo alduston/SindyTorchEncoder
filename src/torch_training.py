@@ -165,10 +165,18 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
                    test_loader = [], printout = False, Loss_dict = {}):
 
     loss_dict = {'epoch': [], 'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': [],  'active_coeffs': []}
-    pretrain_epochs = train_params[f'{mode}_epochs']
+    train_epochs = train_params[f'{mode}_epochs']
     optimizer = torch.optim.Adam(net.parameters(), lr= model_params['learning_rate'])
-    for epoch in range(pretrain_epochs):
+
+    for epoch in range(train_epochs):
         total_loss, total_loss_dict = train_one_epoch(net, train_loader, optimizer)
+        if not (net.epoch % 250)-1:
+            plt.imshow(net.sindy_coeffs.detach().cpu().numpy(), vmin=0, vmax=1)
+            run = net.params['run']
+            plt.colorbar()
+            plt.savefig(f'../plots/coeff_hmaps/A_run{run}_{net.epoch}_hmap.png')
+            clear_plt()
+
         if not isinf(print_freq):
             if not epoch % print_freq:
                 #if printout:
@@ -182,7 +190,6 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
                     loss_dict['active_coeffs'].append(int(net.num_active_coeffs))
                     if printout:
                        print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in loss_dict.items()])}')
-
     if len(Loss_dict.keys()):
         for key, val in loss_dict.items():
             Loss_dict[key] += val
@@ -290,11 +297,13 @@ def validate_paralell_epoch(model, data_loader, Loss_dict):
     avg_coeffs = (1 / n_bags) * torch.sum(Bag_coeffs, dim=0)
     val_model = copy(model)
     val_model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
-    plt.imshow(val_model.sindy_coeffs.detach().cpu().numpy(), vmin=0, vmax=1)
 
-    plt.colorbar()
-    plt.savefig(f'../plots/coeff_hmaps/{val_model.epoch}_hmmap.png')
-    clear_plt()
+    if not (model.epoch % 250)-1:
+        run =  model.params['run']
+        plt.imshow(val_model.sindy_coeffs.detach().cpu().numpy(), vmin=0, vmax=1)
+        plt.colorbar()
+        plt.savefig(f'../plots/coeff_hmaps/PA_run{run}_{model.epoch}_hmap.png')
+        clear_plt()
 
     for batch_index, data in enumerate(data_loader):
         with torch.no_grad():
