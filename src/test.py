@@ -78,12 +78,16 @@ def BA_test(model_params, training_data, validation_data):
     return net, Loss_dict
 
 
-def PA_small_test(model_params, training_data, validation_data):
+def PA_test_small(model_params, training_data, validation_data, run  = 0):
     model_params['sequential_thresholding'] = False
+    model_params['use_activation_mask'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 1000, 'pretrain_epochs': 0, 'nbags': 3, 'bag_size': 7, 'refinement_epochs': 300}
-    model_params['batch_size'] = 7
+    train_params = {'bag_epochs': 50, 'nbags': 12, 'bag_size': int(l//8), 'refinement_epochs': 0}
+    model_params['batch_size'] = int(l/2)
     model_params['threshold_frequency'] = 25
+    model_params['crossval_freq'] = 25
+    model_params['run'] = run
+    model_params['pretrain_epochs'] = 100
     net, Loss_dict = parallell_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
@@ -115,34 +119,33 @@ def A_test(model_params, training_data, validation_data, run = 0):
     return net, Loss_dict
 
 
-def A_small_test(model_params, training_data, validation_data):
+def A_test_small(model_params, training_data, validation_data, run = 0):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 8000, 'nbags': int(1.5 * l // 300), 'bag_size': 300,
-                    'subtrain_epochs': 80, 'bag_sub_epochs': 4, 'bag_learning_rate': .01, 'shuffle_threshold': 5,
-                    'refinement_epochs': 0}
-    if torch.cuda.is_available():
-        model_params['batch_size'] = l
-    else:
-        model_params['batch_size'] = 7
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 45, 'nbags': l // 6, 'bag_size': 100,
+                    'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
+                    'refinement_epochs': 5}
+    model_params['batch_size'] = int(l/2)
     model_params['threshold_frequency'] = 25
+    model_params['run'] = run
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
 
 
-def Meta_test(runs = 15):
+
+def Meta_test(runs = 15, small = False):
     Keys = {'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': [], 'active_coeffs':[]}
     Meta_PA_dict = {}
     Meta_A_dict = {}
     for run_ix in range(runs):
-        model_params, training_data, validation_data = get_test_params(max_data=10000)
-        PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data, run = run_ix)
-        Anet, ALoss_dict = A_test(model_params, training_data, validation_data, run = run_ix)
-
-        #PA_coeffs = ((PAnet.coefficient_mask * torch.sum(PAnet.sub_model_coeffs,0)) / (PAnet.sub_model_coeffs.shape[0])).detach().cpu().numpy()
-        #A_coeffs = Anet.sindy_coeffs.detach().cpu().numpy()
-        #pd.DataFrame(PA_coeffs).to_csv(f'../data/PAS_sindy_coeffs_{run_ix}.csv')
-        #pd.DataFrame(A_coeffs).to_csv(f'../data/A_sindy_coeffs_{run_ix}.csv')
+        if small:
+            model_params, training_data, validation_data = get_test_params(max_data=50)
+            PAnet, PALoss_dict = PA_test_small(model_params, training_data, validation_data, run = run_ix)
+            Anet, ALoss_dict = A_test_small(model_params, training_data, validation_data, run = run_ix)
+        else:
+            model_params, training_data, validation_data = get_test_params(max_data=10000)
+            PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data, run=run_ix)
+            Anet, ALoss_dict = A_test(model_params, training_data, validation_data, run=run_ix)
 
         for key,val in ALoss_dict.items():
             if key=='epoch':
@@ -168,11 +171,16 @@ def Meta_test(runs = 15):
         Meta_PA_dict[f'{key}_avg'] = PAavg * (1 / runs)
 
     PA_keys = copy(list(Meta_PA_dict.keys()))
+    l1 = len(Meta_PA_dict['epoch'])
     for key in PA_keys:
-        if key.startswith('total'):
-            Meta_PA_dict.pop(key,None)
-        if key.startswith('spooky'):
-            Meta_PA_dict.pop(key,None)
+        if len(Meta_PA_dict[key])!=l1:
+            Meta_PA_dict.pop(key, None)
+
+    A_keys = copy(list(Meta_A_dict.keys()))
+    l2 = len(Meta_A_dict['epoch'])
+    for key in A_keys:
+        if len(Meta_A_dict[key])!=l2:
+            Meta_A_dict.pop(key, None)
 
     Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
     Meta_A_df.to_csv('../data/Meta_A_VICTORY.csv')
@@ -185,7 +193,8 @@ def Meta_test(runs = 15):
 
 def run():
     if torch.cuda.is_available():
-        Meta_A_df, Meta_PA_df = Meta_test(runs=15)
+        n_runs = 6
+        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs)
 
     else:
         Meta_A_df = pd.read_csv('../data/Meta_A_VICTORY.csv')
@@ -206,7 +215,7 @@ def run():
 
         avg_xloss_A = np.zeros(len(Meta_A_df[f'decoder_{0}']))
         avg_xloss_PA = np.zeros(len(Meta_PA_df[f'decoder_{0}']))
-        for i in range(15):
+        for i in range(n_runs):
             plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_{i}'], label = 'A_test')
             plt.plot(Meta_PA_df['epoch'], Meta_PA_df[f'active_coeffs_{i}'], label='PA_test')
             plt.legend()
@@ -246,8 +255,8 @@ def run():
 
             torch_training.clear_plt()
 
-    avg_loss_A  *= (1/15)
-    avg_loss_PA *= (1/15)
+    avg_loss_A  *= (1/n_runs)
+    avg_loss_PA *= (1/n_runs)
     plt.plot(Meta_A_df['epoch'], np.log(avg_loss_A), label='A_test')
     plt.plot(Meta_PA_df['epoch'], np.log(avg_loss_PA), label='PA_test')
     plt.legend()
@@ -257,8 +266,8 @@ def run():
     plt.savefig(f'../plots/VICTORY_exp_avg_loss.png')
     torch_training.clear_plt()
 
-    avg_xloss_A *= (1/15)
-    avg_xloss_PA *= (1/15)
+    avg_xloss_A *= (1/n_runs)
+    avg_xloss_PA *= (1/n_runs)
     plt.plot(Meta_A_df['epoch'], np.log(avg_xloss_A), label='A_test')
     plt.plot(Meta_PA_df['epoch'], np.log(avg_xloss_PA), label='PA_test')
     plt.legend()

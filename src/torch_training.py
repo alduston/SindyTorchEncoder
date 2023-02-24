@@ -169,10 +169,10 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
     for epoch in range(train_epochs):
         if not epoch % print_freq:
             test_loss, test_loss_dict = validate_one_epoch(net, test_loader)
+            loss_dict['epoch'].append(float(net.epoch.detach().cpu()))
+            loss_dict['active_coeffs'].append(int(net.num_active_coeffs))
             for key,val in test_loss_dict.items():
                 loss_dict[key].append(float(val.detach().cpu()))
-                loss_dict['epoch'].append(float(net.epoch.detach().cpu()))
-                loss_dict['active_coeffs'].append(int(net.num_active_coeffs))
             if printout:
                 print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in loss_dict.items()])}')
 
