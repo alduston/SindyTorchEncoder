@@ -12,148 +12,11 @@
   <component name="ChangeListManager">
     <list default="true" id="3ae723a2-2f1b-4b45-8b78-c1f489f4fd16" name="Default Changelist" comment="">
       <change afterPath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Meta_A_df.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Meta_PA_df.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/ Meta_A_df.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/A_sindy_coeffs_0.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/A_sindy_coeffs_1.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/A_sindy_coeffs_2.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/A_sindy_coeffs_3.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/A_sindy_coeffs_4.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/A_sindy_coeffs_5.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Losses.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_A_VICTORY.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_A_VICTORY2.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_A_big.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_A_df.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_A_df2.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_A_df3.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_A_df5.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_A_df_N.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_A_df_N2.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_A_df_ST.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_A_df_ST2.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_A_df_ST3.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_A_df_ST4.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_A_df_ip_nn.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_A_df_nn.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_BA_df.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_BA_df_N.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_BA_df_N2.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_BA_df_ST.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_BA_df_ST2.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_BA_df_ST3.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_BA_df_ST4.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_BA_df_ip_nn.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_BA_df_nn.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_PAS_VICTORY.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_PAS_VICTORY2.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_PAS_big.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_PAS_df2.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_PAS_df3.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_PA_df.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/PAS_sindy_coeffs_0.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/PAS_sindy_coeffs_1.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/PAS_sindy_coeffs_2.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/PAS_sindy_coeffs_3.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/PAS_sindy_coeffs_4.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/PAS_sindy_coeffs_5.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/med_exp_ncum.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/pendulum/model1.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/pendulum/model2.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/rd/model1.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/rd/model2.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/training.py" beforeDir="false" afterPath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/training.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_avg_decoder.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_avg_dxloss.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_avg_loss.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_decoder_loss0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_decoder_loss1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_decoder_loss10.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_decoder_loss11.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_decoder_loss12.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_decoder_loss13.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_decoder_loss14.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_decoder_loss2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_decoder_loss3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_decoder_loss4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_decoder_loss5.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_decoder_loss6.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_decoder_loss7.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_decoder_loss8.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_decoder_loss9.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_dxloss0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_dxloss1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_dxloss10.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_dxloss11.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_dxloss12.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_dxloss13.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_dxloss14.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_dxloss2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_dxloss3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_dxloss4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_dxloss5.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_dxloss6.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_dxloss7.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_dxloss8.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_dxloss9.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_loss0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_loss1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_loss10.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_loss11.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_loss12.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_loss13.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_loss14.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_loss2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_loss3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_loss4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_loss5.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_loss6.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_loss7.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_loss8.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_loss9.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_ncoeff0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_ncoeff1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_ncoeff10.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_ncoeff11.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_ncoeff12.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_ncoeff13.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_ncoeff14.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_ncoeff2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_ncoeff3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_ncoeff4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_ncoeff5.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_ncoeff6.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_ncoeff7.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_ncoeff8.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_ncoeff9.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY2_exp_ncoeff_avg.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_decoder_loss0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_decoder_loss1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_decoder_loss2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_decoder_loss3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_decoder_loss4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_decoder_loss5.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_dxloss0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_dxloss1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_dxloss2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_dxloss3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_dxloss4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_dxloss5.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_loss0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_loss1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_loss2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_loss3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_loss4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_loss5.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_ncoeff0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_ncoeff1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_ncoeff2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_ncoeff3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_ncoeff4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_ncoeff5.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/exp_loss1.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -355,7 +218,7 @@
       <workItem from="1677308082745" duration="22000" />
       <workItem from="1677311186942" duration="1118000" />
       <workItem from="1677350878609" duration="1204000" />
-      <workItem from="1677353595979" duration="3573000" />
+      <workItem from="1677353595979" duration="3741000" />
     </task>
     <servers />
   </component>
@@ -510,7 +373,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/test.py</url>
-          <line>190</line>
+          <line>180</line>
           <option name="timeStamp" value="15" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">

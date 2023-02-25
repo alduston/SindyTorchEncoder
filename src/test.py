@@ -134,7 +134,6 @@ def A_test_small(model_params, training_data, validation_data, run = 0):
 
 
 def Meta_test(runs = 15, small = False, exp_label = '', exp_size = (100,np.inf)):
-    Keys = {'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': [], 'active_coeffs':[]}
     Meta_PA_dict = {}
     Meta_A_dict = {}
     for run_ix in range(runs):
@@ -160,15 +159,6 @@ def Meta_test(runs = 15, small = False, exp_label = '', exp_size = (100,np.inf))
                     Meta_PA_dict[f'{key}'] = val
             else:
                 Meta_PA_dict[f'{key}_{run_ix}'] = val
-
-    for key in Keys:
-        PAavg = np.zeros(len(Meta_PA_dict[f'{key}_{0}']))
-        Aavg = np.zeros(len(Meta_A_dict[f'{key}_{0}']))
-        for run_ix in range(runs):
-            PAavg += np.asarray(Meta_PA_dict[f'{key}_{run_ix}'])
-            Aavg += np.asarray(Meta_A_dict[f'{key}_{run_ix}'])
-        Meta_A_dict[f'{key}_avg'] = Aavg * (1/runs)
-        Meta_PA_dict[f'{key}_avg'] = PAavg * (1 / runs)
 
     PA_keys = copy(list(Meta_PA_dict.keys()))
     l1 = len(Meta_PA_dict['epoch'])
