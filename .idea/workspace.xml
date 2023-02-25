@@ -18,11 +18,8 @@
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/rd/model1.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/rd/model2.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/training.py" beforeDir="false" afterPath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/training.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_1_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_1_hmap.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/data_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/torch_autoencoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/torch_autoencoder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/torch_training.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/torch_training.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -222,7 +219,7 @@
       <workItem from="1677306148972" duration="484000" />
       <workItem from="1677308082745" duration="22000" />
       <workItem from="1677311186942" duration="1118000" />
-      <workItem from="1677350878609" duration="385000" />
+      <workItem from="1677350878609" duration="938000" />
     </task>
     <servers />
   </component>
