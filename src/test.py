@@ -133,7 +133,7 @@ def A_test_small(model_params, training_data, validation_data, run = 0):
 
 
 
-def Meta_test(runs = 15, small = False):
+def Meta_test(runs = 15, small = False, exp_label = '', exp_size = (100,np.inf)):
     Keys = {'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': [], 'active_coeffs':[]}
     Meta_PA_dict = {}
     Meta_A_dict = {}
@@ -143,7 +143,7 @@ def Meta_test(runs = 15, small = False):
             PAnet, PALoss_dict = PA_test_small(model_params, training_data, validation_data, run = run_ix)
             Anet, ALoss_dict = A_test_small(model_params, training_data, validation_data, run = run_ix)
         else:
-            model_params, training_data, validation_data = get_test_params(max_data=10000)
+            model_params, training_data, validation_data = get_test_params(exp_size[0], max_data=exp_size[1])
             PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data, run=run_ix)
             Anet, ALoss_dict = A_test(model_params, training_data, validation_data, run=run_ix)
 
@@ -182,128 +182,93 @@ def Meta_test(runs = 15, small = False):
         if len(Meta_A_dict[key])!=l2:
             Meta_A_dict.pop(key, None)
 
+    try:
+        os.mkdir(f'../data/{exp_label}/')
+    except OSError:
+        pass
+
     Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
-    Meta_A_df.to_csv('../data/Meta_A_hmmm.csv')
+    Meta_A_df.to_csv(f'../data/{exp_label}/Meta_A.csv')
 
     Meta_PA_df = pd.DataFrame.from_dict(Meta_PA_dict, orient='columns')
-    Meta_PA_df.to_csv('../data/Meta_PAS_hmmm.csv')
+    Meta_PA_df.to_csv(f'../data/{exp_label}/Meta_PA.csv')
 
     return Meta_A_df, Meta_PA_df
 
 
-def run():
-    n_runs = 4
-    #n_runs = 15
-    if torch.cuda.is_available():
-        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs)
-
+def trajectory_plot(Meta_A_df, Meta_PA_df, exp_label, plot_key, runix):
+    exp_folder = f'{exp_label}_exp'
+    if plot_key in ["sindy_x_","decoder_"]:
+        plt.plot(Meta_A_df['epoch'], np.log(Meta_A_df[f'{plot_key}{runix}']), label='A_test')
+        plt.plot(Meta_PA_df['epoch'], np.log(Meta_PA_df[f'{plot_key}{runix}']), label='PA_test')
+        plt.ylabel(f'Log {plot_key}')
     else:
-        Meta_A_df = pd.read_csv('../data/Meta_A_VICTORY2.csv')
-        Meta_PA_df = pd.read_csv('../data/Meta_PAS_VICTORY2.csv')
+        plt.plot(Meta_A_df['epoch'], Meta_A_df[f'{plot_key}{runix}'], label='A_test')
+        plt.plot(Meta_PA_df['epoch'], Meta_PA_df[f'{plot_key}{runix}'], label='PA_test')
+    plt.xlabel('epoch')
+    plt.legend()
+    plt.title(f'A v PA {plot_key} run {runix}')
+    plt.savefig(f'../plots/{exp_folder}/{exp_label}_exp_ncoeff{runix}.png')
+    torch_training.clear_plt()
+    return True
 
-        plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_avg'], label='A_test')
-        plt.plot(Meta_PA_df['epoch'], Meta_PA_df[f'active_coeffs_avg'], label='PA_test')
-        plt.xlabel('epoch')
-        plt.ylabel('# active_coeffs')
-        plt.title(f'A v PA avg coeffcount')
-        plt.legend()
-        plt.savefig(f'../plots/VICTORY2_exp_ncoeff_avg.png')
-        torch_training.clear_plt()
 
-        avg_loss_A = np.zeros(len(Meta_A_df[f'decoder_{0}']))
-        avg_loss_PA = np.zeros(len(Meta_PA_df[f'decoder_{0}']))
+def avg_trajectory_plot(Meta_A_df, Meta_PA_df, A_avg, PA_avg, exp_label, plot_key):
+    exp_folder = f'{exp_label}_exp'
+    if plot_key in ["sindy_x_","decoder_"]:
+        plt.plot(Meta_A_df['epoch'], np.log(A_avg), label='A_test')
+        plt.plot(Meta_PA_df['epoch'], np.log(PA_avg), label='PA_test')
+        plt.ylabel(f'Log {plot_key}')
+    else:
+        plt.plot(Meta_A_df['epoch'], A_avg, label='A_test')
+        plt.plot(Meta_PA_df['epoch'], PA_avg, label='PA_test')
+    plt.xlabel('epoch')
+    plt.legend()
+    plt.title(f'A v PA {plot_key} avg')
+    plt.savefig(f'../plots/{exp_folder}/{exp_label}_exp_ncoeff_avg.png')
+    torch_training.clear_plt()
+    return True
 
-        avg_xloss_A = np.zeros(len(Meta_A_df[f'decoder_{0}']))
-        avg_xloss_PA = np.zeros(len(Meta_PA_df[f'decoder_{0}']))
 
-        avg_decode_loss_A = np.zeros(len(Meta_A_df[f'decoder_{0}']))
-        avg_decode_loss_PA = np.zeros(len(Meta_PA_df[f'decoder_{0}']))
+
+def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_","decoder_", "active_coeffs_"]):
+    exp_folder = f'{exp_label}_exp'
+    try:
+        os.mkdir(f'../plots/{exp_folder}')
+    except OSError:
+        pass
+
+    for key in plot_keys:
+        avg_A = np.zeros(len(Meta_A_df[f'epoch']))
+        avg_PA = np.zeros(len(Meta_PA_df[f'epoch']))
+
         for i in range(n_runs):
-            plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_{i}'], label = 'A_test')
-            plt.plot(Meta_PA_df['epoch'], Meta_PA_df[f'active_coeffs_{i}'], label='PA_test')
-            plt.legend()
-            plt.xlabel('epoch')
-            plt.ylabel('# active_coeffs')
-            plt.title(f'A v PA coeffcount run {i}')
-            plt.savefig(f'../plots/VICTORY2_exp_ncoeff{i}.png')
+            avg_A += Meta_A_df[f'{key}{i}']
+            avg_PA += Meta_PA_df[f'{key}{i}']
+            trajectory_plot(Meta_A_df, Meta_PA_df, exp_label, key, i)
 
-            torch_training.clear_plt()
-
-            Meta_A_df[f'avg_loss_{i}'] = Meta_A_df[f'decoder_{i}'] + Meta_A_df[f'sindy_x_{i}']
-            Meta_PA_df[f'avg_loss_{i}'] = Meta_PA_df[f'decoder_{i}'] + Meta_PA_df[f'sindy_x_{i}']
-
-            avg_loss_A += Meta_A_df[f'avg_loss_{i}']
-            avg_loss_PA += Meta_PA_df[f'avg_loss_{i}']
-
-            avg_xloss_A += Meta_A_df[f'sindy_x_{i}']
-            avg_xloss_PA += Meta_PA_df[f'sindy_x_{i}']
-
-            avg_decode_loss_A += Meta_A_df[f'decoder_{i}']
-            avg_decode_loss_PA += Meta_PA_df[f'decoder_{i}']
-
-            plt.plot(Meta_A_df['epoch'], np.log(Meta_A_df[f'avg_loss_{i}']), label='A_test')
-            plt.plot(Meta_PA_df['epoch'], np.log(Meta_PA_df[f'avg_loss_{i}']), label='PA_test')
-            plt.legend()
-            plt.xlabel('epoch')
-            plt.ylabel('Log loss')
-            plt.title(f'A v PA loss run {i}')
-            plt.savefig(f'../plots/VICTORY2_exp_loss{i}.png')
-
-            torch_training.clear_plt()
-
-            plt.plot(Meta_A_df['epoch'], np.log(Meta_A_df[f'sindy_x_{i}']), label='A_test')
-            plt.plot(Meta_PA_df['epoch'], np.log(Meta_PA_df[f'sindy_x_{i}']), label='PA_test')
-            plt.legend()
-            plt.xlabel('epoch')
-            plt.ylabel('Log loss')
-            plt.title(f'A v PA xloss run {i}')
-            plt.savefig(f'../plots/VICTORY2_exp_dxloss{i}.png')
-
-            torch_training.clear_plt()
+        avg_A *= (1/n_runs)
+        avg_PA *= (1 / n_runs)
+        avg_trajectory_plot(Meta_A_df, Meta_PA_df, avg_A, avg_PA, exp_label, key)
+    return True
 
 
-            plt.plot(Meta_A_df['epoch'], np.log(Meta_A_df[f'decoder_{i}']), label='A_test')
-            plt.plot(Meta_PA_df['epoch'], np.log(Meta_PA_df[f'decoder_{i}']), label='PA_test')
-            plt.legend()
-            plt.xlabel('epoch')
-            plt.ylabel('Log loss')
-            plt.title(f'A v PA  decoder loss run {i}')
-            plt.savefig(f'../plots/VICTORY2_exp_decoder_loss{i}.png')
+def run():
+    n_runs = 5
+    exp_label = 'hmmm'
+    if torch.cuda.is_available():
+        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label = exp_label,
+                                          exp_size = (100,np.inf))
+    else:
+        exp_folder = f'{exp_label}_exp'
+        try:
+            os.mkdir(f'../plots/{exp_folder}')
+        except OSError:
+            pass
+        Meta_A_df = pd.read_csv(f'../data/{exp_label}/Meta_A.csv')
+        Meta_PA_df = pd.read_csv(f'../data/{exp_label}/Meta_PA.csv')
 
-            torch_training.clear_plt()
-
-        avg_loss_A  *= (1/n_runs)
-        avg_loss_PA *= (1/n_runs)
-        plt.plot(Meta_A_df['epoch'], np.log(avg_loss_A), label='A_test')
-        plt.plot(Meta_PA_df['epoch'], np.log(avg_loss_PA), label='PA_test')
-        plt.legend()
-        plt.xlabel('epoch')
-        plt.ylabel('Log loss')
-        plt.title(f'A v PA avg loss')
-        plt.savefig(f'../plots/VICTORY2_exp_avg_loss.png')
-        torch_training.clear_plt()
-
-        avg_xloss_A *= (1/n_runs)
-        avg_xloss_PA *= (1/n_runs)
-        plt.plot(Meta_A_df['epoch'], np.log(avg_xloss_A), label='A_test')
-        plt.plot(Meta_PA_df['epoch'], np.log(avg_xloss_PA), label='PA_test')
-        plt.legend()
-        plt.xlabel('epoch')
-        plt.ylabel('Log loss')
-        plt.title(f'A v PA avg dx/dt loss')
-        plt.savefig(f'../plots/VICTORY2_exp_avg_dxloss.png')
-        torch_training.clear_plt()
-
-        avg_decode_loss_A *= (1 / n_runs)
-        avg_decode_loss_PA *= (1 / n_runs)
-        plt.plot(Meta_A_df['epoch'], np.log(avg_decode_loss_A), label='A_test')
-        plt.plot(Meta_PA_df['epoch'], np.log(avg_decode_loss_PA), label='PA_test')
-        plt.legend()
-        plt.xlabel('epoch')
-        plt.ylabel('Log loss')
-        plt.title(f'A v PA avg decoder loss')
-        plt.savefig(f'../plots/VICTORY2_exp_avg_decoder.png')
-        torch_training.clear_plt()
+    get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label)
 
 
 
