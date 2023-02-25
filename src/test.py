@@ -3,6 +3,7 @@ sys.path.append("../src")
 sys.path.append("../tf_model/src")
 sys.path.append("../examples/lorenz")
 sys.path.append("../examples/lorenz/example_lorenz.py")
+print('here')
 
 import os
 import datetime
