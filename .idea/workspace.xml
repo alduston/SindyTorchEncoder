@@ -11,28 +11,40 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3ae723a2-2f1b-4b45-8b78-c1f489f4fd16" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/plots/best_plots/VICTORY_exp_avg_dxloss.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/plots/best_plots/VICTORY_exp_avg_loss.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/plots/best_plots/VICTORY_exp_ncoeff_avg.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_A_VICTORY.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/Meta_A_VICTORY.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/Meta_PAS_VICTORY.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/Meta_PAS_VICTORY.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_avg_dxloss.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_avg_loss.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_dxloss0.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/VICTORY_exp_dxloss0.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_dxloss1.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/VICTORY_exp_dxloss1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_dxloss2.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/VICTORY_exp_dxloss2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_dxloss3.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/VICTORY_exp_dxloss3.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_loss0.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/VICTORY_exp_loss0.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_loss1.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/VICTORY_exp_loss1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_loss2.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/VICTORY_exp_loss2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_loss3.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/VICTORY_exp_loss3.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_ncoeff0.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/VICTORY_exp_ncoeff0.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_ncoeff1.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/VICTORY_exp_ncoeff1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_ncoeff2.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/VICTORY_exp_ncoeff2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_ncoeff3.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/VICTORY_exp_ncoeff3.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/VICTORY_exp_ncoeff_avg.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_1001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_1001_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_1251_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_1251_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_1501_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_1501_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_1751_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_1751_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_1_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_1_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_2001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_2001_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_2251_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_2251_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_2501_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_2501_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_251_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_251_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_2751_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_2751_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_3001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_3001_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_3251_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_3251_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_3501_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_3501_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_3751_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_3751_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_4001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_4001_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_4251_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_4251_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_4501_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_4501_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_4751_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_4751_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_501_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_501_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_751_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_751_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run1_1001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run1_1001_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run1_1_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run1_1_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run1_2001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run1_2001_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run1_3001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run1_3001_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run1_4001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run1_4001_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run2_1001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run2_1001_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run2_2001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run2_2001_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run2_3001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run2_3001_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run2_4001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run2_4001_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run3_1001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run3_1001_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run3_2001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run3_2001_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run3_3001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run3_3001_hmap.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run3_4001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run3_4001_hmap.png" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -229,7 +241,8 @@
       <workItem from="1677256693980" duration="196000" />
       <workItem from="1677263631652" duration="1426000" />
       <workItem from="1677278159219" duration="1939000" />
-      <workItem from="1677306148972" duration="20000" />
+      <workItem from="1677306148972" duration="484000" />
+      <workItem from="1677308082745" duration="22000" />
     </task>
     <servers />
   </component>
