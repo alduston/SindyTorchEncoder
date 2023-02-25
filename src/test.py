@@ -183,16 +183,16 @@ def Meta_test(runs = 15, small = False):
             Meta_A_dict.pop(key, None)
 
     Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
-    Meta_A_df.to_csv('../data/Meta_A_VICTORY2.csv')
+    Meta_A_df.to_csv('../data/Meta_A_hmmm.csv')
 
     Meta_PA_df = pd.DataFrame.from_dict(Meta_PA_dict, orient='columns')
-    Meta_PA_df.to_csv('../data/Meta_PAS_VICTORY2.csv')
+    Meta_PA_df.to_csv('../data/Meta_PAS_hmmm.csv')
 
     return Meta_A_df, Meta_PA_df
 
 
 def run():
-    n_runs = 1
+    n_runs = 4
     #n_runs = 15
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs)
