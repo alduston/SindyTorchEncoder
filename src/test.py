@@ -192,13 +192,14 @@ def Meta_test(runs = 15, small = False):
 
 
 def run():
-    n_runs = 15
+    n_runs = 1
+    #n_runs = 15
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs)
 
     else:
-        Meta_A_df = pd.read_csv('../data/Meta_A_VICTORY.csv')
-        Meta_PA_df = pd.read_csv('../data/Meta_PAS_VICTORY.csv')
+        Meta_A_df = pd.read_csv('../data/Meta_A_VICTORY2.csv')
+        Meta_PA_df = pd.read_csv('../data/Meta_PAS_VICTORY2.csv')
 
         plt.plot(Meta_A_df['epoch'], Meta_A_df[f'active_coeffs_avg'], label='A_test')
         plt.plot(Meta_PA_df['epoch'], Meta_PA_df[f'active_coeffs_avg'], label='PA_test')
@@ -206,7 +207,7 @@ def run():
         plt.ylabel('# active_coeffs')
         plt.title(f'A v PA avg coeffcount')
         plt.legend()
-        plt.savefig(f'../plots/VICTORY_exp_ncoeff_avg.png')
+        plt.savefig(f'../plots/VICTORY2_exp_ncoeff_avg.png')
         torch_training.clear_plt()
 
         avg_loss_A = np.zeros(len(Meta_A_df[f'decoder_{0}']))
@@ -224,7 +225,7 @@ def run():
             plt.xlabel('epoch')
             plt.ylabel('# active_coeffs')
             plt.title(f'A v PA coeffcount run {i}')
-            plt.savefig(f'../plots/VICTORY_exp_ncoeff{i}.png')
+            plt.savefig(f'../plots/VICTORY2_exp_ncoeff{i}.png')
 
             torch_training.clear_plt()
 
@@ -246,7 +247,7 @@ def run():
             plt.xlabel('epoch')
             plt.ylabel('Log loss')
             plt.title(f'A v PA loss run {i}')
-            plt.savefig(f'../plots/VICTORY_exp_loss{i}.png')
+            plt.savefig(f'../plots/VICTORY2_exp_loss{i}.png')
 
             torch_training.clear_plt()
 
@@ -256,7 +257,7 @@ def run():
             plt.xlabel('epoch')
             plt.ylabel('Log loss')
             plt.title(f'A v PA xloss run {i}')
-            plt.savefig(f'../plots/VICTORY_exp_dxloss{i}.png')
+            plt.savefig(f'../plots/VICTORY2_exp_dxloss{i}.png')
 
             torch_training.clear_plt()
 
@@ -267,7 +268,7 @@ def run():
             plt.xlabel('epoch')
             plt.ylabel('Log loss')
             plt.title(f'A v PA  decoder loss run {i}')
-            plt.savefig(f'../plots/VICTORY_exp_decoder_loss{i}.png')
+            plt.savefig(f'../plots/VICTORY2_exp_decoder_loss{i}.png')
 
             torch_training.clear_plt()
 
@@ -279,7 +280,7 @@ def run():
         plt.xlabel('epoch')
         plt.ylabel('Log loss')
         plt.title(f'A v PA avg loss')
-        plt.savefig(f'../plots/VICTORY_exp_avg_loss.png')
+        plt.savefig(f'../plots/VICTORY2_exp_avg_loss.png')
         torch_training.clear_plt()
 
         avg_xloss_A *= (1/n_runs)
@@ -290,7 +291,7 @@ def run():
         plt.xlabel('epoch')
         plt.ylabel('Log loss')
         plt.title(f'A v PA avg dx/dt loss')
-        plt.savefig(f'../plots/VICTORY_exp_avg_dxloss.png')
+        plt.savefig(f'../plots/VICTORY2_exp_avg_dxloss.png')
         torch_training.clear_plt()
 
         avg_decode_loss_A *= (1 / n_runs)
@@ -301,7 +302,7 @@ def run():
         plt.xlabel('epoch')
         plt.ylabel('Log loss')
         plt.title(f'A v PA avg decoder loss')
-        plt.savefig(f'../plots/VICTORY_exp_avg_decoder.png')
+        plt.savefig(f'../plots/VICTORY2_exp_avg_decoder.png')
         torch_training.clear_plt()
 
 
