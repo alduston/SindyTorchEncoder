@@ -2,7 +2,7 @@ import sys
 sys.path.append("../src")
 sys.path.append("../tf_model/src")
 sys.path.append("../examples/lorenz")
-sys.path.append("../examples/lorenz/example_lorenz.py")
+sys.path.append("../examples/lorenz/example_lorenz")
 print('here')
 
 import os
