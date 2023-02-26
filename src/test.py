@@ -187,7 +187,7 @@ def Meta_test(runs = 15, small = False, exp_label = '', exp_size = (100,np.inf),
 
 
 def trajectory_plot(Meta_A_df, Meta_PA_df, exp_label, plot_key, runix):
-    if plot_key in ["sindy_x_","decoder_"]:
+    if plot_key in ["sindy_x_","decoder_", "sindy_z"]:
         plt.plot(Meta_A_df['epoch'], np.log(Meta_A_df[f'{plot_key}{runix}']), label='A_test')
         plt.plot(Meta_PA_df['epoch'], np.log(Meta_PA_df[f'{plot_key}{runix}']), label='PA_test')
         plt.ylabel(f'Log {plot_key}')
@@ -241,12 +241,11 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 
 
 def run():
-    n_runs = 2
-    exp_label = 'medium_with_z'
-    param_update = {'loss_weight_sindy_z': 1e-5}
+    n_runs = 5
+    exp_label = 'eureka'
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label = exp_label,
-                                          exp_size = (100,np.inf))
+                                          exp_size = (128,np.inf))
     else:
         try:
             os.mkdir(f'../plots/{exp_label}')

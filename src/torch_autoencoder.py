@@ -183,7 +183,7 @@ class SindyNet(nn.Module):
         return Theta
 
 
-    def sindy_predict(self, z, x = None, dx = None, idx = None):
+    def sindy_predict(self, z, x = None, dx = None, idx = None, idx_mask=False):
         Theta = self.Theta(z, x, dx)
         if idx == None:
             sindy_coefficients = self.sindy_coeffs
@@ -196,6 +196,8 @@ class SindyNet(nn.Module):
                 self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
         if self.params['use_activation_mask']:
             return torch.matmul(Theta, self.activation_mask * sindy_coefficients)
+        if idx_mask != None and not idx_mask:
+            return torch.matmul(Theta, sindy_coefficients)
         return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
 
 
