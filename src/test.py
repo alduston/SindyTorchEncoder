@@ -132,7 +132,7 @@ def A_test_small(model_params, training_data, validation_data, run = 0):
 
 
 
-def Meta_test(runs = 15, small = False, exp_label = '', exp_size = (100,np.inf), param_updates = {}):
+def Meta_test(runs = 5, small = False, exp_label = '', exp_size = (100,np.inf), param_updates = {}):
     Meta_PA_dict = {}
     Meta_A_dict = {}
     for run_ix in range(runs):
@@ -143,8 +143,9 @@ def Meta_test(runs = 15, small = False, exp_label = '', exp_size = (100,np.inf),
         else:
             model_params, training_data, validation_data = get_test_params(exp_size[0], max_data=exp_size[1])
             model_params.update(param_updates)
-            PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data, run=run_ix)
             Anet, ALoss_dict = A_test(model_params, training_data, validation_data, run=run_ix)
+            PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data, run=run_ix)
+            #Anet, ALoss_dict = A_test(model_params, training_data, validation_data, run=run_ix)
 
         for key,val in ALoss_dict.items():
             if key=='epoch':
@@ -241,10 +242,10 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 
 
 def run():
-    n_runs = 6
-    exp_label = 'random_init'
-    #Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label,
-                                      #exp_size=(20, 2000))
+    n_runs = 4
+    exp_label = 'double_random_init'
+    Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label,
+                                      exp_size=(20, 2000))
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label = exp_label,
                                           exp_size = (128,np.inf))
