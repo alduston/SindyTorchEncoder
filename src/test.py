@@ -141,7 +141,7 @@ def A_test_small(model_params, training_data, validation_data, run = 0):
 
 
 
-def Meta_test(runs = 15, small = False, exp_label = '', exp_size = (100,np.inf)):
+def Meta_test(runs = 15, small = False, exp_label = '', exp_size = (100,np.inf), param_updates = {}):
     Meta_PA_dict = {}
     Meta_A_dict = {}
     for run_ix in range(runs):
@@ -151,6 +151,7 @@ def Meta_test(runs = 15, small = False, exp_label = '', exp_size = (100,np.inf))
             Anet, ALoss_dict = A_test_small(model_params, training_data, validation_data, run = run_ix)
         else:
             model_params, training_data, validation_data = get_test_params(exp_size[0], max_data=exp_size[1])
+            model_params.update(param_updates)
             PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data, run=run_ix)
             Anet, ALoss_dict = A_test(model_params, training_data, validation_data, run=run_ix)
 
@@ -195,7 +196,6 @@ def Meta_test(runs = 15, small = False, exp_label = '', exp_size = (100,np.inf))
 
 
 def trajectory_plot(Meta_A_df, Meta_PA_df, exp_label, plot_key, runix):
-    exp_folder = f'{exp_label}_exp'
     if plot_key in ["sindy_x_","decoder_"]:
         plt.plot(Meta_A_df['epoch'], np.log(Meta_A_df[f'{plot_key}{runix}']), label='A_test')
         plt.plot(Meta_PA_df['epoch'], np.log(Meta_PA_df[f'{plot_key}{runix}']), label='PA_test')
@@ -206,13 +206,12 @@ def trajectory_plot(Meta_A_df, Meta_PA_df, exp_label, plot_key, runix):
     plt.xlabel('epoch')
     plt.legend()
     plt.title(f'A v PA {plot_key} run {runix}')
-    plt.savefig(f'../plots/{exp_folder}/{exp_label}_exp_ncoeff{runix}.png')
+    plt.savefig(f'../data/{exp_label}/{exp_label}_exp_{plot_key}_{runix}.png')
     torch_training.clear_plt()
     return True
 
 
 def avg_trajectory_plot(Meta_A_df, Meta_PA_df, A_avg, PA_avg, exp_label, plot_key):
-    exp_folder = f'{exp_label}_exp'
     if plot_key in ["sindy_x_","decoder_"]:
         plt.plot(Meta_A_df['epoch'], np.log(A_avg), label='A_test')
         plt.plot(Meta_PA_df['epoch'], np.log(PA_avg), label='PA_test')
@@ -223,16 +222,15 @@ def avg_trajectory_plot(Meta_A_df, Meta_PA_df, A_avg, PA_avg, exp_label, plot_ke
     plt.xlabel('epoch')
     plt.legend()
     plt.title(f'A v PA {plot_key} avg')
-    plt.savefig(f'../plots/{exp_folder}/{exp_label}_exp_ncoeff_avg.png')
+    plt.savefig(f'../data/{exp_label}/{exp_label}_exp_{plot_key}_avg.png')
     torch_training.clear_plt()
     return True
 
 
 
 def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_","decoder_", "active_coeffs_"]):
-    exp_folder = f'{exp_label}_exp'
     try:
-        os.mkdir(f'../plots/{exp_folder}')
+        os.mkdir(f'../plots/{exp_label}')
     except OSError:
         pass
 
@@ -252,15 +250,15 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 
 
 def run():
-    n_runs = 4
-    exp_label = 'medium'
+    n_runs = 2
+    exp_label = 'medium_withz'
+    param_update = {'loss_weight_sindy_z': 1e-5}
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label = exp_label,
                                           exp_size = (100,np.inf))
     else:
-        exp_folder = f'{exp_label}_exp'
         try:
-            os.mkdir(f'../plots/{exp_folder}')
+            os.mkdir(f'../plots/{exp_label}')
         except OSError:
             pass
         Meta_A_df = pd.read_csv(f'../data/{exp_label}/Meta_A.csv')
