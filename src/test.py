@@ -1,10 +1,15 @@
 import sys
 import os
+import torch
 sys.path.append("../src")
 sys.path.append("../tf_model/src")
 sys.path.append("../examples/lorenz")
 sys.path.append("../examples/lorenz/example_lorenz")
-sys.path.append(os.getcwd()) 
+
+if torch.cuda.is_available():
+    os.chdir('/mmfs1/gscratch/dynamicsai/ald6fd/SindyTorchEncoder')
+    sys.path.append(os.getcwd())
+    print(sys.path)
 
 
 import datetime
