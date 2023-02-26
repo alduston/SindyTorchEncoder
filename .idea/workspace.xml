@@ -12,7 +12,6 @@
   <component name="ChangeListManager">
     <list default="true" id="3ae723a2-2f1b-4b45-8b78-c1f489f4fd16" name="Default Changelist" comment="">
       <change afterPath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/pendulum/model1.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/pendulum/model2.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/rd/model1.data-00000-of-00001" beforeDir="false" />
@@ -222,7 +221,7 @@
       <workItem from="1677353595979" duration="3919000" />
       <workItem from="1677367609169" duration="592000" />
       <workItem from="1677371242026" duration="2000" />
-      <workItem from="1677376014911" duration="1480000" />
+      <workItem from="1677376014911" duration="1562000" />
     </task>
     <servers />
   </component>
