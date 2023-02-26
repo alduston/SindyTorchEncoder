@@ -41,10 +41,12 @@ class SindyNet(nn.Module):
         self.activation_mask = torch.tensor(params['coefficient_mask'], dtype=torch.float32, device=self.device)
 
         self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
+        self.exp_label = params['exp_label']
 
         self.sub_model_coeffs = {}
         self.sub_model_masks = {}
         self.sub_model_losses_dict = {}
+
 
 
 
@@ -296,24 +298,20 @@ class SindyNet(nn.Module):
         return loss, loss_refinement, losses
 
 
-    def Loss(self, x, x_decode, z, dx, ddx = None, idx = None, spooky = False, reg = True):
+    def Loss(self, x, x_decode, z, dx, ddx = None, idx = None, penalize_self = False):
         decoder_loss = self.decoder_loss(x, x_decode)
         sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx, idx)
         sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx, idx)
-        reg_loss = self.sindy_reg_loss(idx, penalize_self=False)
+        reg_loss = self.sindy_reg_loss(idx)
+        if penalize_self:
+            self_loss = self.sindy_reg_loss(idx, penalize_self)
+            reg_loss += self_loss
 
         loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss
         loss = loss_refinement
         losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss,
-                  'sindy_x': sindy_x_loss, 'reg': 0}
+                  'sindy_x': sindy_x_loss, 'reg': reg_loss}
 
-        if reg:
-            loss +=  reg_loss
-            losses['reg'] += reg_loss
-        if spooky:
-            spooky_loss = self.spooky_loss()
-            loss += spooky_loss
-            losses['spooky'] = spooky_loss
         return loss, loss_refinement, losses
 
 
@@ -321,9 +319,9 @@ class SindyNet(nn.Module):
         return self.Loss(x, x_decode, z, dx, ddx)[0]
 
 
-    def auto_Loss(self, x, dx, ddx=None, idx=None, spooky = False, reg = True):
+    def auto_Loss(self, x, dx, ddx=None, idx=None):
         x_decode, z = self.forward(x)
-        return self.Loss(x, x_decode, z, dx, ddx, idx, spooky, reg)
+        return self.Loss(x, x_decode, z, dx, ddx, idx)
 
 
     def bag_loss(self, x, dx, ddx=None):

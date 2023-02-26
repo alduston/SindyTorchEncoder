@@ -136,7 +136,7 @@ def train_one_epoch(model, data_loader, optimizer, scheduler = None):
     return total_loss, total_loss_dict
 
 
-def validate_one_step(model, data, corr = False):
+def validate_one_step(model, data):
     if model.params['model_order'] == 1:
             loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'])
     else:
@@ -163,7 +163,7 @@ def validate_one_epoch(model, data_loader):
 
 def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_freq = np.inf,
                    test_loader = [], printout = False, Loss_dict = {}):
-    loss_dict = {'epoch': [], 'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': [],  'active_coeffs': []}
+    loss_dict = {key:[] for key in Loss_dict.keys()}
     train_epochs = train_params[f'{mode}_epochs']
     optimizer = torch.optim.Adam(net.parameters(), lr= model_params['learning_rate'])
     for epoch in range(train_epochs):
@@ -178,11 +178,12 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
 
         total_loss, total_loss_dict = train_one_epoch(net, train_loader, optimizer)
         if not (net.epoch % 1000)-1:
-            plt.imshow(net.sindy_coeffs.detach().cpu().numpy(), vmin=0, vmax=1)
-            run = net.params['run']
-            plt.colorbar()
-            plt.savefig(f'../plots/coeff_hmaps/A_run{run}_{net.epoch}_hmap.png')
-            clear_plt()
+            pass
+            #plt.imshow(net.sindy_coeffs.detach().cpu().numpy(), vmin=0, vmax=1)
+            #run = net.params['run']
+            #plt.colorbar()
+            #plt.savefig(f'../plots/coeff_hmaps/A_run{run}_{net.epoch}_hmap.png')
+            #clear_plt()
 
     if len(Loss_dict.keys()):
         for key, val in loss_dict.items():
@@ -192,7 +193,8 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
 
 
 def train_sindy(model_params, train_params, training_data, validation_data, printout = False):
-    Loss_dict = {'epoch': [], 'decoder': [], 'sindy_x': [], 'reg': [], 'sindy_z': [], 'active_coeffs': []}
+    Loss_dict = {'epoch': [], 'decoder': [], 'sindy_x': [],
+                 'reg': [], 'sindy_z': [], 'active_coeffs': []}
     if torch.cuda.is_available():
         device = 'cuda:0'
     else:
@@ -228,8 +230,7 @@ def train_sindy(model_params, train_params, training_data, validation_data, prin
 def train_parallel_step(model, data, optimizer, idx, spooky = True):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
-        loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'],  idx = idx,
-                                                        spooky = False, reg = True)
+        loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'],  idx = idx)
     else:
         loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'], idx = idx)
     loss.backward()
@@ -294,15 +295,16 @@ def validate_paralell_epoch(model, data_loader, Loss_dict):
     val_model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
 
     if not (model.epoch % 1000)-1:
-        run =  model.params['run']
-        plt.imshow(val_model.sindy_coeffs.detach().cpu().numpy(), vmin=0, vmax=1)
-        plt.colorbar()
-        plt.savefig(f'../plots/coeff_hmaps/PA_run{run}_{model.epoch}_hmap.png')
-        clear_plt()
+        pass
+        #run =  model.params['run']
+        #plt.imshow(val_model.sindy_coeffs.detach().cpu().numpy(), vmin=0, vmax=1)
+        #plt.colorbar()
+        #plt.savefig(f'../plots/coeff_hmaps/PA_run{run}_{model.epoch}_hmap.png')
+        #clear_plt()
 
     for batch_index, data in enumerate(data_loader):
         with torch.no_grad():
-            loss, loss_refinement, losses = validate_one_step(val_model, data, corr = False)
+            loss, loss_refinement, losses = validate_one_step(val_model, data)
             total_loss += loss
             if len(total_loss_dict.keys()):
                 for key in total_loss_dict.keys():
@@ -335,8 +337,8 @@ def print_keyval(key,val_list):
 
 
 def parallell_train_sindy(model_params, train_params, training_data, validation_data, printout = False):
-    Loss_dict = {'epoch': [], 'total': [], 'decoder': [], 'sindy_x': [], 'reg': [],
-                 'spooky':[], 'sindy_z': [], 'active_coeffs': []}
+    Loss_dict = {'epoch': [], 'total': [], 'decoder': [], 'sindy_x': [],
+                 'reg': [], 'sindy_z': [], 'active_coeffs': []}
     if torch.cuda.is_available():
         device = 'cuda:0'
     else:

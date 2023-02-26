@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  26 FEB 2023 15:23
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  20 FEB 2023 20:45
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -505,7 +505,7 @@ File: l3backend-pdfmode.def 2020-03-12 L3 backend support: PDF mode
 \l__kernel_color_stack_int=\count281
 \l__pdf_internal_box=\box58
 )
-No file BA-sindy.aux.
+(./BA-sindy.aux)
 \openout1 = `BA-sindy.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 63.
@@ -522,7 +522,7 @@ LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 63.
 LaTeX Font Info:    ... okay on input line 63.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 63.
 LaTeX Font Info:    ... okay on input line 63.
-ABD: EveryShipout initializing macros
+ ABD: EveryShipout initializing macros
 (/usr/local/texlive/2020/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count282
@@ -571,140 +571,74 @@ File: ubbm.fd 1999/03/15 V 1.2 Font definition for bbm font - TH
 ) [1
 
 {/usr/local/texlive/2020/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-
-LaTeX Warning: File `avg_loss.png' not found on input line 138.
-
-
-! Package pdftex.def Error: File `avg_loss.png' not found: using draft setting.
-
-
-See the pdftex.def package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.138 \includegraphics[width=100mm]{avg_loss.png}
-                                                 
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-LaTeX Warning: File `avg_coeff.png' not found on input line 142.
-
-
-! Package pdftex.def Error: File `avg_coeff.png' not found: using draft setting
-.
-
-See the pdftex.def package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.142 \includegraphics[width=100mm]{avg_coeff.png}
-                                                  
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-[2] [3]
-
-LaTeX Warning: File `run1_loss.png' not found on input line 152.
-
-
-! Package pdftex.def Error: File `run1_loss.png' not found: using draft setting
-.
-
-See the pdftex.def package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.152 \includegraphics[width=80mm]{run1_loss.png}
-                                                 
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-LaTeX Warning: File `run3_loss.png' not found on input line 153.
-
-
-! Package pdftex.def Error: File `run3_loss.png' not found: using draft setting
-.
-
-See the pdftex.def package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.153 \includegraphics[width=80mm]{run3_loss.png}
-                                                 
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
+<avg_loss.png, id=21, 462.528pt x 346.896pt>
+File: avg_loss.png Graphic file (type png)
+<use avg_loss.png>
+Package pdftex.def Info: avg_loss.png  used on input line 138.
+(pdftex.def)             Requested size: 284.52756pt x 213.40593pt.
+<avg_coeff.png, id=23, 462.528pt x 346.896pt>
+File: avg_coeff.png Graphic file (type png)
+<use avg_coeff.png>
+Package pdftex.def Info: avg_coeff.png  used on input line 142.
+(pdftex.def)             Requested size: 284.52756pt x 213.40593pt.
+ [2 <./avg_loss.png> <./avg_coeff.png>]
+<run1_loss.png, id=29, 462.528pt x 346.896pt>
+File: run1_loss.png Graphic file (type png)
+<use run1_loss.png>
+Package pdftex.def Info: run1_loss.png  used on input line 152.
+(pdftex.def)             Requested size: 227.62204pt x 170.71628pt.
+<run3_loss.png, id=30, 462.528pt x 346.896pt>
+File: run3_loss.png Graphic file (type png)
+<use run3_loss.png>
+Package pdftex.def Info: run3_loss.png  used on input line 153.
+(pdftex.def)             Requested size: 227.62204pt x 170.71628pt.
 
 Overfull \hbox (97.67741pt too wide) in paragraph at lines 152--154
 [][] [] 
  []
 
-
-LaTeX Warning: File `run1_coeffs.png' not found on input line 155.
-
-
-! Package pdftex.def Error: File `run1_coeffs.png' not found: using draft setti
-ng.
-
-See the pdftex.def package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.155 ...ludegraphics[width=80mm]{run1_coeffs.png}
-                                                  
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-LaTeX Warning: File `run3_coeffs.png' not found on input line 156.
-
-
-! Package pdftex.def Error: File `run3_coeffs.png' not found: using draft setti
-ng.
-
-See the pdftex.def package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.156 ...ludegraphics[width=80mm]{run3_coeffs.png}
-                                                  
-Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
+<run1_coeffs.png, id=31, 462.528pt x 346.896pt>
+File: run1_coeffs.png Graphic file (type png)
+<use run1_coeffs.png>
+Package pdftex.def Info: run1_coeffs.png  used on input line 155.
+(pdftex.def)             Requested size: 227.62204pt x 170.71628pt.
+<run3_coeffs.png, id=32, 462.528pt x 346.896pt>
+File: run3_coeffs.png Graphic file (type png)
+<use run3_coeffs.png>
+Package pdftex.def Info: run3_coeffs.png  used on input line 156.
+(pdftex.def)             Requested size: 227.62204pt x 170.71628pt.
 
 Overfull \hbox (97.67741pt too wide) in paragraph at lines 155--157
 [][] [] 
  []
 
-[4] (./BA-sindy.aux) ) 
+[3 <./run1_loss.png> <./run3_loss.png> <./run1_coeffs.png> <./run3_coeffs.png>]
+(./BA-sindy.aux) ) 
 Here is how much of TeX's memory you used:
- 14073 strings out of 480608
- 270540 string characters out of 5903631
+ 14001 strings out of 480608
+ 269444 string characters out of 5903631
  506739 words of memory out of 5000000
- 29671 multiletter control sequences out of 15000+600000
- 538352 words of font info for 50 fonts, out of 8000000 for 9000
+ 29610 multiletter control sequences out of 15000+600000
+ 538184 words of font info for 49 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 60i,5n,60p,876b,202s stack positions out of 5000i,500n,10000p,200000b,80000s
- </Users/aloisduston/Library/texlive/2020/texmf-var/fonts
-/pk/ljfour/public/bbm/bbm10.657pk></usr/local/texlive/2020/texmf-dist/fonts/typ
-e1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type
-1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1
-/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/
-public/amsfonts/cm/cmmi6.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/pu
-blic/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/publ
-ic/amsfonts/cm/cmr10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public
-/amsfonts/cm/cmr6.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/am
-sfonts/cm/cmr8.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfo
-nts/cm/cmsy10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfon
-ts/cm/cmsy8.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts
-/cm/cmtt10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/
-symbols/msbm10.pfb>
-Output written on BA-sindy.pdf (4 pages, 126118 bytes).
+ 60i,5n,60p,876b,164s stack positions out of 5000i,500n,10000p,200000b,80000s
+ </Users/aloisduston/Library/texlive/2020/texmf-var/fonts/pk/
+ljfour/public/bbm/bbm10.657pk></usr/local/texlive/2020/texmf-dist/fonts/type1/p
+ublic/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/pu
+blic/amsfonts/cm/cmex10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/pub
+lic/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/publ
+ic/amsfonts/cm/cmmi6.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmr10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/ams
+fonts/cm/cmr6.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmr8.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/
+cm/cmsy10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/c
+m/cmsy8.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/sym
+bols/msbm10.pfb>
+Output written on BA-sindy.pdf (3 pages, 294434 bytes).
 PDF statistics:
- 73 PDF objects out of 1000 (max. 8388607)
- 53 compressed objects within 1 object stream
+ 79 PDF objects out of 1000 (max. 8388607)
+ 49 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 13 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 43 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -132,20 +132,19 @@ def A_test_small(model_params, training_data, validation_data, run = 0):
 
 
 
-def Meta_test(runs = 5, small = False, exp_label = '', exp_size = (100,np.inf), param_updates = {}):
+def Meta_test(runs = 5, small = False, exp_label = '', exp_size = (128,np.inf), param_updates = {}):
     Meta_PA_dict = {}
     Meta_A_dict = {}
+    param_updates['exp_label'] = exp_label
     for run_ix in range(runs):
+        model_params, training_data, validation_data = get_test_params(exp_size[0], max_data=exp_size[1])
+        model_params.update(param_updates)
         if small:
-            model_params, training_data, validation_data = get_test_params(max_data=50)
             PAnet, PALoss_dict = PA_test_small(model_params, training_data, validation_data, run = run_ix)
             Anet, ALoss_dict = A_test_small(model_params, training_data, validation_data, run = run_ix)
         else:
-            model_params, training_data, validation_data = get_test_params(exp_size[0], max_data=exp_size[1])
-            model_params.update(param_updates)
-            Anet, ALoss_dict = A_test(model_params, training_data, validation_data, run=run_ix)
             PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data, run=run_ix)
-            #Anet, ALoss_dict = A_test(model_params, training_data, validation_data, run=run_ix)
+            Anet, ALoss_dict = A_test(model_params, training_data, validation_data, run=run_ix)
 
         for key,val in ALoss_dict.items():
             if key=='epoch':
@@ -204,7 +203,7 @@ def trajectory_plot(Meta_A_df, Meta_PA_df, exp_label, plot_key, runix):
 
 
 def avg_trajectory_plot(Meta_A_df, Meta_PA_df, A_avg, PA_avg, exp_label, plot_key):
-    if plot_key in ["sindy_x_","decoder_"]:
+    if plot_key in ["sindy_x_","decoder_","sindy_z_"]:
         plt.plot(Meta_A_df['epoch'], np.log(A_avg), label='A_test')
         plt.plot(Meta_PA_df['epoch'], np.log(PA_avg), label='PA_test')
         plt.ylabel(f'Log {plot_key}')
@@ -242,11 +241,12 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 
 
 def run():
+    exp_label='with_z'
     n_runs = 4
-    exp_label = 'double_random_init'
+    param_updates = {'loss_weight_sindy_z': 1e-5}
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label = exp_label,
-                                          exp_size = (128,np.inf))
+                                          exp_size = (128,np.inf), param_updates = param_updates)
     else:
         try:
             os.mkdir(f'../plots/{exp_label}')
@@ -255,7 +255,8 @@ def run():
         Meta_A_df = pd.read_csv(f'../data/{exp_label}/Meta_A.csv')
         Meta_PA_df = pd.read_csv(f'../data/{exp_label}/Meta_PA.csv')
 
-    get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label)
+    plot_keys = ["sindy_x_", "decoder_", "active_coeffs_", "sindy_z_"]
+    get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys=plot_keys)
 
 
 
