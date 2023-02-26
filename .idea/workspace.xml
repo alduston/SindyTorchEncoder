@@ -12,20 +12,12 @@
   <component name="ChangeListManager">
     <list default="true" id="3ae723a2-2f1b-4b45-8b78-c1f489f4fd16" name="Default Changelist" comment="">
       <change afterPath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/pendulum/model1.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/pendulum/model2.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/rd/model1.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/rd/model2.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/training.py" beforeDir="false" afterPath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/training.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_1001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_1001_hmap.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_1_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_1_hmap.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_2001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_2001_hmap.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_3001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_3001_hmap.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_4001_hmap.png" beforeDir="false" afterPath="$PROJECT_DIR$/plots/coeff_hmaps/A_run0_4001_hmap.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/torch_autoencoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/torch_autoencoder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/torch_training.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/torch_training.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -231,7 +223,7 @@
       <workItem from="1677371242026" duration="2000" />
       <workItem from="1677376014911" duration="4441000" />
       <workItem from="1677390604341" duration="3082000" />
-      <workItem from="1677429163190" duration="1200000" />
+      <workItem from="1677429163190" duration="1381000" />
     </task>
     <servers />
   </component>
