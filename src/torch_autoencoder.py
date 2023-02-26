@@ -164,9 +164,9 @@ class SindyNet(nn.Module):
         library_dim = self.params['library_dim']
         latent_dim = self.params['latent_dim']
         initializer, init_param = self.initializer()
-        return torch.randn((library_dim, latent_dim), device = self.device)
-        #return get_initialized_weights([library_dim, latent_dim], initializer,
-                                       #init_param = init_param, device = self.device)
+        #return torch.randn((library_dim, latent_dim), device = self.device)
+        return get_initialized_weights([library_dim, latent_dim], initializer,
+                                       init_param = init_param, device = self.device)
 
 
     def Theta(self, z, x = None, dx = None):
