@@ -354,8 +354,9 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
         latent_dim = net.params['latent_dim']
 
         initializer, init_param = net.initializer()
-        sub_model_coeffs.append(get_initialized_weights([library_dim, latent_dim], initializer,
-                                       init_param = init_param, device = net.device))
+        #sub_model_coeffs.append(get_initialized_weights([library_dim, latent_dim], initializer,
+                                       #init_param = init_param, device = net.device))
+        sub_model_coeffs.append(torch.randn((library_dim, latent_dim), device = net.device))
         sub_model_losses_dict[f'{idx}'] = deepcopy(Loss_dict)
     sub_model_test_losses_dict = deepcopy(sub_model_losses_dict)
 
