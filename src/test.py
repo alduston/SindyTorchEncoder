@@ -1,11 +1,12 @@
 import sys
+import os
 sys.path.append("../src")
 sys.path.append("../tf_model/src")
 sys.path.append("../examples/lorenz")
 sys.path.append("../examples/lorenz/example_lorenz")
-print('here')
+sys.path.append(os.getcwd()) 
 
-import os
+
 import datetime
 import pandas as pd
 import numpy as np
