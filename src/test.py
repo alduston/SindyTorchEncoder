@@ -143,7 +143,9 @@ def Meta_test(runs = 5, small = False, exp_label = '', exp_size = (128,np.inf), 
             PAnet, PALoss_dict = PA_test_small(model_params, training_data, validation_data, run = run_ix)
             Anet, ALoss_dict = A_test_small(model_params, training_data, validation_data, run = run_ix)
         else:
+            model_params['loss_weight_sindy_regularization'] = 5e-5
             PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data, run=run_ix)
+            model_params['loss_weight_sindy_regularization'] = 1e-5
             Anet, ALoss_dict = A_test(model_params, training_data, validation_data, run=run_ix)
 
         for key,val in ALoss_dict.items():
