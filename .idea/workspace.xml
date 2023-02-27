@@ -18,7 +18,8 @@
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/rd/model1.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/rd/model2.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/training.py" beforeDir="false" afterPath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/training.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/torch_training.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/torch_training.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -229,7 +230,7 @@
       <workItem from="1677452033978" duration="1407000" />
       <workItem from="1677454517566" duration="3052000" />
       <workItem from="1677516555106" duration="445000" />
-      <workItem from="1677529213033" duration="130000" />
+      <workItem from="1677529213033" duration="397000" />
     </task>
     <servers />
   </component>
@@ -399,7 +400,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/torch_training.py</url>
-          <line>379</line>
+          <line>378</line>
           <option name="timeStamp" value="19" />
         </line-breakpoint>
       </breakpoints>

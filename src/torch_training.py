@@ -231,7 +231,7 @@ def train_parallel_step(model, data, optimizer, idx):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
         loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'],
-                                                        idx = idx, penalize_self=True)
+                                                        idx = idx, penalize_self=False)
     else:
         loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'],
                                                         dxx = data['dxx'], idx = idx)
@@ -356,8 +356,7 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
     for idx, bag in enumerate(train_bag_loader):
         library_dim = net.params['library_dim']
         latent_dim = net.params['latent_dim']
-
-        initializer, init_param = net.initializer()
+        #initializer, init_param = net.initializer()
         #sub_model_coeffs.append(get_initialized_weights([library_dim, latent_dim], initializer,
                                        #init_param = init_param, device = net.device))
         sub_model_coeffs.append(torch.randn((library_dim, latent_dim), device = net.device))
