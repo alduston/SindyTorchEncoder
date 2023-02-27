@@ -9,6 +9,7 @@ from math import inf, isinf
 from copy import deepcopy, copy
 from scipy.stats import ttest_1samp
 import matplotlib.pyplot as plt
+from itertools import permutations
 from scipy import stats as st
 import random
 import os
@@ -286,7 +287,21 @@ def crossval(model):
     return model
 
 
-def validate_paralell_epoch(model, data_loader, Loss_dict):
+def col_permutations(M):
+    M_permutes = []
+    columns = list(range(M.shape[1]))
+    for perm in permutations(columns):
+        M_permuted = torch.stack([M[:, idx] for idx in perm])
+        M_permutes.append(torch.transpose(M_permuted,0,1))
+    return M_permutes
+
+
+def coeff_loss(pred_coeffs, true_coeffs):
+    losses = [torch.mean(torch.abs(pred_coeffs - ptrue_coeffs)) for ptrue_coeffs in col_permutations(true_coeffs)]
+    return min(losses)
+
+
+def validate_paralell_epoch(model, data_loader, Loss_dict, true_coeffs = None):
     model.eval()
     total_loss = 0
     total_loss_dict = {}
@@ -295,6 +310,10 @@ def validate_paralell_epoch(model, data_loader, Loss_dict):
     avg_coeffs = (1 / n_bags) * torch.sum(Bag_coeffs, dim=0)
     val_model = copy(model)
     val_model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
+
+    if true_coeffs != None:
+        coeff_loss_val = coeff_loss(val_model.sindy_coeffs, true_coeffs)
+        print(f'Coeff loss was {coeff_loss_val}')
 
     if not (model.epoch % 1000)-1:
         pass
@@ -356,10 +375,9 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
     for idx, bag in enumerate(train_bag_loader):
         library_dim = net.params['library_dim']
         latent_dim = net.params['latent_dim']
-        #initializer, init_param = net.initializer()
-        #sub_model_coeffs.append(get_initialized_weights([library_dim, latent_dim], initializer,
-                                       #init_param = init_param, device = net.device))
-        sub_model_coeffs.append(torch.randn((library_dim, latent_dim), device = net.device))
+        initializer, init_param = net.initializer()
+        sub_model_coeffs.append(get_initialized_weights([library_dim, latent_dim], initializer,
+                                       init_param = init_param, device = net.device))
         sub_model_losses_dict[f'{idx}'] = deepcopy(Loss_dict)
     sub_model_test_losses_dict = deepcopy(sub_model_losses_dict)
 
@@ -371,9 +389,10 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
     crossval_freq = net.params['crossval_freq']
     test_freq = net.params['test_freq']
     optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'])
+    true_coeffs = net.true_coeffs
     for epoch in range(train_params['bag_epochs']):
         if not epoch % test_freq:
-            validate_paralell_epoch(net, test_loader, Loss_dict)
+            validate_paralell_epoch(net, test_loader, Loss_dict, true_coeffs)
             if printout:
                 print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in Loss_dict.items()])}')
         if not epoch % crossval_freq and epoch >= net.params['pretrain_epochs']:

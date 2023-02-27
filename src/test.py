@@ -132,21 +132,26 @@ def A_test_small(model_params, training_data, validation_data, run = 0):
 
 
 
-def Meta_test(runs = 5, small = False, exp_label = '', exp_size = (128,np.inf), param_updates = {}):
+def Meta_test(runs = 5, small = False, exp_label = '', exp_size = (128,np.inf),
+              param_updates = {}, PAparam_updates = {}, Aparam_updates = {}):
     Meta_PA_dict = {}
     Meta_A_dict = {}
     param_updates['exp_label'] = exp_label
     for run_ix in range(runs):
         model_params, training_data, validation_data = get_test_params(exp_size[0], max_data=exp_size[1])
         model_params.update(param_updates)
+
+        pa_params = copy(model_params)
+        pa_params.update(PAparam_updates)
+        a_params = copy(model_params)
+        a_params.update(Aparam_updates)
+
         if small:
-            PAnet, PALoss_dict = PA_test_small(model_params, training_data, validation_data, run = run_ix)
-            Anet, ALoss_dict = A_test_small(model_params, training_data, validation_data, run = run_ix)
+            PAnet, PALoss_dict = PA_test_small(pa_params, training_data, validation_data, run = run_ix)
+            Anet, ALoss_dict = A_test_small(a_params, training_data, validation_data, run = run_ix)
         else:
-            model_params['loss_weight_sindy_regularization'] = 5e-5
-            PAnet, PALoss_dict = PA_test(model_params, training_data, validation_data, run=run_ix)
-            model_params['loss_weight_sindy_regularization'] = 1e-5
-            Anet, ALoss_dict = A_test(model_params, training_data, validation_data, run=run_ix)
+            PAnet, PALoss_dict = PA_test(pa_params, training_data, validation_data, run=run_ix)
+            Anet, ALoss_dict = A_test(a_params, training_data, validation_data, run=run_ix)
 
         for key,val in ALoss_dict.items():
             if key=='epoch':
@@ -243,12 +248,13 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 
 
 def run():
-    exp_label='reg_random_init'
-    n_runs = 5
+    exp_label='coeff_loss'
+    n_runs = 1
     param_updates = {'loss_weight_sindy_z': 0}
+    PAparam_updates = {'coefficient_initialization': 'normal',
+                       'loss_weight_sindy_regularization': 5e-4}
     if torch.cuda.is_available():
-        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label = exp_label,
-                                          exp_size = (128,np.inf), param_updates = param_updates)
+        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, exp_size=(256, np.inf))
     else:
         try:
             os.mkdir(f'../plots/{exp_label}')

@@ -42,6 +42,7 @@ class SindyNet(nn.Module):
 
         self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
         self.exp_label = params['exp_label']
+        self.true_coeffs = torch.tensor(params['true_coeffs'], dtype=torch.float32, device=self.device)
 
         self.sub_model_coeffs = {}
         self.sub_model_masks = {}
@@ -166,7 +167,6 @@ class SindyNet(nn.Module):
         library_dim = self.params['library_dim']
         latent_dim = self.params['latent_dim']
         initializer, init_param = self.initializer()
-        #return torch.randn((library_dim, latent_dim), device = self.device)
         return get_initialized_weights([library_dim, latent_dim], initializer,
                                        init_param = init_param, device = self.device)
 

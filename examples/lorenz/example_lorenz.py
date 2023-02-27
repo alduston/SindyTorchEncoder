@@ -168,7 +168,6 @@ def generate_lorenz_data(ics, t, n_points, linear=True, normalization=None,
         sindy_coefficients = lorenz_coefficients([1,1,1], sigma=sigma, beta=beta, rho=rho)
     else:
         sindy_coefficients = lorenz_coefficients(normalization, sigma=sigma, beta=beta, rho=rho)
-
     data = {}
     data['t'] = t
     data['y_spatial'] = y_spatial

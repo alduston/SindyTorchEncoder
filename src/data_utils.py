@@ -43,6 +43,8 @@ class model_data(Dataset):
         self.data_dict = data
         self.x = torch.tensor(self.data_dict['x'], dtype=torch.float32, device=self.device)
         self.dx = torch.tensor(self.data_dict['dx'], dtype=torch.float32, device=self.device)
+        self.true_coeffs = torch.tensor(self.data_dict['sindy_coefficients'],
+                                   dtype=torch.float32, device=self.device)
         self.n_samples = self.x.shape[0]
         if bag_params:
 
@@ -119,6 +121,7 @@ def get_test_params(train_size = 100, max_data = 100000):
     params['train_print_freq'] = np.inf
     params['update_freq'] = 50
     params['use_activation_mask'] = False
+    params['true_coeffs'] = training_data['sindy_coefficients']
 
     return params,training_data, validation_data
 
