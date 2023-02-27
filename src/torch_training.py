@@ -160,7 +160,8 @@ def validate_one_epoch(model, data_loader, true_coeffs = None):
                 for key, val in losses.items():
                     total_loss_dict[key] = val
     if true_coeffs!= None:
-        coeff_loss_val = float(coeff_loss(model.sindy_coeffs, true_coeffs).detach().cpu())
+        pred_coeffs = model.sindy_coeffs *model.coefficient_mask
+        coeff_loss_val = float(coeff_pattern_loss(pred_coeffs, true_coeffs).detach().cpu())
         total_loss_dict['coeff'] = coeff_loss_val
     return  total_loss, total_loss_dict
 
@@ -300,8 +301,11 @@ def col_permutations(M):
     return M_permutes
 
 
-def coeff_loss(pred_coeffs, true_coeffs):
-    losses = [torch.mean(torch.abs(pred_coeffs - ptrue_coeffs)) for ptrue_coeffs in col_permutations(true_coeffs)]
+def coeff_pattern_loss(pred_coeffs, true_coeffs, binary = True):
+    if binary:
+        pred_coeffs = torch.abs(pred_coeffs) ** 0.00000001
+        true_coeffs = torch.abs(true_coeffs) ** 0.00000001
+    losses = [torch.sum(torch.abs(pred_coeffs - ptrue_coeffs)) for ptrue_coeffs in col_permutations(true_coeffs)]
     return min(losses)
 
 
@@ -315,8 +319,6 @@ def validate_paralell_epoch(model, data_loader, Loss_dict, true_coeffs = None):
     val_model = copy(model)
     val_model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
 
-    if true_coeffs != None:
-        coeff_loss_val = coeff_loss(val_model.sindy_coeffs, true_coeffs)
 
     if not (model.epoch % 1000)-1:
         pass
@@ -339,9 +341,11 @@ def validate_paralell_epoch(model, data_loader, Loss_dict, true_coeffs = None):
     Loss_dict['epoch'].append(int(model.epoch))
     Loss_dict['active_coeffs'].append(int(torch.sum(val_model.coefficient_mask).cpu().detach()))
     Loss_dict['total'].append(float(total_loss.cpu().detach()))
+
     if true_coeffs != None:
-        coeff_loss_val = float(coeff_loss(val_model.sindy_coeffs, true_coeffs).detach().cpu())
-        Loss_dict['coeff'].append(coeff_loss_val)
+        pred_coeffs = val_model.sindy_coeffs * val_model.coefficient_mask
+        coeff_loss_val = coeff_pattern_loss(pred_coeffs, true_coeffs)
+        Loss_dict['coeff'].append(float(coeff_loss_val.detach().cpu()))
 
     for key, val in total_loss_dict.items():
         Loss_dict[key].append(float(val.detach().cpu()))
