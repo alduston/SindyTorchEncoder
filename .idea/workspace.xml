@@ -13,23 +13,12 @@
     <list default="true" id="3ae723a2-2f1b-4b45-8b78-c1f489f4fd16" name="Default Changelist" comment="">
       <change afterPath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/notes/BA-sindy.log" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/notes/BA-sindy.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/notes/BA-sindy.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/notes/BA-sindy.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/notes/BA-sindy.synctex.gz" beforeDir="false" afterPath="$PROJECT_DIR$/Docs/notes/BA-sindy.synctex.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/notes/avg_coeff.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/notes/avg_loss.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/notes/run1_coeffs.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/notes/run1_loss.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/notes/run3_coeffs.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Docs/notes/run3_loss.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/pendulum/model1.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/pendulum/model2.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/rd/model1.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/rd/model2.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/training.py" beforeDir="false" afterPath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/training.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/torch_autoencoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/torch_autoencoder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/torch_training.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/torch_training.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -238,7 +227,7 @@
       <workItem from="1677429163190" duration="3859000" />
       <workItem from="1677448371812" duration="388000" />
       <workItem from="1677452033978" duration="1407000" />
-      <workItem from="1677454517566" duration="1273000" />
+      <workItem from="1677454517566" duration="2091000" />
     </task>
     <servers />
   </component>
