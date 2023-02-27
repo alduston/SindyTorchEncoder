@@ -308,7 +308,7 @@ class SindyNet(nn.Module):
             reg_loss += self_loss
 
         loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss
-        loss = loss_refinement
+        loss = loss_refinement + reg_loss
         losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss,
                   'sindy_x': sindy_x_loss, 'reg': reg_loss}
 

@@ -145,7 +145,7 @@ def validate_one_step(model, data):
     return loss, loss_refinement, losses
 
 
-def validate_one_epoch(model, data_loader):
+def validate_one_epoch(model, data_loader, true_coeffs = None):
     model.eval()
     total_loss = 0
     total_loss_dict = {}
@@ -159,6 +159,9 @@ def validate_one_epoch(model, data_loader):
             else:
                 for key, val in losses.items():
                     total_loss_dict[key] = val
+    if true_coeffs!= None:
+        coeff_loss_val = float(coeff_loss(model.sindy_coeffs, true_coeffs).detach().cpu())
+        total_loss_dict['coeff'] = coeff_loss_val
     return  total_loss, total_loss_dict
 
 
@@ -167,9 +170,10 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
     loss_dict = {key:[] for key in Loss_dict.keys()}
     train_epochs = train_params[f'{mode}_epochs']
     optimizer = torch.optim.Adam(net.parameters(), lr= model_params['learning_rate'])
+    true_coeffs = net.true_coeffs
     for epoch in range(train_epochs):
         if not epoch % print_freq:
-            test_loss, test_loss_dict = validate_one_epoch(net, test_loader)
+            test_loss, test_loss_dict = validate_one_epoch(net, test_loader, true_coeffs)
             loss_dict['epoch'].append(float(net.epoch.detach().cpu()))
             loss_dict['active_coeffs'].append(int(net.num_active_coeffs))
             for key,val in test_loss_dict.items():
@@ -195,7 +199,7 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
 
 def train_sindy(model_params, train_params, training_data, validation_data, printout = False):
     Loss_dict = {'epoch': [], 'decoder': [], 'sindy_x': [],
-                 'reg': [], 'sindy_z': [], 'active_coeffs': []}
+                 'reg': [], 'sindy_z': [], 'active_coeffs': [], 'coeff': []}
     if torch.cuda.is_available():
         device = 'cuda:0'
     else:
@@ -313,7 +317,6 @@ def validate_paralell_epoch(model, data_loader, Loss_dict, true_coeffs = None):
 
     if true_coeffs != None:
         coeff_loss_val = coeff_loss(val_model.sindy_coeffs, true_coeffs)
-        print(f'Coeff loss was {coeff_loss_val}')
 
     if not (model.epoch % 1000)-1:
         pass
@@ -333,10 +336,13 @@ def validate_paralell_epoch(model, data_loader, Loss_dict, true_coeffs = None):
             else:
                 for key, val in losses.items():
                     total_loss_dict[key] = val
-
     Loss_dict['epoch'].append(int(model.epoch))
     Loss_dict['active_coeffs'].append(int(torch.sum(val_model.coefficient_mask).cpu().detach()))
     Loss_dict['total'].append(float(total_loss.cpu().detach()))
+    if true_coeffs != None:
+        coeff_loss_val = float(coeff_loss(val_model.sindy_coeffs, true_coeffs).detach().cpu())
+        Loss_dict['coeff'].append(coeff_loss_val)
+
     for key, val in total_loss_dict.items():
         Loss_dict[key].append(float(val.detach().cpu()))
     return val_model, Loss_dict
@@ -359,7 +365,7 @@ def print_keyval(key,val_list):
 
 def parallell_train_sindy(model_params, train_params, training_data, validation_data, printout = False):
     Loss_dict = {'epoch': [], 'total': [], 'decoder': [], 'sindy_x': [],
-                 'reg': [], 'sindy_z': [], 'active_coeffs': []}
+                 'reg': [], 'sindy_z': [], 'active_coeffs': [], 'coeff': []}
     if torch.cuda.is_available():
         device = 'cuda:0'
     else:
