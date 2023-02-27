@@ -33,7 +33,7 @@ class SindyNet(nn.Module):
         self.iter_count = torch.tensor(0, device = device)
         self.epoch = torch.tensor(0, device = device)
 
-        self.sindy_coeffs = torch.nn.Parameter(self.sindy_coefficients(), requires_grad = True)
+        self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad = True)
         #if self.params['sequential_thresholding']:
         self.coefficient_mask = torch.tensor(params['coefficient_mask'], dtype = torch.float32, device = self.device)
 
@@ -162,7 +162,7 @@ class SindyNet(nn.Module):
         return intializer, init_param
 
 
-    def sindy_coefficients(self):
+    def init_sindy_coefficients(self):
         library_dim = self.params['library_dim']
         latent_dim = self.params['latent_dim']
         initializer, init_param = self.initializer()
@@ -319,9 +319,9 @@ class SindyNet(nn.Module):
         return self.Loss(x, x_decode, z, dx, ddx)[0]
 
 
-    def auto_Loss(self, x, dx, ddx=None, idx=None):
+    def auto_Loss(self, x, dx, ddx=None, idx=None, penalize_self = False):
         x_decode, z = self.forward(x)
-        return self.Loss(x, x_decode, z, dx, ddx, idx)
+        return self.Loss(x, x_decode, z, dx, ddx, idx, penalize_self)
 
 
     def bag_loss(self, x, dx, ddx=None):

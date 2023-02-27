@@ -227,12 +227,14 @@ def train_sindy(model_params, train_params, training_data, validation_data, prin
 
 
 
-def train_parallel_step(model, data, optimizer, idx, spooky = True):
+def train_parallel_step(model, data, optimizer, idx):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
-        loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'],  idx = idx)
+        loss, loss_refinement, losses = model.auto_Loss(x = data['x_bag'], dx = data['dx_bag'],
+                                                        idx = idx, penalize_self=True)
     else:
-        loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'], idx = idx)
+        loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'],
+                                                        dxx = data['dxx'], idx = idx)
     loss.backward()
     optimizer.step()
     return loss, loss_refinement, losses
@@ -356,9 +358,9 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
         latent_dim = net.params['latent_dim']
 
         initializer, init_param = net.initializer()
-        sub_model_coeffs.append(get_initialized_weights([library_dim, latent_dim], initializer,
-                                       init_param = init_param, device = net.device))
-        #sub_model_coeffs.append(torch.randn((library_dim, latent_dim), device = net.device))
+        #sub_model_coeffs.append(get_initialized_weights([library_dim, latent_dim], initializer,
+                                       #init_param = init_param, device = net.device))
+        sub_model_coeffs.append(torch.randn((library_dim, latent_dim), device = net.device))
         sub_model_losses_dict[f'{idx}'] = deepcopy(Loss_dict)
     sub_model_test_losses_dict = deepcopy(sub_model_losses_dict)
 

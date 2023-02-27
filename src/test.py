@@ -241,9 +241,9 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 
 
 def run():
-    exp_label='with_z'
-    n_runs = 2
-    param_updates = {'loss_weight_sindy_z': 1e-5}
+    exp_label='reg_random_init'
+    n_runs = 5
+    param_updates = {'loss_weight_sindy_z': 0}
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label = exp_label,
                                           exp_size = (128,np.inf), param_updates = param_updates)
