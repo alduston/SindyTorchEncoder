@@ -95,7 +95,7 @@ def get_test_params(train_size = 100, max_data = 100000):
     params['coefficient_initialization'] = 'xavier'
 
     # loss function weighting
-    params['loss_weight_decoder'] = .1
+    params['loss_weight_decoder'] = 1
     params['loss_weight_sindy_z'] = 0.00
     params['loss_weight_sindy_x'] = 1e-4
     params['loss_weight_sindy_regularization'] = 1e-5

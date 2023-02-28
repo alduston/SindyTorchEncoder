@@ -160,7 +160,7 @@ def validate_one_epoch(model, data_loader, true_coeffs = None):
                 for key, val in losses.items():
                     total_loss_dict[key] = val
     if true_coeffs!= None:
-        pred_coeffs = model.sindy_coeffs *model.coefficient_mask
+        pred_coeffs = model.sindy_coeffs * model.coefficient_mask
         coeff_loss_val = float(coeff_pattern_loss(pred_coeffs, true_coeffs).detach().cpu())
         total_loss_dict['coeff'] = coeff_loss_val
     return  total_loss, total_loss_dict
