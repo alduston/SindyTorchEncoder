@@ -120,6 +120,7 @@ def get_test_params(train_size = 100, max_data = 100000):
     params['train_print_freq'] = np.inf
     params['update_freq'] = 50
     params['use_activation_mask'] = False
+    params['true_coeffs'] = training_data['sindy_coefficients']
 
     return params,training_data, validation_data
 
