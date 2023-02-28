@@ -299,8 +299,8 @@ def col_permutations(M):
     M_permutes = []
     columns = list(range(M.shape[1]))
     for perm in permutations(columns):
-        M_permuted = torch.stack([M[:, idx] for idx in perm])
-        M_permutes.append(torch.transpose(M_permuted,0,1))
+        M_permuted = np.stack([M[:, idx] for idx in perm])
+        M_permutes.append(np.transpose(M_permuted))
     return M_permutes
 
 
