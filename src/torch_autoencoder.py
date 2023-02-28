@@ -41,7 +41,7 @@ class SindyNet(nn.Module):
         self.damping_mask = torch.tensor(params['coefficient_mask'], dtype=torch.float32, device=self.device)
         self.activation_mask = torch.tensor(params['coefficient_mask'], dtype=torch.float32, device=self.device)
 
-        self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
+        self.num_active_coeffs = torch.sum(copy(self.coefficient_mask)).cpu().detach().numpy()
         self.exp_label = params['exp_label']
         self.true_coeffs = torch.tensor(params['true_coeffs'], dtype=torch.float32, device=self.device)
 
@@ -197,7 +197,7 @@ class SindyNet(nn.Module):
         if self.params['sequential_thresholding']:
             if epoch and (epoch % self.params['threshold_frequency'] == 0):
                 self.coefficient_mask = self.coefficient_mask * torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
-                self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
+                self.num_active_coeffs = torch.sum(copy(self.coefficient_mask)).cpu().detach().numpy()
         if self.params['use_activation_mask']:
             return torch.matmul(Theta, self.activation_mask * sindy_coefficients)
         return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
@@ -243,6 +243,7 @@ class SindyNet(nn.Module):
 
     def decoder_loss(self, x, x_pred):
         return  self.params['loss_weight_decoder'] * torch.mean((x - x_pred) ** 2)
+
 
 
     def sindy_reg_loss(self, idx = None, penalize_self = False):

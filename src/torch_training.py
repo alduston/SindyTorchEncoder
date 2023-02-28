@@ -179,7 +179,7 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
             loss_dict['active_coeffs'].append(int(net.num_active_coeffs))
             for key,val in test_loss_dict.items():
                 try:
-                    loss_dict[key].append(float(val.detach().cpu()))
+                    loss_dict[key].append(float(copy(val.detach()).cpu()))
                 except AttributeError:
                     loss_dict[key].append(float(val))
             if printout:
@@ -290,7 +290,7 @@ def crossval(model):
 
     model.coefficient_mask = model.coefficient_mask * new_mask
     model.damping_mask = damping_mask
-    model.num_active_coeffs = int(torch.sum(model.coefficient_mask).cpu().detach())
+    model.num_active_coeffs = int(torch.sum(copy(model.coefficient_mask)).cpu().detach())
     model.sindy_coeffs = torch.nn.Parameter(model.coefficient_mask * avg_coeffs, requires_grad=True)
     return model
 
