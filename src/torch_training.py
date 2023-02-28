@@ -313,7 +313,7 @@ def col_permutations(M):
 
 
 def coeff_pattern_loss(pred_coeffs, true_coeffs, binary = True):
-    pred_coeffs = copy(pred_coeffs).detach().numpy()
+    pred_coeffs = copy(pred_coeffs).detach().cpu().numpy()
     true_coeffs = copy(true_coeffs).detach().cpu().numpy()
     if binary:
         pred_coeffs[np.where(np.abs(pred_coeffs) <.1)] = 0
