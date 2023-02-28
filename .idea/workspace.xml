@@ -12,13 +12,14 @@
   <component name="ChangeListManager">
     <list default="true" id="3ae723a2-2f1b-4b45-8b78-c1f489f4fd16" name="Default Changelist" comment="">
       <change afterPath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/pendulum/model1.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/pendulum/model2.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/rd/model1.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/rd/model2.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/training.py" beforeDir="false" afterPath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/training.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test2.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/torch_autoencoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/torch_autoencoder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -230,7 +231,7 @@
       <workItem from="1677454517566" duration="3052000" />
       <workItem from="1677516555106" duration="445000" />
       <workItem from="1677529213033" duration="443000" />
-      <workItem from="1677531012422" duration="6924000" />
+      <workItem from="1677531012422" duration="7471000" />
     </task>
     <servers />
   </component>
@@ -384,7 +385,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/torch_autoencoder.py</url>
-          <line>314</line>
+          <line>318</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">

@@ -244,6 +244,10 @@ class SindyNet(nn.Module):
         criterion = nn.MSELoss()
         return self.params['loss_weight_decoder'] * criterion(x, x_pred)
 
+    def orcale_loss(self, x, x_pred):
+        criterion = nn.MSELoss()
+        return self.params['loss_weight_decoder'] * criterion(x, x_pred)
+
 
     def sindy_reg_loss(self, idx = None, penalize_self = False):
         if idx == None:
