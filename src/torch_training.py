@@ -161,7 +161,7 @@ def validate_one_epoch(model, data_loader, true_coeffs = None):
                     total_loss_dict[key] = val
     if true_coeffs!= None:
         pred_coeffs = model.sindy_coeffs * model.coefficient_mask
-        coeff_loss_val = float(coeff_pattern_loss(pred_coeffs, true_coeffs).detach().cpu())
+        coeff_loss_val = coeff_pattern_loss(pred_coeffs, true_coeffs)
         total_loss_dict['coeff'] = coeff_loss_val
     return  total_loss, total_loss_dict
 
@@ -323,7 +323,7 @@ def coeff_pattern_loss(pred_coeffs, true_coeffs, binary = True):
 
     losses = []
     for permutation in col_permutations(true_coeffs):
-        leq_M = pred_coeffs[np.where(pred_coeffs + .1 < true_coeffs)]
+        leq_M = pred_coeffs[np.where(pred_coeffs + .1 < permutation)]
         L_minus = len(leq_M)
         losses.append(L_minus)
     return min(losses)
@@ -365,7 +365,7 @@ def validate_paralell_epoch(model, data_loader, Loss_dict, true_coeffs = None):
     if true_coeffs != None:
         pred_coeffs = val_model.sindy_coeffs * val_model.coefficient_mask
         coeff_loss_val = coeff_pattern_loss(pred_coeffs, true_coeffs)
-        Loss_dict['coeff'].append(float(coeff_loss_val.detach().cpu()))
+        Loss_dict['coeff'].append(coeff_loss_val)
 
     for key, val in total_loss_dict.items():
         Loss_dict[key].append(float(val.detach().cpu()))
