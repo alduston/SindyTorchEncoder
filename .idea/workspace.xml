@@ -19,7 +19,7 @@
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/autoencoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/autoencoder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/sindy_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/sindy_utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/training.py" beforeDir="false" afterPath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/training.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/torch_autoencoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/torch_autoencoder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -259,7 +259,7 @@
       <workItem from="1677557192741" duration="17000" />
       <workItem from="1677557229494" duration="3692000" />
       <workItem from="1677562685545" duration="108000" />
-      <workItem from="1677564117275" duration="7031000" />
+      <workItem from="1677564117275" duration="7369000" />
     </task>
     <servers />
   </component>
