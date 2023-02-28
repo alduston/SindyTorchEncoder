@@ -77,7 +77,7 @@ def process_bag_coeffs(Bag_coeffs, model):
     n_samples = Bag_coeffs.shape[0]
     avg_coeffs = (1/n_samples) * torch.sum(Bag_coeffs, dim = 0)
 
-    ip_thresh = 2/3
+    ip_thresh = .8
     for ix in range(x):
         for iy in range(y):
             coeffs_vec = Bag_coeffs[:,ix,iy]
