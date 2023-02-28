@@ -12,7 +12,6 @@
   <component name="ChangeListManager">
     <list default="true" id="3ae723a2-2f1b-4b45-8b78-c1f489f4fd16" name="Default Changelist" comment="">
       <change afterPath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/pendulum/model1.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/pendulum/model2.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/examples/rd/model1.data-00000-of-00001" beforeDir="false" />
@@ -20,9 +19,7 @@
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/autoencoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/autoencoder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/sindy_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/sindy_utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/training.py" beforeDir="false" afterPath="$PROJECT_DIR$/original_model/SindyAutoencoders/src/training.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/torch_autoencoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/torch_autoencoder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/torch_training.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/torch_training.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -262,7 +259,7 @@
       <workItem from="1677557192741" duration="17000" />
       <workItem from="1677557229494" duration="3692000" />
       <workItem from="1677562685545" duration="108000" />
-      <workItem from="1677564117275" duration="6724000" />
+      <workItem from="1677564117275" duration="6863000" />
     </task>
     <servers />
   </component>
@@ -425,7 +422,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/torch_autoencoder.py</url>
-          <line>307</line>
+          <line>308</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
