@@ -304,11 +304,28 @@ def col_permutations(M):
     return M_permutes
 
 
+#def coeff_pattern_loss(pred_coeffs, true_coeffs, binary = True):
+    #if binary:
+        #pred_coeffs = torch.abs(pred_coeffs) ** 0.00000001
+        #true_coeffs = torch.abs(true_coeffs) ** 0.00000001
+    #losses = [torch.sum(torch.abs(pred_coeffs - ptrue_coeffs)) for ptrue_coeffs in col_permutations(true_coeffs)]
+    #return min(losses)
+
+
 def coeff_pattern_loss(pred_coeffs, true_coeffs, binary = True):
+    pred_coeffs = pred_coeffs.numpy()
+    true_coeffs = true_coeffs.numpy()
     if binary:
-        pred_coeffs = torch.abs(pred_coeffs) ** 0.00000001
-        true_coeffs = torch.abs(true_coeffs) ** 0.00000001
-    losses = [torch.sum(torch.abs(pred_coeffs - ptrue_coeffs)) for ptrue_coeffs in col_permutations(true_coeffs)]
+        pred_coeffs[np.where(np.abs(pred_coeffs) <.1)] = 0
+        pred_coeffs[np.where(np.abs(pred_coeffs) >= .1)] = 1
+        pred_coeffs = np.asarray((np.abs(pred_coeffs) ** 0.000000000001),int)
+        true_coeffs = np.asarray(np.abs(true_coeffs) ** 0.00000000001,int)
+
+    losses = []
+    for permutation in col_permutations(true_coeffs):
+        leq_M = pred_coeffs[np.where(pred_coeffs + .1 < true_coeffs)]
+        L_minus = len(leq_M)
+        losses.append(L_minus)
     return min(losses)
 
 
