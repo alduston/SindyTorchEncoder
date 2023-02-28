@@ -34,7 +34,7 @@ class SindyNet(nn.Module):
         self.iter_count = torch.tensor(0, device = device)
         self.epoch = torch.tensor(0, device = device)
 
-        #self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad = True)
+        self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad = True)
         self.coefficient_mask = torch.tensor(params['coefficient_mask'], dtype = torch.float32, device = self.device)
 
         self.damping_mask = torch.tensor(params['coefficient_mask'], dtype=torch.float32, device=self.device)
@@ -42,9 +42,7 @@ class SindyNet(nn.Module):
 
         self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
         self.exp_label = params['exp_label']
-
         self.true_coeffs = torch.tensor(params['true_coeffs'], dtype=torch.float32, device=self.device)
-        self.sindy_coeffs = self.true_coeffs
 
         self.sub_model_coeffs = {}
         self.sub_model_masks = {}
@@ -243,8 +241,7 @@ class SindyNet(nn.Module):
 
 
     def decoder_loss(self, x, x_pred):
-        criterion = nn.MSELoss()
-        return self.params['loss_weight_decoder'] * criterion(x, x_pred)
+        return  self.params['loss_weight_decoder'] * torch.mean((x - x_pred) ** 2)
 
 
     def sindy_reg_loss(self, idx = None, penalize_self = False):
