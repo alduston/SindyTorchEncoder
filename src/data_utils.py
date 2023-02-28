@@ -92,13 +92,14 @@ def get_test_params(train_size = 100, max_data = 100000):
     params['sequential_thresholding'] = False
     params['coefficient_threshold'] = 0.1
     params['coefficient_mask'] = np.ones((params['library_dim'], params['latent_dim']))
-    params['coefficient_initialization'] = 'constant'
+    params['coefficient_initialization'] = 'xavier'
 
     # loss function weighting
     params['loss_weight_decoder'] = 1.0
     params['loss_weight_sindy_z'] = 0.00
     params['loss_weight_sindy_x'] = 1e-4
     params['loss_weight_sindy_regularization'] = 1e-5
+    params['loss_weight_oracle'] = 1e-4
 
     params['activation'] = 'sigmoid'
     params['widths'] = [64,32]

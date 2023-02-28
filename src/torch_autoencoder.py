@@ -5,6 +5,7 @@ import warnings
 from sindy_utils import z_derivative, z_derivative_order2,\
     get_initialized_weights, sindy_library_torch, sindy_library_torch_order2
 import warnings
+from copy import copy
 warnings.filterwarnings("ignore")
 
 
@@ -34,7 +35,6 @@ class SindyNet(nn.Module):
         self.epoch = torch.tensor(0, device = device)
 
         self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad = True)
-        #if self.params['sequential_thresholding']:
         self.coefficient_mask = torch.tensor(params['coefficient_mask'], dtype = torch.float32, device = self.device)
 
         self.damping_mask = torch.tensor(params['coefficient_mask'], dtype=torch.float32, device=self.device)
@@ -42,7 +42,9 @@ class SindyNet(nn.Module):
 
         self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
         self.exp_label = params['exp_label']
+
         self.true_coeffs = torch.tensor(params['true_coeffs'], dtype=torch.float32, device=self.device)
+        self.sindy_coeffs = self.true_coeffs
 
         self.sub_model_coeffs = {}
         self.sub_model_masks = {}
@@ -195,7 +197,7 @@ class SindyNet(nn.Module):
         epoch = self.epoch
         if self.params['sequential_thresholding']:
             if epoch and (epoch % self.params['threshold_frequency'] == 0):
-                self.coefficient_mask = torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
+                self.coefficient_mask = self.coefficient_mask * torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
                 self.num_active_coeffs = torch.sum(self.coefficient_mask).cpu().detach().numpy()
         if self.params['use_activation_mask']:
             return torch.matmul(Theta, self.activation_mask * sindy_coefficients)
@@ -244,10 +246,6 @@ class SindyNet(nn.Module):
         criterion = nn.MSELoss()
         return self.params['loss_weight_decoder'] * criterion(x, x_pred)
 
-    def orcale_loss(self, x, x_pred):
-        criterion = nn.MSELoss()
-        return self.params['loss_weight_decoder'] * criterion(x, x_pred)
-
 
     def sindy_reg_loss(self, idx = None, penalize_self = False):
         if idx == None:
@@ -259,12 +257,6 @@ class SindyNet(nn.Module):
                 sub_coeffs = torch.sum(self.sub_model_coeffs, dim = 0)
                 #sub_coeffs = self.sub_model_coeffs[idx]
         return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sub_coeffs))
-
-
-    def spooky_loss(self):
-        n_bags = self.sindy_coeffs.shape[0]
-        coeffs = (1/n_bags) * torch.sum(self.sub_model_coeffs)
-        return self.params['loss_weight_mystery'] * torch.mean(torch.abs(coeffs))
 
 
     def sindy_z_loss(self, z, x, dx, ddx = None, idx = None):
@@ -315,7 +307,6 @@ class SindyNet(nn.Module):
         loss = loss_refinement + reg_loss
         losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss,
                   'sindy_x': sindy_x_loss, 'reg': reg_loss}
-
         return loss, loss_refinement, losses
 
 

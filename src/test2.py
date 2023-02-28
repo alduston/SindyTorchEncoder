@@ -252,7 +252,8 @@ def run():
     n_runs = 1
 
     if torch.cuda.is_available():
-        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, exp_size=(1024, np.inf))
+        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, exp_size=(512, np.inf))
+
     else:
         try:
             os.mkdir(f'../plots/{exp_label}')
