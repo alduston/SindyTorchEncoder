@@ -43,8 +43,6 @@ class model_data(Dataset):
         self.data_dict = data
         self.x = torch.tensor(self.data_dict['x'], dtype=torch.float32, device=self.device)
         self.dx = torch.tensor(self.data_dict['dx'], dtype=torch.float32, device=self.device)
-        self.true_coeffs = torch.tensor(self.data_dict['sindy_coefficients'],
-                                   dtype=torch.float32, device=self.device)
         self.n_samples = self.x.shape[0]
         if bag_params:
 
@@ -92,14 +90,14 @@ def get_test_params(train_size = 100, max_data = 100000):
     params['sequential_thresholding'] = False
     params['coefficient_threshold'] = 0.1
     params['coefficient_mask'] = np.ones((params['library_dim'], params['latent_dim']))
-    params['coefficient_initialization'] = 'xavier'
+    params['coefficient_initialization'] = 'constant'
 
     # loss function weighting
-    params['loss_weight_decoder'] = 1
+    params['loss_weight_decoder'] = 1.0
     params['loss_weight_sindy_z'] = 0.00
     params['loss_weight_sindy_x'] = 1e-4
     params['loss_weight_sindy_regularization'] = 1e-5
-    params['loss_weight_oracle'] = 1e-4
+    params['loss_weight_mystery'] = 1e-5
 
     params['activation'] = 'sigmoid'
     params['widths'] = [64,32]
@@ -122,7 +120,6 @@ def get_test_params(train_size = 100, max_data = 100000):
     params['train_print_freq'] = np.inf
     params['update_freq'] = 50
     params['use_activation_mask'] = False
-    params['true_coeffs'] = training_data['sindy_coefficients']
 
     return params,training_data, validation_data
 

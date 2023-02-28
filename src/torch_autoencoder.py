@@ -200,7 +200,7 @@ class SindyNet(nn.Module):
                 self.num_active_coeffs = torch.sum(copy(self.coefficient_mask)).cpu().detach().numpy()
         if self.params['use_activation_mask']:
             return torch.matmul(Theta, self.activation_mask * sindy_coefficients)
-        return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
+        return torch.matmul(Theta, self.activation_mask * sindy_coefficients)
 
 
     def calc_coefficient_mask(self):
@@ -242,7 +242,8 @@ class SindyNet(nn.Module):
 
 
     def decoder_loss(self, x, x_pred):
-        return  self.params['loss_weight_decoder'] * torch.mean((x - x_pred) ** 2)
+        criterion = nn.MSELoss()
+        return self.params['loss_weight_decoder'] * criterion(x, x_pred)
 
 
     def sindy_reg_loss(self, idx = None, penalize_self = False):
@@ -252,29 +253,33 @@ class SindyNet(nn.Module):
             if penalize_self:
                 sub_coeffs = self.sub_model_coeffs[idx]
             else:
-                sub_coeffs = torch.sum(self.sub_model_coeffs, dim = 0) * (1/self.params['nbags'])
+                #sub_coeffs = torch.sum(self.sub_model_coeffs, dim = 0) * (1/self.params['nbags'])
+                sub_coeffs = torch.sum(self.sub_model_coeffs, dim=0)
         return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sub_coeffs))
 
 
     def sindy_z_loss(self, z, x, dx, ddx = None, idx = None):
+        criterion = nn.MSELoss()
         if self.params['model_order'] == 1:
             dz = self.dz(x, dx)
             dz_predict = torch.transpose(self.sindy_predict(z, x, dx, idx),0,1)
-            return self.params['loss_weight_sindy_z'] * torch.mean((dz - dz_predict) ** 2)
+            criterion = nn.MSELoss()
+            return self.params['loss_weight_sindy_z'] * criterion(dz - dz_predict)
         else:
             ddz = self.ddz(x, dx, ddx)[1]
             ddz_predict = torch.transpose(self.sindy_predict(z, x, dx, idx),0,1)
-            return  self.params['loss_weight_sindy_z'] * torch.mean((ddz - ddz_predict) ** 2)
+            return  self.params['loss_weight_sindy_z'] * criterion((ddz - ddz_predict) ** 2)
 
 
     def sindy_x_loss(self, z, x, dx, ddx = None, idx = None):
+        criterion = nn.MSELoss()
         if self.params['model_order'] == 1:
             dx_decode = torch.transpose(self.dx_decode(z, x, dx, idx),0,1)
-            return self.params['loss_weight_sindy_x'] * torch.mean((dx - dx_decode) ** 2)
+            return self.params['loss_weight_sindy_x'] * criterion((dx - dx_decode) ** 2)
         else:
             dx_decode, ddx_decode = self.ddx_decode(z, x, dx, idx)
             ddx_decode = torch.transpose(ddx_decode,0,1)
-            return  self.params['loss_weight_sindy_x'] * torch.mean((ddx - ddx_decode) ** 2)
+            return  self.params['loss_weight_sindy_x'] * criterion((ddx - ddx_decode) ** 2)
 
 
     def oldLoss(self, x, x_decode, z, dx, ddx = None, idx = None, spooky = False):
