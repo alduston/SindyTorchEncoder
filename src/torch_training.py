@@ -178,7 +178,10 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
             loss_dict['epoch'].append(float(net.epoch.detach().cpu()))
             loss_dict['active_coeffs'].append(int(net.num_active_coeffs))
             for key,val in test_loss_dict.items():
-                loss_dict[key].append(float(val.detach().cpu()))
+                try:
+                    loss_dict[key].append(float(val.detach().cpu()))
+                except AttributeError:
+                    loss_dict[key].append(float(val))
             if printout:
                 print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in loss_dict.items()])}')
 
