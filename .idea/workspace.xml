@@ -259,7 +259,7 @@
       <workItem from="1677557192741" duration="17000" />
       <workItem from="1677557229494" duration="3692000" />
       <workItem from="1677562685545" duration="108000" />
-      <workItem from="1677564117275" duration="6863000" />
+      <workItem from="1677564117275" duration="7031000" />
     </task>
     <servers />
   </component>
@@ -422,7 +422,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/torch_autoencoder.py</url>
-          <line>308</line>
+          <line>307</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
