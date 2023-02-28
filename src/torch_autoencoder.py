@@ -245,7 +245,6 @@ class SindyNet(nn.Module):
         return  self.params['loss_weight_decoder'] * torch.mean((x - x_pred) ** 2)
 
 
-
     def sindy_reg_loss(self, idx = None, penalize_self = False):
         if idx == None:
             sub_coeffs = self.sindy_coeffs
@@ -253,7 +252,7 @@ class SindyNet(nn.Module):
             if penalize_self:
                 sub_coeffs = self.sub_model_coeffs[idx]
             else:
-                sub_coeffs = torch.sum(self.sub_model_coeffs, dim = 0)
+                sub_coeffs = torch.sum(self.sub_model_coeffs, dim = 0) * (1/self.params['nbags'])
                 print(sub_coeffs)
         return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sub_coeffs))
 
