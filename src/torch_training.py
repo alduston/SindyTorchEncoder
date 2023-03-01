@@ -473,7 +473,7 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
 
     crossval_freq = net.params['crossval_freq']
     test_freq = net.params['test_freq']
-    optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'])
+    optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'], capturable=True)
     true_coeffs = net.true_coeffs
     for epoch in range(train_params['bag_epochs']):
         if not epoch % test_freq:
