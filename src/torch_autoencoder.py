@@ -319,6 +319,7 @@ class SindyNet(nn.Module):
 
 
     def auto_Loss(self, x, dx, ddx=None, idx=None, penalize_self = False):
+        print('here')
         x_decode, z = self.forward(x)
         return self.Loss(x, x_decode, z, dx, ddx, idx, penalize_self)
 
