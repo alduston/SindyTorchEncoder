@@ -112,7 +112,7 @@ def A_test(model_params, training_data, validation_data, run = 0):
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
                     'refinement_epochs': 500}
     model_params['batch_size'] = 1024
-    model_params['threshold_frequency'] = 25
+    model_params['threshold_frequency'] = 300
     model_params['run'] = run
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
@@ -253,7 +253,7 @@ def run():
     param_updates = {'loss_weight_decoder': .1}
     if torch.cuda.is_available():
 
-        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, exp_size=(128, np.inf),
+        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, exp_size=(512, np.inf),
                                           param_updates = param_updates)
 
     else:

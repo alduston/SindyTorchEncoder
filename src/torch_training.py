@@ -287,8 +287,8 @@ def train_paralell_epoch(model, bag_loader, optimizer):
 def crossval(model):
     Bag_coeffs = model.sub_model_coeffs
     new_mask, damping_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model)
-    model.coefficient_mask = new_mask
-    #model.coefficient_mask = model.coefficient_mask * new_mask
+    #model.coefficient_mask = new_mask
+    model.coefficient_mask = model.coefficient_mask * new_mask
     model.damping_mask = damping_mask
     model.num_active_coeffs = int(torch.sum(copy(model.coefficient_mask)).cpu().detach())
     model.sindy_coeffs = torch.nn.Parameter(model.coefficient_mask * avg_coeffs, requires_grad=True)
