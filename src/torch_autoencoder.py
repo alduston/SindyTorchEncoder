@@ -192,7 +192,7 @@ class SindyNet(nn.Module):
         if idx == None:
             sindy_coefficients = self.sindy_coeffs
         else:
-            sindy_coefficients = self.sub_model_coeffs[idx]
+            sindy_coefficients = self.sub_model_coeffs[torch.long(idx)]
         epoch = self.epoch
         if self.params['sequential_thresholding']:
             if epoch and (epoch % self.params['threshold_frequency'] == 0):
