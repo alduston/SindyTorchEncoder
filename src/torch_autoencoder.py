@@ -193,12 +193,12 @@ class SindyNet(nn.Module):
             sindy_coefficients = self.sindy_coeffs
         else:
             sindy_coefficients = self.sub_model_coeffs[idx.long()]
+            alt_sindy_coefficients = self.sindy_coeffs
+
             print(x.shape)
             print(Theta.shape)
-            print(self.coefficient_mask * sindy_coefficients.shape)
-            print(torch.matmul(Theta, self.coefficient_mask * sindy_coefficients).shape)
-            alt_sindy_coefficients = self.sindy_coeffs
-            print(self.coefficient_mask * alt_sindy_coefficients.shape)
+            print((self.coefficient_mask * sindy_coefficients).shape)
+            print((self.coefficient_mask * alt_sindy_coefficients).shape)
             print('\n')
 
         epoch = self.epoch
