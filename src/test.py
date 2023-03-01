@@ -150,8 +150,8 @@ def Meta_test(runs = 5, small = False, exp_label = '', exp_size = (100,10000),
             PAnet, PALoss_dict = PA_test_small(pa_params, training_data, validation_data, run = run_ix)
             Anet, ALoss_dict = A_test_small(a_params, training_data, validation_data, run = run_ix)
         else:
-            Anet, ALoss_dict = A_test(a_params, training_data, validation_data, run=run_ix)
             PAnet, PALoss_dict = PA_test(pa_params, training_data, validation_data, run=run_ix)
+            Anet, ALoss_dict = A_test(a_params, training_data, validation_data, run=run_ix)
 
         for key,val in ALoss_dict.items():
             if key=='epoch':
@@ -248,12 +248,12 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 
 
 def run():
-    exp_label='sanity_check'
+    exp_label='midscale_sanity_check'
     n_runs = 6
     param_updates = {'loss_weight_decoder': 1}
     PAparam_updates = {'coefficient_initialization': 'constant'}
     if torch.cuda.is_available():
-        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, exp_size=(200, np.inf),
+        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, exp_size=(200, 15000),
                                           param_updates = param_updates, PAparam_updates = PAparam_updates)
 
     else:
