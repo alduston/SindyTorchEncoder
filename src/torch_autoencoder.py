@@ -196,7 +196,7 @@ class SindyNet(nn.Module):
             predictions = []
             for coeff_matrix,x in zip(sindy_coefficients, Theta):
                 predictions.append(torch.matmul(coeff_matrix,x))
-                predictions = torch.stack(predictions)
+            predictions = torch.stack(predictions)
             return predictions
         epoch = self.epoch
         if self.params['sequential_thresholding']:
