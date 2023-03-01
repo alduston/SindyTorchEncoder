@@ -326,6 +326,8 @@ class SindyNet(nn.Module):
         idx = x[:,-1]
         x = x[:,:-1]
         dx = dx[:,-1]
+        print(x.shape)
+        print(dx.shape)
         x_decode, z = self.forward(x)
         decoder_loss = self.decoder_loss(x, x_decode)
         sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx, idx)
