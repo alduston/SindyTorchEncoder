@@ -10,7 +10,7 @@ from example_lorenz import get_lorenz_data
 import torch
 from sindy_utils import library_size
 import torch_training
-from torch_training import parallell_train_sindy, train_sindy
+from torch_training import parallell_train_sindy, train_sindy, scramble_train_sindy
 from torch_autoencoder import SindyNet
 import pickle
 import warnings
@@ -81,7 +81,7 @@ def PA_test_small(model_params, training_data, validation_data, run  = 0):
     model_params['sequential_thresholding'] = False
     model_params['use_activation_mask'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 50, 'nbags': 12, 'bag_size': int(l//8), 'refinement_epochs': 0}
+    train_params = {'bag_epochs': 50, 'nbags': 10, 'bag_size': int(l//6), 'refinement_epochs': 0}
     model_params['batch_size'] = int(l/2)
     model_params['threshold_frequency'] = 25
     model_params['crossval_freq'] = 25
@@ -95,13 +95,13 @@ def PA_test(model_params, training_data, validation_data, run  = 0):
     model_params['sequential_thresholding'] = False
     model_params['use_activation_mask'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 5000, 'nbags': 12, 'bag_size': int(l//8), 'refinement_epochs': 0}
+    train_params = {'bag_epochs': 5000, 'nbags': 10, 'bag_size': int(l//6), 'refinement_epochs': 0}
     model_params['batch_size'] = int(l/2)
     model_params['threshold_frequency'] = 25
-    model_params['crossval_freq'] = 100
+    model_params['crossval_freq'] = 200
     model_params['run'] = run
     model_params['pretrain_epochs'] = 100
-    net, Loss_dict = parallell_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
+    net, Loss_dict = scramble_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
 
@@ -111,8 +111,8 @@ def A_test(model_params, training_data, validation_data, run = 0):
     train_params = {'bag_epochs': 0, 'pretrain_epochs': 4500, 'nbags': l // 6, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
                     'refinement_epochs': 500}
-    model_params['batch_size'] = 1024
-    model_params['threshold_frequency'] = 100
+    model_params['batch_size'] = int(l/2)
+    model_params['threshold_frequency'] = 25
     model_params['run'] = run
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
@@ -125,14 +125,14 @@ def A_test_small(model_params, training_data, validation_data, run = 0):
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
                     'refinement_epochs': 5}
     model_params['batch_size'] = int(l/2)
-    model_params['threshold_frequency'] = 5000
+    model_params['threshold_frequency'] = 25
     model_params['run'] = run
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
 
 
 
-def Meta_test(runs = 5, small = False, exp_label = '', exp_size = (100,10000),
+def Meta_test(runs = 5, small = False, exp_label = '', exp_size = (128,np.inf),
               param_updates = {}, PAparam_updates = {}, Aparam_updates = {}):
     Meta_PA_dict = {}
     Meta_A_dict = {}
@@ -150,8 +150,8 @@ def Meta_test(runs = 5, small = False, exp_label = '', exp_size = (100,10000),
             PAnet, PALoss_dict = PA_test_small(pa_params, training_data, validation_data, run = run_ix)
             Anet, ALoss_dict = A_test_small(a_params, training_data, validation_data, run = run_ix)
         else:
-            Anet, ALoss_dict = A_test(a_params, training_data, validation_data, run=run_ix)
             PAnet, PALoss_dict = PA_test(pa_params, training_data, validation_data, run=run_ix)
+            Anet, ALoss_dict = A_test(a_params, training_data, validation_data, run=run_ix)
 
         for key,val in ALoss_dict.items():
             if key=='epoch':
@@ -241,21 +241,22 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
             avg_PA += Meta_PA_df[f'{key}{i}']
             trajectory_plot(Meta_A_df, Meta_PA_df, exp_label, key, i)
 
-        avg_A *= (1 / n_runs)
+        avg_A *= (1/n_runs)
         avg_PA *= (1 / n_runs)
         avg_trajectory_plot(Meta_A_df, Meta_PA_df, avg_A, avg_PA, exp_label, key)
     return True
 
 
 def run():
-    exp_label='normal_init'
-    n_runs = 6
+    PAparam_updates = {'coefficient_initialization': 'constant'}
     param_updates = {'loss_weight_decoder': .1}
-    PAparam_updates = {'coefficient_initialization': 'normal'}
+    n_runs = 5
+    exp_label = 'copy_test'
+    Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
+                                      exp_size=(50, 2500), PAparam_updates=PAparam_updates)
     if torch.cuda.is_available():
-        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, exp_size=(200, np.inf),
-                                          param_updates = param_updates, PAparam_updates = PAparam_updates)
-
+        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates= param_updates,
+                                          exp_size=(128, np.inf), PAparam_updates = PAparam_updates)
     else:
         try:
             os.mkdir(f'../plots/{exp_label}')
@@ -264,7 +265,7 @@ def run():
         Meta_A_df = pd.read_csv(f'../data/{exp_label}/Meta_A.csv')
         Meta_PA_df = pd.read_csv(f'../data/{exp_label}/Meta_PA.csv')
 
-    plot_keys = ["sindy_x_", "decoder_", "active_coeffs_", "sindy_z_","coeff_"]
+    plot_keys = ["sindy_x_", "decoder_", "active_coeffs_", "sindy_z_"]
     get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys=plot_keys)
 
 

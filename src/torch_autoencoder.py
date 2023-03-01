@@ -192,10 +192,11 @@ class SindyNet(nn.Module):
         if idx == None:
             sindy_coefficients = self.sindy_coeffs
         else:
-            sindy_coefficients = self.coefficient_mask * self.sub_model_coeffs[idx.long()]
-            prediction = torch.einsum('ijk,ij->ik', sindy_coefficients, Theta)
-            print(prediction.shape)
-            return prediction
+            sindy_coefficients = self.sub_model_coeffs[idx]
+        #else:
+            #sindy_coefficients = self.coefficient_mask * self.sub_model_coeffs[idx.long()]
+            #prediction = torch.einsum('ijk,ij->ik', sindy_coefficients, Theta)
+            #return prediction
         epoch = self.epoch
         if self.params['sequential_thresholding']:
             if epoch and (epoch % self.params['threshold_frequency'] == 0):
@@ -283,20 +284,6 @@ class SindyNet(nn.Module):
             dx_decode, ddx_decode = self.ddx_decode(z, x, dx, idx)
             ddx_decode = torch.transpose(ddx_decode,0,1)
             return  self.params['loss_weight_sindy_x'] * criterion(ddx , ddx_decode)
-
-
-    def oldLoss(self, x, x_decode, z, dx, ddx = None, idx = None, spooky = False):
-        decoder_loss = self.decoder_loss(x, x_decode)
-        sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx, idx)
-        sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx, idx)
-        reg_loss = self.sindy_reg_loss(idx)
-
-        loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss
-        loss = loss_refinement + reg_loss
-
-        losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss,
-                  'sindy_x': sindy_x_loss, 'reg':  reg_loss}
-        return loss, loss_refinement, losses
 
 
     def Loss(self, x, x_decode, z, dx, ddx = None, idx = None,
