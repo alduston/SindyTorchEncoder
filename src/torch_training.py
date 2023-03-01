@@ -251,7 +251,7 @@ def train_parallel_step(model, data, optimizer, idx, scramble = False):
 
 def train_paralell_epoch(model, bag_loader, optimizer, scramble = False):
     printfreq = model.params['train_print_freq']
-    model.eval()
+    model.train()
     epoch_loss = 0
 
     sub_model_losses_dict = model.sub_model_losses_dict

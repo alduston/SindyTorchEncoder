@@ -193,10 +193,6 @@ class SindyNet(nn.Module):
             sindy_coefficients = self.sindy_coeffs
         else:
             sindy_coefficients = self.sub_model_coeffs[idx]
-        #else:
-            #sindy_coefficients = self.coefficient_mask * self.sub_model_coeffs[idx.long()]
-            #prediction = torch.einsum('ijk,ij->ik', sindy_coefficients, Theta)
-            #return prediction
         epoch = self.epoch
         if self.params['sequential_thresholding']:
             if epoch and (epoch % self.params['threshold_frequency'] == 0):
