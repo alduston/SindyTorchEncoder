@@ -59,7 +59,7 @@ def get_bag_coeffs(bag_model, bag_data, params, train_params):
 
 
 def frac_round(vec,val):
-    vec *=(1/val)
+    vec *= (1/val)
     vec = np.asarray(np.asarray(vec, int), float)
     vec *= .05
     return vec
@@ -71,23 +71,20 @@ def f_check(tensor, ix, iy):
 
 def process_bag_coeffs(Bag_coeffs, model):
     new_mask =  np.zeros(Bag_coeffs.shape[1:])
-    damping_mask = model.damping_mask
     x,y = new_mask.shape
 
     n_samples = Bag_coeffs.shape[0]
     avg_coeffs = (1/n_samples) * torch.sum(Bag_coeffs, dim = 0)
 
-    ip_thresh = .8
+    ip_thresh = 2/3
     for ix in range(x):
         for iy in range(y):
             coeffs_vec = Bag_coeffs[:,ix,iy]
             ip = sum([abs(val) > .1 for val in coeffs_vec])/len(coeffs_vec)
             if ip > ip_thresh:
                 new_mask[ix, iy] = 1
-            else:
-                damping_mask[ix, iy] = min(damping_mask[ix, iy], .7)
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = model.params['device'])
-    return new_mask, damping_mask, avg_coeffs
+    return new_mask, avg_coeffs
 
 
 def get_choice_tensor(shape, prob, device):
@@ -107,9 +104,8 @@ def train_bag_epochs(model, bag_loader, params, train_params):
         bag_coeffs = get_bag_coeffs(bag_model, bag_data, params, train_params)
         Bag_coeffs.append(bag_coeffs)
     Bag_coeffs = torch.stack(Bag_coeffs)
-    new_mask, damping_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model)
+    new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model)
     coefficient_mask = new_mask * model.coefficient_mask
-    model.damping_mask = damping_mask
     model.sindy_coeffs = torch.nn.Parameter(coefficient_mask * avg_coeffs, requires_grad=True)
 
     model.coefficient_mask = coefficient_mask
@@ -240,7 +236,8 @@ def train_parallel_step(model, data, optimizer, idx, scramble = False):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
         if scramble:
-            loss, loss_refinement, losses = model.scramble_Loss(x = data['x_bag'], dx = data['dx_bag'], penalize_self=False)
+            loss, loss_refinement, losses = model.scramble_Loss(x = data['x_bag'], dx = data['dx_bag'],
+                                                                penalize_self=False)
         else:
             loss, loss_refinement, losses = model.auto_Loss(x=data['x_bag'], dx=data['dx_bag'],
                                                             idx=idx, penalize_self=False)
@@ -287,10 +284,9 @@ def train_paralell_epoch(model, bag_loader, optimizer, scramble = False):
 
 def crossval(model):
     Bag_coeffs = model.sub_model_coeffs
-    new_mask, damping_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model)
+    new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model)
     #model.coefficient_mask = new_mask
     model.coefficient_mask = model.coefficient_mask * new_mask
-    model.damping_mask = damping_mask
     model.num_active_coeffs = int(torch.sum(copy(model.coefficient_mask)).cpu().detach())
     model.sindy_coeffs = torch.nn.Parameter(model.coefficient_mask * avg_coeffs, requires_grad=True)
     return model
@@ -339,7 +335,6 @@ def validate_paralell_epoch(model, data_loader, Loss_dict, true_coeffs = None):
     avg_coeffs = (1 / n_bags) * torch.sum(Bag_coeffs, dim=0)
     val_model = copy(model)
     val_model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
-
 
     if not (model.epoch % 1000)-1:
         pass
@@ -396,7 +391,6 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
     else:
         device = 'cpu'
 
-
     train_bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
     test_loader = get_loader(validation_data, model_params, device=device)
 
@@ -447,7 +441,6 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
         device = 'cuda:0'
     else:
         device = 'cpu'
-
 
     train_bag_loader = get_bag_loader(training_data, train_params, model_params, device=device, augment = True)
     test_loader = get_loader(validation_data, model_params, device=device)

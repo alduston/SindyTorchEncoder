@@ -202,8 +202,6 @@ class SindyNet(nn.Module):
             if epoch and (epoch % self.params['threshold_frequency'] == 0):
                 self.coefficient_mask = self.coefficient_mask * torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
                 self.num_active_coeffs = torch.sum(copy(self.coefficient_mask)).cpu().detach().numpy()
-        if self.params['use_activation_mask']:
-            return torch.matmul(Theta, self.activation_mask * sindy_coefficients)
         return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
 
 
