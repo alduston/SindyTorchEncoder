@@ -98,7 +98,7 @@ def PA_test(model_params, training_data, validation_data, run  = 0):
     train_params = {'bag_epochs': 5000, 'nbags': 12, 'bag_size': int(l//8), 'refinement_epochs': 0}
     model_params['batch_size'] = int(l/2)
     model_params['threshold_frequency'] = 25
-    model_params['crossval_freq'] = 25
+    model_params['crossval_freq'] = 200
     model_params['run'] = run
     model_params['pretrain_epochs'] = 100
     net, Loss_dict = parallell_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
