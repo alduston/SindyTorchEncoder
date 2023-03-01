@@ -248,12 +248,12 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 
 
 def run():
-    exp_label='normal_init'
+    exp_label='midscale_sanity_check'
     n_runs = 6
-    param_updates = {'loss_weight_decoder': .1}
-    PAparam_updates = {'coefficient_initialization': 'normal'}
+    param_updates = {'loss_weight_decoder': 1}
+    PAparam_updates = {'coefficient_initialization': 'constant'}
     if torch.cuda.is_available():
-        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, exp_size=(200, np.inf),
+        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, exp_size=(200, 15000),
                                           param_updates = param_updates, PAparam_updates = PAparam_updates)
 
     else:
