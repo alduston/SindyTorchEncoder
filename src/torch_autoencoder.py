@@ -187,7 +187,7 @@ class SindyNet(nn.Module):
         return Theta
 
 
-    def sindy_predict(self, z, x = None, dx = None, idx = None):
+    def sindy_predict(self, z, x = None, dx = None, idx = None, ignore_mask = False):
         Theta = self.Theta(z, x, dx)
         if idx == None:
             sindy_coefficients = self.sindy_coeffs
@@ -200,6 +200,8 @@ class SindyNet(nn.Module):
                 self.num_active_coeffs = torch.sum(copy(self.coefficient_mask)).cpu().detach().numpy()
         if self.params['use_activation_mask']:
             return torch.matmul(Theta, self.activation_mask * sindy_coefficients)
+        if idx!=None:
+            return torch.matmul(Theta, sindy_coefficients)
         return torch.matmul(Theta, self.activation_mask * sindy_coefficients)
 
 
@@ -296,7 +298,8 @@ class SindyNet(nn.Module):
         return loss, loss_refinement, losses
 
 
-    def Loss(self, x, x_decode, z, dx, ddx = None, idx = None, penalize_self = False):
+    def Loss(self, x, x_decode, z, dx, ddx = None, idx = None,
+             penalize_self = False):
         decoder_loss = self.decoder_loss(x, x_decode)
         sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx, idx)
         sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx, idx)
