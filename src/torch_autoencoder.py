@@ -249,7 +249,7 @@ class SindyNet(nn.Module):
     def sindy_reg_loss(self, idx = None, penalize_self = False):
         if idx == None:
             sub_coeffs = self.sindy_coeffs
-            print(sub_coeffs)
+            print(torch.abs(self.coefficient_mask * sub_coeffs))
         else:
             if penalize_self:
                 sub_coeffs = self.sub_model_coeffs[idx]
