@@ -325,7 +325,7 @@ class SindyNet(nn.Module):
     def scramble_Loss(self, x, dx, ddx=None, penalize_self = False):
         idx = x[:,-1]
         x = x[:,:-1]
-        dx = dx[:,-1]
+        dx = dx[:,,-1]
         print(x.shape)
         print(dx.shape)
         x_decode, z = self.forward(x)
