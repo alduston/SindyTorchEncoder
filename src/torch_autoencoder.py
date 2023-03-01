@@ -199,6 +199,8 @@ class SindyNet(nn.Module):
             print(Theta.shape)
             print((self.coefficient_mask * sindy_coefficients).shape)
             print((self.coefficient_mask * alt_sindy_coefficients).shape)
+            print(torch.matmul(Theta, self.coefficient_mask * sindy_coefficients).shape)
+            print(torch.matmul(Theta, self.coefficient_mask * alt_sindy_coefficients).shape)
             print('\n')
 
         epoch = self.epoch
@@ -208,7 +210,7 @@ class SindyNet(nn.Module):
                 self.num_active_coeffs = torch.sum(copy(self.coefficient_mask)).cpu().detach().numpy()
         if self.params['use_activation_mask']:
             return torch.matmul(Theta, self.activation_mask * sindy_coefficients)
-        return torch.matmul(Theta, self.activation_mask * sindy_coefficients)
+        return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
 
 
     def calc_coefficient_mask(self):
