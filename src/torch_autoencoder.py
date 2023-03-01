@@ -5,7 +5,7 @@ import warnings
 from sindy_utils import z_derivative, z_derivative_order2,\
     get_initialized_weights, sindy_library_torch, sindy_library_torch_order2
 import warnings
-from copy import copy
+from copy import copy, deepcopy
 import tensorflow as tf
 warnings.filterwarnings("ignore")
 
@@ -255,8 +255,7 @@ class SindyNet(nn.Module):
             else:
                 #sub_coeffs = torch.sum(self.sub_model_coeffs, dim = 0) * (1/self.params['nbags'])
                 sub_coeffs = self.sub_model_coeffs[idx]
-                #sub_coeffs = torch.sum(self.sub_model_coeffs, dim=0)
-
+                sub_coeffs = sub_coeffs + torch.sum(deepcopy(self.sub_model_coeffs), dim=0) - deepcopy(sub_coeffs)
         return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sub_coeffs))
 
 
