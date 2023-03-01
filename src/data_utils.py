@@ -15,17 +15,32 @@ from torch.utils.data import Dataset, DataLoader
 warnings.filterwarnings("ignore")
 
 
-def make_samples(tensors, n_samples, sample_size, device):
+def augment_sample(sample, n_samples, indexes, device):
+    L = len(sample)
+    indexes = random.choices(indexes, k = L)
+    augmented_sample = []
+    for i,tensor in enumerate(sample):
+        index_tensor = torch.tensor([indexes[i]], device = device, dtype = torch.float32)
+        augmented_tensor = torch.cat((tensor, index_tensor))
+        augmented_sample.append(augmented_tensor)
+    return torch.stack(augmented_sample)
+
+
+def make_samples(tensors, n_samples, sample_size, device, augment = False):
     samples = [[] for tensor in tensors]
     indexes = list(range(0,tensors[0].shape[0]))
     for i in range(n_samples):
         sub_indexes = random.choices(indexes, k = sample_size)
         for i,tensor in enumerate(tensors):
             sample = torch.index_select(tensor, 0, torch.tensor(sub_indexes, device = device))
+            if augment:
+                sample = augment_sample(sample, n_samples, indexes, device)
             samples[i].append(sample)
 
     for i,Sample in enumerate(samples):
         shape = [n_samples * sample_size] + list(tensors[i].shape[1:])
+        if augment:
+            shape[1] += 1
         samples[i] = torch.stack(Sample).reshape(shape)
     return samples
 
@@ -45,8 +60,7 @@ class model_data(Dataset):
         self.dx = torch.tensor(self.data_dict['dx'], dtype=torch.float32, device=self.device)
         self.n_samples = self.x.shape[0]
         if bag_params:
-
-            x_bags,dx_bags = make_samples([self.x,self.dx], n_samples = bag_params['nbags'],
+            x_bags,dx_bags = make_samples([self.x,self.dx], n_samples = bag_params['nbags'], augment = bag_params['augment'],
                                           sample_size = bag_params['bag_size'], device = self.device)
             self.x_bags = x_bags
             self.dx_bags = dx_bags
@@ -130,7 +144,8 @@ def get_loader(data, params, workers = 0, device = 'cpu'):
     return DataLoader(data_class, batch_size=params['batch_size'], num_workers=workers)
 
 
-def get_bag_loader(data, train_params, model_params,  workers = 0, device = 'cpu'):
+def get_bag_loader(data, train_params, model_params,  workers = 0, device = 'cpu', augment = False):
+    train_params['augment'] = augment
     data_class = model_data(data, model_params, device, bag_params = train_params)
     return DataLoader(data_class, batch_size=train_params['bag_size'], num_workers=workers)
 

@@ -10,7 +10,7 @@ from example_lorenz import get_lorenz_data
 import torch
 from sindy_utils import library_size
 import torch_training
-from torch_training import parallell_train_sindy, train_sindy
+from torch_training import parallell_train_sindy, train_sindy, scramble_train_sindy
 from torch_autoencoder import SindyNet
 import pickle
 import warnings
@@ -101,7 +101,7 @@ def PA_test(model_params, training_data, validation_data, run  = 0):
     model_params['crossval_freq'] = 200
     model_params['run'] = run
     model_params['pretrain_epochs'] = 100
-    net, Loss_dict = parallell_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
+    net, Loss_dict = scramble_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
 
@@ -252,6 +252,8 @@ def run():
     param_updates = {'loss_weight_decoder': .1}
     n_runs = 5
     exp_label = 'copy_test'
+    Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
+                                      exp_size=(50, 2500), PAparam_updates=PAparam_updates)
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates= param_updates,
                                           exp_size=(128, np.inf), PAparam_updates = PAparam_updates)

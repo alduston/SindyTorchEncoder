@@ -187,7 +187,7 @@ class SindyNet(nn.Module):
         return Theta
 
 
-    def sindy_predict(self, z, x = None, dx = None, idx = None, ignore_mask = False):
+    def sindy_predict(self, z, x = None, dx = None, idx = None):
         Theta = self.Theta(z, x, dx)
         if idx == None:
             sindy_coefficients = self.sindy_coeffs
@@ -227,7 +227,7 @@ class SindyNet(nn.Module):
 
 
     def ddx_decode(self,z, x, dx, idx = None):
-        sindy_predict = self.sindy_predict(z, x, dx, idx)
+        sindy_predict = self.sindy_predict(z, x, dx)
         decoder_weights, decoder_biases = self.decoder_weights()
         activation = self.params['activation']
         dz = self.dz(x,dx)
@@ -253,9 +253,8 @@ class SindyNet(nn.Module):
             if penalize_self:
                 sub_coeffs = self.sub_model_coeffs[idx]
             else:
-                #sub_coeffs = torch.sum(self.sub_model_coeffs, dim = 0) * (1/self.params['nbags'])
-                sub_coeffs = self.sub_model_coeffs[idx]
-                sub_coeffs = sub_coeffs + torch.sum(copy(self.sub_model_coeffs), dim=0) - copy(sub_coeffs)
+                sub_coeffs = torch.sum(self.sub_model_coeffs, dim = 0) * (1/self.params['nbags'])
+                #sub_coeffs = self.sub_model_coeffs[idx]
         return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sub_coeffs))
 
 
@@ -321,6 +320,26 @@ class SindyNet(nn.Module):
     def auto_Loss(self, x, dx, ddx=None, idx=None, penalize_self = False):
         x_decode, z = self.forward(x)
         return self.Loss(x, x_decode, z, dx, ddx, idx, penalize_self)
+
+
+    def scramble_Loss(self, x, dx, ddx=None, penalize_self = False):
+        idx = x[-1]
+        x = x[:-1]
+        dx = dx[:-1]
+        x_decode, z = self.forward(x)
+        decoder_loss = self.decoder_loss(x, x_decode)
+        sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx, idx)
+        sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx, idx)
+        reg_loss = self.sindy_reg_loss(idx)
+        if penalize_self:
+            self_loss = self.sindy_reg_loss(idx, penalize_self)
+            reg_loss += self_loss
+
+        loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss
+        loss = loss_refinement + reg_loss
+        losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss,
+                  'sindy_x': sindy_x_loss, 'reg': reg_loss}
+        return loss, loss_refinement, losses
 
 
     def bag_loss(self, x, dx, ddx=None):
