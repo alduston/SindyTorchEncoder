@@ -192,17 +192,12 @@ class SindyNet(nn.Module):
         if idx == None:
             sindy_coefficients = self.sindy_coeffs
         else:
-            sindy_coefficients = self.sub_model_coeffs[idx.long()]
-            alt_sindy_coefficients = self.sindy_coeffs
-
-            print(x.shape)
-            print(Theta.shape)
-            print((self.coefficient_mask * sindy_coefficients).shape)
-            print((self.coefficient_mask * alt_sindy_coefficients).shape)
-            print(torch.matmul(Theta, self.coefficient_mask * sindy_coefficients).shape)
-            print(torch.matmul(Theta, self.coefficient_mask * alt_sindy_coefficients).shape)
-            print('\n')
-
+            sindy_coefficients = self.coefficient_mask * self.sub_model_coeffs[idx.long()]
+            predictions = []
+            for coeff_matrix,x in zip(sindy_coefficients, Theta):
+                predictions.append(torch.matmul(coeff_matrix,x))
+                predictions = torch.stack(predictions)
+            return predictions
         epoch = self.epoch
         if self.params['sequential_thresholding']:
             if epoch and (epoch % self.params['threshold_frequency'] == 0):
