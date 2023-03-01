@@ -195,6 +195,7 @@ class SindyNet(nn.Module):
             sindy_coefficients = self.coefficient_mask * self.sub_model_coeffs[idx.long()]
             predictions = []
             for coeff_matrix,x in zip(sindy_coefficients, Theta):
+                print(torch.matmul(torch.transpose(coeff_matrix,0,1),x).shape)
                 predictions.append(torch.matmul(torch.transpose(coeff_matrix,0,1),x))
             predictions = torch.stack(predictions)
             return predictions
