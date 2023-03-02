@@ -110,8 +110,8 @@ def A_test(model_params, training_data, validation_data, run = 0):
     train_params = {'bag_epochs': 0, 'pretrain_epochs': 4500, 'nbags': l // 6, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
                     'refinement_epochs': 500}
-    model_params['batch_size'] = 1024
-    model_params['threshold_frequency'] = 100
+    model_params['batch_size'] = int(l/2)
+    model_params['threshold_frequency'] = 25
     model_params['run'] = run
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
@@ -124,7 +124,7 @@ def A_test_small(model_params, training_data, validation_data, run = 0):
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
                     'refinement_epochs': 5}
     model_params['batch_size'] = int(l/2)
-    model_params['threshold_frequency'] = 5000
+    model_params['threshold_frequency'] = 25
     model_params['run'] = run
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
@@ -247,12 +247,13 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 
 
 def run():
-    exp_label='recovery_test'
-    n_runs = 6
+    #NOTE eurak comit was f76ebcf
+    exp_label= 'eureka_pt2'
+    n_runs = 10
     param_updates = {'loss_weight_decoder': 1}
     PAparam_updates = {'coefficient_initialization': 'constant'}
     if torch.cuda.is_available():
-        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, exp_size=(200, 15000),
+        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, exp_size=(128, np.inf),
                                           param_updates = param_updates, PAparam_updates = PAparam_updates)
 
     else:

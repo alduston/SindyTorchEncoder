@@ -50,8 +50,6 @@ class SindyNet(nn.Module):
         self.sub_model_losses_dict = {}
 
 
-
-
     def Encoder(self, params):
         activation_function = self.get_activation_f(params)
         input_dim = params['input_dim']
@@ -189,11 +187,11 @@ class SindyNet(nn.Module):
 
     def sindy_predict(self, z, x = None, dx = None, idx = None):
         Theta = self.Theta(z, x, dx)
+        epoch = self.epoch
         if idx == None:
             sindy_coefficients = self.sindy_coeffs
         else:
             sindy_coefficients = self.sub_model_coeffs[idx]
-        epoch = self.epoch
         if self.params['sequential_thresholding']:
             if epoch and (epoch % self.params['threshold_frequency'] == 0):
                 self.coefficient_mask = self.coefficient_mask * torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
@@ -225,7 +223,7 @@ class SindyNet(nn.Module):
 
 
     def ddx_decode(self,z, x, dx, idx = None):
-        sindy_predict = self.sindy_predict(z, x, dx)
+        sindy_predict = self.sindy_predict(z, x, dx, idx)
         decoder_weights, decoder_biases = self.decoder_weights()
         activation = self.params['activation']
         dz = self.dz(x,dx)
@@ -262,7 +260,6 @@ class SindyNet(nn.Module):
         if self.params['model_order'] == 1:
             dz = self.dz(x, dx)
             dz_predict = torch.transpose(self.sindy_predict(z, x, dx, idx),0,1)
-            criterion = nn.MSELoss()
             return self.params['loss_weight_sindy_z'] * criterion(dz, dz_predict)
         else:
             ddz = self.ddz(x, dx, ddx)[1]
@@ -286,7 +283,7 @@ class SindyNet(nn.Module):
         decoder_loss = self.decoder_loss(x, x_decode)
         sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx, idx)
         sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx, idx)
-        reg_loss = self.sindy_reg_loss(idx)
+        reg_loss = self.sindy_reg_loss(idx, penalize_self = False)
         if penalize_self:
             self_loss = self.sindy_reg_loss(idx, penalize_self)
             reg_loss += self_loss

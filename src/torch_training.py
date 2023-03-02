@@ -154,7 +154,7 @@ def validate_one_epoch(model, data_loader, true_coeffs = None):
                 for key, val in losses.items():
                     total_loss_dict[key] = val
     if true_coeffs!= None:
-        pred_coeffs = model.sindy_coeffs * model.coefficient_mask
+        pred_coeffs = copy(model.sindy_coeffs) * copy(model.coefficient_mask)
         coeff_loss_val = coeff_pattern_loss(pred_coeffs, true_coeffs)
         total_loss_dict['coeff'] = coeff_loss_val
     return  total_loss, total_loss_dict
@@ -239,6 +239,8 @@ def train_parallel_step(model, data, optimizer, idx, scramble = False):
         else:
             loss, loss_refinement, losses = model.auto_Loss(x=data['x_bag'], dx=data['dx_bag'],
                                                             idx=idx, penalize_self=False)
+            #loss, loss_refinement, losses = model.auto_Loss(x=data['x_bag'], dx=data['dx_bag'], idx=idx, spooky=False, reg=True)
+
     else:
         loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'],
                                                         dxx = data['dxx'], idx = idx)
@@ -265,6 +267,8 @@ def train_paralell_epoch(model, bag_loader, optimizer, scramble = False):
 
     for idx, bag in enumerate(bag_loader):
         loss, loss_refinement, losses = train_parallel_step(model, bag, optimizer, idx, scramble)
+        epoch_loss += loss
+
         if update:
             sub_losses_dict = sub_model_losses_dict[f'{idx}']
             sub_losses_dict['epoch'].append(model.epoch)
@@ -420,7 +424,7 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
             validate_paralell_epoch(net, test_loader, Loss_dict, true_coeffs)
             if printout:
                 print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in Loss_dict.items()])}')
-        if not epoch % crossval_freq and epoch >= net.params['pretrain_epochs']:
+        if (not epoch % crossval_freq) and (epoch >= net.params['pretrain_epochs']):
             net = crossval(net)
         train_paralell_epoch(net, train_bag_loader, optimizer)
 
