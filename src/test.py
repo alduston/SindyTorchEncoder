@@ -97,8 +97,7 @@ def PA_test(model_params, training_data, validation_data, run  = 0):
     l = len(training_data['x'])
     train_params = {'bag_epochs': 5000, 'nbags': 12, 'bag_size': int(l//8), 'refinement_epochs': 0}
     model_params['batch_size'] = int(l/2)
-    model_params['threshold_frequency'] = 25
-    model_params['crossval_freq'] = 100
+    model_params['crossval_freq'] = 25
     model_params['run'] = run
     model_params['pretrain_epochs'] = 100
     net, Loss_dict = parallell_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
@@ -248,7 +247,7 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 
 
 def run():
-    exp_label='midscale_sanity_check'
+    exp_label='recovery_test'
     n_runs = 6
     param_updates = {'loss_weight_decoder': 1}
     PAparam_updates = {'coefficient_initialization': 'constant'}

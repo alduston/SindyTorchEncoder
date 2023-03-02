@@ -7,10 +7,8 @@ from data_utils import get_test_params,get_loader, get_bag_loader
 from sindy_utils import get_initialized_weights
 from math import inf, isinf
 from copy import deepcopy, copy
-from scipy.stats import ttest_1samp
 import matplotlib.pyplot as plt
 from itertools import permutations
-from scipy import stats as st
 import random
 import os
 

@@ -91,7 +91,7 @@ def PA_test_small(model_params, training_data, validation_data, run  = 0):
     return net, Loss_dict
 
 
-def PA_test(model_params, training_data, validation_data, run  = 0):
+def PAS_test(model_params, training_data, validation_data, run  = 0):
     model_params['sequential_thresholding'] = False
     model_params['use_activation_mask'] = False
     l = len(training_data['x'])
@@ -150,7 +150,7 @@ def Meta_test(runs = 5, small = False, exp_label = '', exp_size = (128,np.inf),
             PAnet, PALoss_dict = PA_test_small(pa_params, training_data, validation_data, run = run_ix)
             Anet, ALoss_dict = A_test_small(a_params, training_data, validation_data, run = run_ix)
         else:
-            PAnet, PALoss_dict = PA_test(pa_params, training_data, validation_data, run=run_ix)
+            PAnet, PALoss_dict = PAS_test(pa_params, training_data, validation_data, run=run_ix)
             Anet, ALoss_dict = A_test(a_params, training_data, validation_data, run=run_ix)
 
         for key,val in ALoss_dict.items():
@@ -251,7 +251,7 @@ def run():
     PAparam_updates = {'coefficient_initialization': 'constant'}
     param_updates = {'loss_weight_decoder': .1}
     n_runs = 5
-    exp_label = 'copy_test'
+    exp_label = 'scramble_test'
     Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
                                       exp_size=(50, 2500), PAparam_updates=PAparam_updates)
     if torch.cuda.is_available():

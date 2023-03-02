@@ -111,7 +111,7 @@ def get_test_params(train_size = 100, max_data = 100000):
     params['loss_weight_sindy_z'] = 0.00
     params['loss_weight_sindy_x'] = 1e-4
     params['loss_weight_sindy_regularization'] = 1e-5
-    params['loss_weight_mystery'] = 1e-5
+    params['loss_weight_mystery'] = 0
 
     params['activation'] = 'sigmoid'
     params['widths'] = [64,32]
