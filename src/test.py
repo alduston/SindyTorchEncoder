@@ -248,10 +248,10 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 
 def run():
     #NOTE eurak comit was f76ebcf
-    exp_label= 'eureka_alt'
+    exp_label= 'xavier_.1'
     n_runs = 10
     param_updates = {'loss_weight_decoder': .1}
-    PAparam_updates = {'coefficient_initialization': 'constant'}
+    PAparam_updates = {'coefficient_initialization': 'xavier'}
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, exp_size=(128, np.inf),
                                           param_updates = param_updates, PAparam_updates = PAparam_updates)
