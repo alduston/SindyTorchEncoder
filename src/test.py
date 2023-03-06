@@ -20,20 +20,6 @@ from copy import deepcopy, copy
 
 warnings.filterwarnings("ignore")
 
-#data_path = '../examples/lorenz/'
-#data_path = '../examples/pendulum/'
-#data_path = '../examples/rd/'
-
-#save_name = 'model1'
-#save_name = 'model2'
-
-#params = pickle.load(open(data_path + save_name + '_params.pkl', 'rb'))
-#params['save_name'] = data_path + save_name
-
-
-#x = torch.rand(params['input_dim'])
-#dx = torch.rand(params['input_dim'])
-
 
 def BA_small_test(model_params, training_data, validation_data):
     model_params['sequential_thresholding'] = False
@@ -248,12 +234,12 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 
 def run():
     #NOTE eurak comit was f76ebcf
-    exp_label= 'xavier_1'
-    n_runs = 10
+    exp_label= 'BIG'
+    n_runs = 8
     param_updates = {'loss_weight_decoder': 1}
     PAparam_updates = {'coefficient_initialization': 'xavier'}
     if torch.cuda.is_available():
-        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, exp_size=(128, np.inf),
+        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, exp_size=(512, np.inf),
                                           param_updates = param_updates, PAparam_updates = PAparam_updates)
 
     else:
