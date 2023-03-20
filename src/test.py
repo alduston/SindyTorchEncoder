@@ -233,9 +233,9 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 
 
 def run():
-    exp_label= 'encoder_only'
-    n_runs = 2
-    param_updates = {'loss_weight_decoder': 1, 'loss_weight_sindy_x': 0, 'loss_weight_sindy_regularization': 0}
+    exp_label= 'no_reg'
+    n_runs = 3
+    param_updates = {'loss_weight_decoder': .1, 'loss_weight_sindy_x': 1e-4, 'loss_weight_sindy_regularization': 0}
     PAparam_updates = {'coefficient_initialization': 'xavier', 'crossval_freq': 10000}
     Aparam_updates = {'threshold_frequency': 10000}
     if torch.cuda.is_available():
