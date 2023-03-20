@@ -81,7 +81,7 @@ def PA_test(model_params, training_data, validation_data, run  = 0):
     model_params['sequential_thresholding'] = False
     model_params['use_activation_mask'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 5000, 'nbags': 12, 'bag_size': int(l//8), 'refinement_epochs': 0}
+    train_params = {'bag_epochs': 5000, 'nbags': 8, 'bag_size': int(l//8), 'refinement_epochs': 0}
     model_params['batch_size'] = int(l/2)
     model_params['crossval_freq'] = 25
     model_params['run'] = run
@@ -96,7 +96,7 @@ def A_test(model_params, training_data, validation_data, run = 0):
     train_params = {'bag_epochs': 0, 'pretrain_epochs': 4500, 'nbags': l // 6, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
                     'refinement_epochs': 500}
-    model_params['batch_size'] = int(l/2)
+    model_params['batch_size'] = int(l/8)
     model_params['threshold_frequency'] = 25
     model_params['run'] = run
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
