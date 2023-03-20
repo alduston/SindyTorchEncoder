@@ -251,7 +251,7 @@ def run():
         Meta_A_df = pd.read_csv(f'../data/{exp_label}/Meta_A.csv')
         Meta_PA_df = pd.read_csv(f'../data/{exp_label}/Meta_PA.csv')
 
-    plot_keys = ["decoder_", "active_coeffs_"]
+    plot_keys = ["decoder_", "active_coeffs_", "sindy_x_"]
     get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys=plot_keys)
 
 
