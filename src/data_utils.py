@@ -140,13 +140,13 @@ def get_test_params(train_size = 100, max_data = 100000):
 
 def get_loader(data, params, workers = 0, device = 'cpu'):
     data_class = model_data(data, params, device)
-    return DataLoader(data_class, batch_size=params['batch_size'], num_workers=workers)
+    return DataLoader(data_class, batch_size=params['batch_size'], num_workers=workers, shuffle=False)
 
 
 def get_bag_loader(data, train_params, model_params,  workers = 0, device = 'cpu', augment = False):
     train_params['augment'] = augment
     data_class = model_data(data, model_params, device, bag_params = train_params)
-    return DataLoader(data_class, batch_size=train_params['bag_size'], num_workers=workers)
+    return DataLoader(data_class, batch_size=train_params['bag_size'], num_workers=workers, shuffle=False)
 
 
 def run():

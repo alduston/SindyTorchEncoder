@@ -186,7 +186,7 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 def run():
     PAparam_updates = {'coefficient_initialization': 'xavier'}
     param_updates = {'loss_weight_decoder': .1}
-    n_runs = 3
+    n_runs = 4
     exp_label = 'scramble_test_sum_reg_p1'
 
     if torch.cuda.is_available():
