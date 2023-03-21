@@ -411,6 +411,21 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
     return net, Loss_dict
 
 
+def get_masks(net, train_bag_loader):
+    batch_len = len(train_bag_loader[0]['x_bag'])
+    mask_shape = (batch_len, net.params['latent_dim'])
+    l = batch_len // net.params['nbags']
+    masks = []
+    device = net.device
+    for i in range(net.params['nbags']):
+        mask = torch.zeros(mask_shape, device = device)
+        mask[:, i*l:(i+1)*l] += 1.0
+    masks.append(mask)
+    return torch.stack(masks)
+
+
+
+
 def scramble_train_sindy(model_params, train_params, training_data, validation_data, printout = False):
     Loss_dict = {'epoch': [], 'total': [], 'decoder': [], 'sindy_x': [],
                  'reg': [], 'sindy_z': [], 'active_coeffs': [], 'coeff': []}
@@ -424,6 +439,7 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
 
     net = SindyNet(model_params).to(device)
     net.params['nbags'] = len(train_bag_loader)
+    net.params['coeff_masks'] =  get_masks(net, train_bag_loader)
     sub_model_coeffs = []
     sub_model_losses_dict = {}
 

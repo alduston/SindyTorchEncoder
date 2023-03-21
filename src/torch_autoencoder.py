@@ -184,12 +184,24 @@ class SindyNet(nn.Module):
             Theta = sindy_library_torch_order2(z, dz, latent_dim, poly_order, include_sine, device = self.device)
         return Theta
 
+
     def dist_mult(self, A_tensor, B_tensor):
         xa,ya = A_tensor.shape
         xb,yb,zb = B_tensor.shape
         A_tensor = A_tensor.reshape(xb, xa//xb, ya)
         output_tensor = torch.einsum('bij,bjk->bik', A_tensor, B_tensor)
         return output_tensor.reshape(xa, zb)
+
+
+    def masked_predict(self, Theta, coeffs):
+        for idx,coeff_m in enumerate(coeffs):
+            sub_predict = torch.matmut(Theta, coeff_m)
+            mask = self.params['coeff_masks'][idx]
+            if not idx:
+                sindy_predict = deepcopy(sub_predict)
+            else:
+                sindy_predict += sub_predict
+        return sindy_predict
 
 
     def sindy_predict(self, z, x = None, dx = None, idx = None, scramble = False):
@@ -205,8 +217,8 @@ class SindyNet(nn.Module):
                 self.coefficient_mask = self.coefficient_mask * torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
                 self.num_active_coeffs = torch.sum(copy(self.coefficient_mask)).cpu().detach().numpy()
         if scramble:
-            sindy_predict = self.dist_mult(Theta,  self.sub_model_coeffs)
-            return sindy_predict
+            #sindy_predict = self.dist_mult(Theta,  self.sub_model_coeffs)
+            return self.masked_predict(Theta,  self.sub_model_coeffs)
         return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
 
 
