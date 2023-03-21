@@ -192,8 +192,8 @@ class SindyNet(nn.Module):
         print(f'Coeff tensor has shape {B_tensor.shape}')
 
         A_tensor = A_tensor.reshape(xb, xa//xb, ya)
-        print(f'Reshaped theta tensor has shape {A_tensor.shape}')
-        output_tensor = torch.matmul(B_tensor, A_tensor)
+        output_tensor = torch.stack([torch.matmul(a_tensor, b_tensor)
+                                     for a_tensor, b_tensor in zip(A_tensor, B_tensor)])
 
         print(f'Output tensor has shape {output_tensor.shape}')
         output_tensor.reshape(xa, zb)
