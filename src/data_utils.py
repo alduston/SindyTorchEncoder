@@ -20,8 +20,8 @@ def augment_sample(sample):
     shuffled_samples = []
     l = len(sample[0])//n_bags
 
+    print(sample.shape)
     for i in range(n_bags):
-        print(sample[i].shape)
         shuffled_sample = [bag[i*l:(i+1)*(l)] for bag in sample]
         shuffle_shape = [n_bags*l] + list(sample[0].shape)[1:]
 
