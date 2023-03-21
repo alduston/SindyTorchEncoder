@@ -36,10 +36,9 @@ def PAS_test(model_params, training_data, validation_data, run  = 0):
     model_params['sequential_thresholding'] = False
     model_params['use_activation_mask'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 100, 'nbags': 10, 'bag_size': l//10, 'refinement_epochs': 0}
+    train_params = {'bag_epochs': 5000, 'nbags': 10, 'bag_size': l//10, 'refinement_epochs': 0}
     model_params['batch_size'] = int(l/2)
-    model_params['threshold_frequency'] = 25
-    model_params['crossval_freq'] = 200
+    model_params['crossval_freq'] = 100
     model_params['run'] = run
     model_params['pretrain_epochs'] = 100
     net, Loss_dict = scramble_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
@@ -53,7 +52,7 @@ def A_test(model_params, training_data, validation_data, run = 0):
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
                     'refinement_epochs': 500}
     model_params['batch_size'] = int(l/2)
-    model_params['threshold_frequency'] = 25
+    model_params['threshold_frequency'] = 100
     model_params['run'] = run
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
@@ -186,14 +185,13 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 
 def run():
     PAparam_updates = {'coefficient_initialization': 'xavier'}
-    param_updates = {'loss_weight_decoder': 1}
-    n_runs = 5
+    param_updates = {'loss_weight_decoder': .1}
+    n_runs = 3
     exp_label = 'scramble_test'
-    Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
-                                      exp_size=(50, 2500), PAparam_updates=PAparam_updates)
+
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates= param_updates,
-                                          exp_size=(128, np.inf), PAparam_updates = PAparam_updates)
+                                          exp_size=(100, np.inf), PAparam_updates = PAparam_updates)
     else:
         try:
             os.mkdir(f'../plots/{exp_label}')
@@ -202,7 +200,7 @@ def run():
         Meta_A_df = pd.read_csv(f'../data/{exp_label}/Meta_A.csv')
         Meta_PA_df = pd.read_csv(f'../data/{exp_label}/Meta_PA.csv')
 
-    plot_keys = ["sindy_x_", "decoder_", "active_coeffs_", "sindy_z_"]
+    plot_keys = ["sindy_x_", "decoder_", "active_coeffs_"]
     get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys=plot_keys)
 
 
