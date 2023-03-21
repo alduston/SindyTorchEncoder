@@ -319,7 +319,7 @@ class SindyNet(nn.Module):
         decoder_loss = self.decoder_loss(x, x_decode)
         sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx, scramble = True)
         sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx, scramble = True)
-        reg_loss = self.sindy_reg_loss(idx = True)
+        reg_loss = self.sindy_reg_loss(idx = True, penalize_self = False)
         if penalize_self:
             self_loss = self.sindy_reg_loss(penalize_self)
             reg_loss += self_loss
