@@ -15,17 +15,6 @@ from torch.utils.data import Dataset, DataLoader
 warnings.filterwarnings("ignore")
 
 
-def augment_sample(sample, n_samples, indexes, device):
-    L = len(sample)
-    indexes = random.choices(indexes, k = L)
-    augmented_sample = []
-    for i,tensor in enumerate(sample):
-        index_tensor = torch.tensor([indexes[i]], device = device, dtype = torch.float32)
-        augmented_tensor = torch.cat((tensor, index_tensor))
-        augmented_sample.append(augmented_tensor)
-    return torch.stack(augmented_sample)
-
-
 def make_samples(tensors, n_samples, sample_size, device, augment = False):
     samples = [[] for tensor in tensors]
     indexes = list(range(0,tensors[0].shape[0]))
@@ -33,15 +22,10 @@ def make_samples(tensors, n_samples, sample_size, device, augment = False):
         sub_indexes = random.choices(indexes, k = sample_size)
         for i,tensor in enumerate(tensors):
             sample = torch.index_select(tensor, 0, torch.tensor(sub_indexes, device = device))
-            if augment:
-                sample = augment_sample(sample, n_samples, indexes, device)
             samples[i].append(sample)
 
     for i,Sample in enumerate(samples):
         shape = [n_samples * sample_size] + list(tensors[i].shape[1:])
-        if augment:
-            shape[1] += 1
-        samples[i] = torch.stack(Sample).reshape(shape)
     return samples
 
 

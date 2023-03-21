@@ -239,8 +239,6 @@ def train_parallel_step(model, data, optimizer, idx, scramble = False):
         else:
             loss, loss_refinement, losses = model.auto_Loss(x=data['x_bag'], dx=data['dx_bag'],
                                                             idx=idx, penalize_self=False)
-            #loss, loss_refinement, losses = model.auto_Loss(x=data['x_bag'], dx=data['dx_bag'], idx=idx, spooky=False, reg=True)
-
     else:
         loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'],
                                                         dxx = data['dxx'], idx = idx)
@@ -287,7 +285,6 @@ def train_paralell_epoch(model, bag_loader, optimizer, scramble = False):
 def crossval(model):
     Bag_coeffs = model.sub_model_coeffs
     new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model)
-    #model.coefficient_mask = new_mask
     model.coefficient_mask = model.coefficient_mask * new_mask
     model.num_active_coeffs = int(torch.sum(copy(model.coefficient_mask)).cpu().detach())
     model.sindy_coeffs = torch.nn.Parameter(model.coefficient_mask * avg_coeffs, requires_grad=True)
@@ -301,14 +298,6 @@ def col_permutations(M):
         M_permuted = np.stack([M[:, idx] for idx in perm])
         M_permutes.append(np.transpose(M_permuted))
     return M_permutes
-
-
-#def coeff_pattern_loss(pred_coeffs, true_coeffs, binary = True):
-    #if binary:
-        #pred_coeffs = torch.abs(pred_coeffs) ** 0.00000001
-        #true_coeffs = torch.abs(true_coeffs) ** 0.00000001
-    #losses = [torch.sum(torch.abs(pred_coeffs - ptrue_coeffs)) for ptrue_coeffs in col_permutations(true_coeffs)]
-    #return min(losses)
 
 
 def coeff_pattern_loss(pred_coeffs, true_coeffs, binary = True):

@@ -196,6 +196,8 @@ class SindyNet(nn.Module):
             if epoch and (epoch % self.params['threshold_frequency'] == 0):
                 self.coefficient_mask = self.coefficient_mask * torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
                 self.num_active_coeffs = torch.sum(copy(self.coefficient_mask)).cpu().detach().numpy()
+        print(f'Theta has shape {Theta.shape}')
+        print(f'sub_model_coeffs has shape {self.sub_model_coeffs.shape}')
         return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
 
 
@@ -305,16 +307,13 @@ class SindyNet(nn.Module):
 
 
     def scramble_Loss(self, x, dx, ddx=None, penalize_self = False):
-        idx = x[:,-1]
-        x = x[:,:-1]
-        dx = dx[:,:-1]
         x_decode, z = self.forward(x)
         decoder_loss = self.decoder_loss(x, x_decode)
-        sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx, idx)
-        sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx, idx)
-        reg_loss = self.sindy_reg_loss(idx)
+        sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx)
+        sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
+        reg_loss = self.sindy_reg_loss()
         if penalize_self:
-            self_loss = self.sindy_reg_loss(idx, penalize_self)
+            self_loss = self.sindy_reg_loss(penalize_self)
             reg_loss += self_loss
 
         loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss

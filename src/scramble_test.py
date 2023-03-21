@@ -14,15 +14,12 @@ from torch_training import parallell_train_sindy, train_sindy, scramble_train_si
 from torch_autoencoder import SindyNet
 import pickle
 import warnings
-from data_utils import get_test_params,get_loader
+from data_utils import get_test_params, get_loader
 import matplotlib.pyplot as plt
 from copy import deepcopy, copy
 
 warnings.filterwarnings("ignore")
 
-#data_path = '../examples/lorenz/'
-#data_path = '../examples/pendulum/'
-#data_path = '../examples/rd/'
 
 #save_name = 'model1'
 #save_name = 'model2'
@@ -35,67 +32,11 @@ warnings.filterwarnings("ignore")
 #dx = torch.rand(params['input_dim'])
 
 
-def BA_small_test(model_params, training_data, validation_data):
-    model_params['sequential_thresholding'] = False
-    l = len(training_data['x'])
-    if torch.cuda.is_available():
-        train_params = {'bag_epochs': 165, 'pretrain_epochs': 50, 'nbags': int((1.5 * l) // 75), 'bag_size': 75,
-                    'subtrain_epochs': 70, 'bag_sub_epochs': 15, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                        'refinement_epochs': 100}
-        model_params['batch_size'] = l/10
-    else:
-        train_params = {'bag_epochs': 120, 'pretrain_epochs': 50, 'nbags': int((1.5 * l) // 7), 'bag_size': 7,
-                        'subtrain_epochs': 30, 'bag_sub_epochs': 5, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                        'refinement_epochs': 100}
-        model_params['batch_size'] = 7
-    model_params['threshold_frequency'] = 25
-    net, Loss_dict = torch_training.train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
-    return net, Loss_dict
-
-
-def BA_small_test(model_params, training_data, validation_data):
-    model_params['sequential_thresholding'] = False
-    l = len(training_data['x'])
-    train_params = {'bag_epochs': 120, 'pretrain_epochs': 50, 'nbags': int((1.5 * l) // 7), 'bag_size': 7,
-                    'subtrain_epochs': 30, 'bag_sub_epochs': 5, 'bag_learning_rate': .01,
-                    'shuffle_threshold': 3, 'refinement_epochs': 100}
-    model_params['batch_size'] = 7
-    model_params['threshold_frequency'] = 25
-    net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
-    return net, Loss_dict
-
-
-def BA_test(model_params, training_data, validation_data):
-    model_params['sequential_thresholding'] = False
-    l = len(training_data['x'])
-    train_params = {'bag_epochs': 58, 'pretrain_epochs': 200, 'nbags':  int((1.5 * l) // 250), 'bag_size': 250,
-                    'subtrain_epochs': 100, 'bag_sub_epochs': 20, 'bag_learning_rate': .01, 'shuffle_threshold': 5,
-                    'refinement_epochs': 2000}
-    model_params['batch_size'] = 5000
-    model_params['threshold_frequency'] = 25
-    net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
-    return net, Loss_dict
-
-
-def PA_test_small(model_params, training_data, validation_data, run  = 0):
-    model_params['sequential_thresholding'] = False
-    model_params['use_activation_mask'] = False
-    l = len(training_data['x'])
-    train_params = {'bag_epochs': 50, 'nbags': 10, 'bag_size': int(l//6), 'refinement_epochs': 0}
-    model_params['batch_size'] = int(l/2)
-    model_params['threshold_frequency'] = 25
-    model_params['crossval_freq'] = 25
-    model_params['run'] = run
-    model_params['pretrain_epochs'] = 100
-    net, Loss_dict = parallell_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
-    return net, Loss_dict
-
-
 def PAS_test(model_params, training_data, validation_data, run  = 0):
     model_params['sequential_thresholding'] = False
     model_params['use_activation_mask'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 5000, 'nbags': 10, 'bag_size': int(l//6), 'refinement_epochs': 0}
+    train_params = {'bag_epochs': 100, 'nbags': 10, 'bag_size': 7, 'refinement_epochs': 0}
     model_params['batch_size'] = int(l/2)
     model_params['threshold_frequency'] = 25
     model_params['crossval_freq'] = 200
@@ -132,7 +73,7 @@ def A_test_small(model_params, training_data, validation_data, run = 0):
 
 
 
-def Meta_test(runs = 5, small = False, exp_label = '', exp_size = (128,np.inf),
+def Meta_test(runs = 5, exp_label = '', exp_size = (128,np.inf),
               param_updates = {}, PAparam_updates = {}, Aparam_updates = {}):
     Meta_PA_dict = {}
     Meta_A_dict = {}
@@ -146,12 +87,8 @@ def Meta_test(runs = 5, small = False, exp_label = '', exp_size = (128,np.inf),
         a_params = copy(model_params)
         a_params.update(Aparam_updates)
 
-        if small:
-            PAnet, PALoss_dict = PA_test_small(pa_params, training_data, validation_data, run = run_ix)
-            Anet, ALoss_dict = A_test_small(a_params, training_data, validation_data, run = run_ix)
-        else:
-            PAnet, PALoss_dict = PAS_test(pa_params, training_data, validation_data, run=run_ix)
-            Anet, ALoss_dict = A_test(a_params, training_data, validation_data, run=run_ix)
+        PAnet, PALoss_dict = PAS_test(pa_params, training_data, validation_data, run=run_ix)
+        Anet, ALoss_dict = A_test(a_params, training_data, validation_data, run=run_ix)
 
         for key,val in ALoss_dict.items():
             if key=='epoch':
@@ -248,8 +185,8 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 
 
 def run():
-    PAparam_updates = {'coefficient_initialization': 'constant'}
-    param_updates = {'loss_weight_decoder': .1}
+    PAparam_updates = {'coefficient_initialization': 'xavier'}
+    param_updates = {'loss_weight_decoder': 1}
     n_runs = 5
     exp_label = 'scramble_test'
     Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
@@ -267,7 +204,6 @@ def run():
 
     plot_keys = ["sindy_x_", "decoder_", "active_coeffs_", "sindy_z_"]
     get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys=plot_keys)
-
 
 
 if __name__=='__main__':
