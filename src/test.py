@@ -252,6 +252,11 @@ def run():
     get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys=plot_keys)
 
 
+#TEST: Epoch: 0, Total: 0.038147159, Decoder: 0.036848631, Sindy_x: 0.00129776, Reg: 7.68e-07, Sindy_z: 0.0, Active_coeffs: 60, Coeff: 3
+#TEST: Epoch: 50, Total: 0.00331827, Decoder: 0.002060368, Sindy_x: 0.001257614, Reg: 2.88e-07, Sindy_z: 0.0, Active_coeffs: 60, Coeff: 6
+#TEST: Epoch: 100, Total: 0.00172237, Decoder: 0.000920405, Sindy_x: 0.000800657, Reg: 1.308e-06, Sindy_z: 0.0, Active_coeffs: 60, Coeff: 2
+#TEST: Epoch: 150, Total: 0.001151902, Decoder: 0.000721954, Sindy_x: 0.000428452, Reg: 1.497e-06, Sindy_z: 0.0, Active_coeffs: 60, Coeff: 3
+
 
 if __name__=='__main__':
     run()
