@@ -211,7 +211,7 @@ class SindyNet(nn.Module):
                 self.coefficient_mask = self.coefficient_mask * torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
                 self.num_active_coeffs = torch.sum(copy(self.coefficient_mask)).cpu().detach().numpy()
 
-        self.dist_mult((copy(Theta), copy(self.coefficient_mask * self.sub_model_coeffs)))
+        self.dist_mult(copy(Theta), copy(self.coefficient_mask * self.sub_model_coeffs))
         return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
 
 
