@@ -188,8 +188,6 @@ class SindyNet(nn.Module):
         xa,ya = A_tensor.shape
         xb,yb,zb = B_tensor.shape
         A_tensor = A_tensor.reshape(xb, xa//xb, ya)
-        if self.epoch == 1:
-            print(f'A_tensor has base shape {A_tensor.shape}')
         output_tensor = torch.stack([torch.matmul(a_tensor, b_tensor)
                                      for a_tensor, b_tensor in zip(A_tensor, B_tensor)])
         return output_tensor.reshape(xa, zb)

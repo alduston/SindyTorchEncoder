@@ -22,8 +22,6 @@ def augment_sample(sample):
     for i in range(n_bags):
         shuffled_sample = [bag[i*l:(i+1)*(l)] for bag in sample]
         shuffle_shape = [n_bags*l] + list(sample[0].shape)[1:]
-        if not i:
-            print(f'shuffled_sampele has base shape {torch.stack(shuffled_sample).shape}')
         shuffled_sample = torch.stack(shuffled_sample).reshape(*shuffle_shape)
         shuffled_samples.append(shuffled_sample)
     return shuffled_samples
