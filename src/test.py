@@ -81,8 +81,8 @@ def PA_test(model_params, training_data, validation_data, run  = 0):
     model_params['sequential_thresholding'] = False
     model_params['use_activation_mask'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 5000, 'nbags': 8, 'bag_size': int(l//8), 'refinement_epochs': 0}
-    model_params['batch_size'] = int(l/8)
+    train_params = {'bag_epochs': 5000, 'nbags': 10, 'bag_size': int(l//10), 'refinement_epochs': 0}
+    model_params['batch_size'] = int(l//2)
     model_params['run'] = run
     model_params['pretrain_epochs'] = 100
     net, Loss_dict = parallell_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
@@ -234,13 +234,11 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 def run():
     exp_label= 'no_reg'
     n_runs = 3
-    param_updates = {'loss_weight_decoder': .1, 'loss_weight_sindy_x': 1e-4, 'loss_weight_sindy_regularization': 0}
-    PAparam_updates = {'coefficient_initialization': 'xavier', 'crossval_freq': 10000}
-    Aparam_updates = {'threshold_frequency': 10000}
+    param_updates = {'loss_weight_decoder': .1}
+    PAparam_updates = {'coefficient_initialization': 'xavier'}
     if torch.cuda.is_available():
-        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, exp_size=(128, np.inf),
-                                          param_updates = param_updates,
-                                          PAparam_updates = PAparam_updates, Aparam_updates= Aparam_updates)
+        Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, exp_size=(50, np.inf),
+                                          param_updates = param_updates, PAparam_updates = PAparam_updates)
 
     else:
         try:

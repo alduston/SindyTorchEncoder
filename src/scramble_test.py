@@ -36,8 +36,8 @@ def PAS_test(model_params, training_data, validation_data, run  = 0):
     model_params['sequential_thresholding'] = False
     model_params['use_activation_mask'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 5000, 'nbags': 10, 'bag_size': l//10, 'refinement_epochs': 0}
-    model_params['batch_size'] = int(l/2)
+    train_params = {'bag_epochs': 5000, 'nbags': 10, 'bag_size': int(l//10), 'refinement_epochs': 0}
+    model_params['batch_size'] = int(l//2)
     model_params['crossval_freq'] = 100
     model_params['run'] = run
     model_params['pretrain_epochs'] = 100
@@ -48,7 +48,7 @@ def PAS_test(model_params, training_data, validation_data, run  = 0):
 def A_test(model_params, training_data, validation_data, run = 0):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 4500, 'nbags': l // 6, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 150, 'nbags': l // 6, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
                     'refinement_epochs': 500}
     model_params['batch_size'] = int(l/2)
