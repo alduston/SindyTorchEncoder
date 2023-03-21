@@ -420,7 +420,7 @@ def get_masks(net):
     for i in range(net.params['nbags']):
         mask = torch.zeros(mask_shape, device = device)
         mask[:, i*l:(i+1)*l] += 1.0
-    masks.append(mask)
+        masks.append(mask)
     return torch.stack(masks)
 
 
