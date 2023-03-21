@@ -19,18 +19,17 @@ def augment_sample(sample):
     n_bags = len(sample)
     shuffled_samples = []
     l = len(sample[0])//n_bags
-    for val_sample in sample:
-        for i in range(len(val_sample)):
-            shuffled_sample = [bag[i*l:(i+1)*(l)] for bag in val_sample]
-            shuffle_shape = [n_bags*l] + list(sample[0].shape)[1:]
+    
+    shuffled_sample = [bag[i*l:(i+1)*(l)] for bag in sample]
+    shuffle_shape = [n_bags*l] + list(sample[0].shape)[1:]
 
-            print(torch.stack(shuffled_sample).shape)
-            print(shuffle_shape)
+    print(torch.stack(shuffled_sample).shape)
+    print(shuffle_shape)
 
-            shuffled_sample = torch.stack(shuffled_sample).reshape(*shuffle_shape)
-            shuffled_samples.append(shuffled_sample)
-        print(val_sample.shape)
-        print(torch.stack(shuffled_samples).shape)
+    shuffled_sample = torch.stack(shuffled_sample).reshape(*shuffle_shape)
+    shuffled_samples.append(shuffled_sample)
+    print(sample.shape)
+    print(torch.stack(shuffled_samples).shape)
     return torch.stack(shuffled_samples)
 
 
@@ -46,8 +45,8 @@ def make_samples(tensors, n_samples, sample_size, device, augment = False):
     for i,Sample in enumerate(samples):
         shape = [n_samples * sample_size] + list(tensors[i].shape[1:])
         samples[i] = torch.stack(Sample).reshape(shape)
-    if augment:
-        samples = augment_sample(samples)
+        if augment:
+            samples[i] = augment_sample(samples)
     return samples
 
 
