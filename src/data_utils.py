@@ -15,7 +15,7 @@ from torch.utils.data import Dataset, DataLoader
 warnings.filterwarnings("ignore")
 
 
-def augment_sample(sample, device):
+def augment_sample(sample):
     n_bags = len(sample)
     shuffled_samples = []
     l = len(sample[0])//n_bags
