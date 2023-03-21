@@ -189,6 +189,7 @@ class SindyNet(nn.Module):
         xb,yb,zb = B_tensor.shape
         A_tensor = A_tensor.reshape(xb, xa//xb, ya)
         output_tensor = torch.einsum('bij,bjk->bik', A_tensor, B_tensor)
+        print(B_tensor[0])
         return output_tensor.reshape(xa, zb)
 
 
