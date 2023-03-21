@@ -24,10 +24,10 @@ def augment_sample(sample):
         shuffle_shape = [n_bags*l] + list(sample[0].shape)[1:]
         shuffled_sample = torch.stack(shuffled_sample).reshape(*shuffle_shape)
         shuffled_samples.append(shuffled_sample)
-        
+
     print(f'Orginial had shape {torch.stack(sample).shape}')
     print(f'Shuffled had shape {torch.stack(shuffled_samples).shape}')
-    return torch.stack(shuffled_samples)
+    return shuffled_samples
 
 
 def make_samples(tensors, n_samples, sample_size, device, augment = False):
