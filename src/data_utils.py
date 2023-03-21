@@ -19,12 +19,13 @@ def augment_sample(sample):
     n_bags = len(sample)
     shuffled_samples = []
     l = len(sample[0])//n_bags
-    
-    shuffled_sample = [bag[i*l:(i+1)*(l)] for bag in sample]
-    shuffle_shape = [n_bags*l] + list(sample[0].shape)[1:]
 
-    print(torch.stack(shuffled_sample).shape)
-    print(shuffle_shape)
+    for i in range(n_bags):
+        shuffled_sample = [bag[i*l:(i+1)*(l)] for bag in sample]
+        shuffle_shape = [n_bags*l] + list(sample[0].shape)[1:]
+
+        print(torch.stack(shuffled_sample).shape)
+        print(shuffle_shape)
 
     shuffled_sample = torch.stack(shuffled_sample).reshape(*shuffle_shape)
     shuffled_samples.append(shuffled_sample)
