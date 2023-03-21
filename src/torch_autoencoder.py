@@ -191,7 +191,7 @@ class SindyNet(nn.Module):
         #output_tensor = torch.einsum('bij,bjk->bik', A_tensor, B_tensor)
         #return output_tensor.reshape(xa, zb)
         output_tensor = torch.matmul(A_tensor, B_tensor)
-        print(B_tensor[0])
+        print(B_tensor)
         return output_tensor
 
 
