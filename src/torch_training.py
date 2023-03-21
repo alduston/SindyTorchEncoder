@@ -224,7 +224,7 @@ def train_parallel_step(model, data, optimizer, idx, scramble = False):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
         if scramble:
-            loss, loss_refinement, losses = model.scramble_Loss(x = data['x_bag'], dx = data['dx_bag'],
+            loss, loss_refinement, losses = model.scramble_Loss(x = data['x_bag'], dx = data['dx_bag'], idx=idx,
                                                                 penalize_self=False)
         else:
             loss, loss_refinement, losses = model.auto_Loss(x=data['x_bag'], dx=data['dx_bag'],

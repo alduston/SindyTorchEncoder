@@ -203,7 +203,6 @@ class SindyNet(nn.Module):
 
 
     def sindy_predict(self, z, x = None, dx = None, idx = None, scramble = False):
-        scramble = False
         Theta = self.Theta(z, x, dx)
         epoch = self.epoch
         if idx == None:
@@ -324,12 +323,12 @@ class SindyNet(nn.Module):
         return self.Loss(x, x_decode, z, dx, ddx, idx, penalize_self)
 
 
-    def scramble_Loss(self, x, dx, ddx=None, penalize_self = False):
+    def scramble_Loss(self, x, dx, ddx=None, penalize_self = False, idx = None):
         x_decode, z = self.forward(x)
         decoder_loss = self.decoder_loss(x, x_decode)
-        sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx, scramble = True)
-        sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx, scramble = True)
-        reg_loss = self.sindy_reg_loss(idx = True, penalize_self = False)
+        sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx, idx = idx, scramble = True)
+        sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx, idx = idx, scramble = True)
+        reg_loss = self.sindy_reg_loss(idx = idx, penalize_self = False)
         if penalize_self:
             self_loss = self.sindy_reg_loss(penalize_self)
             reg_loss += self_loss
