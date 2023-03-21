@@ -197,12 +197,13 @@ class SindyNet(nn.Module):
         sindy_predict = torch.zeros(masks[0].shape, device = self.device)
         for idx,coeff_m in enumerate(coeffs):
             mask = masks[idx]
-            sub_predict = mask * torch.matmut(Theta, coeff_m)
+            sub_predict = mask * torch.matmul(Theta, coeff_m)
             sindy_predict += sub_predict
         return sindy_predict
 
 
-    def sindy_predict(self, z, x = None, dx = None, idx = None, scramble = False):
+    def sindy_predict(self, z, x = None, dx = None, idx = None,  scramble = False):
+        scramble = False
         Theta = self.Theta(z, x, dx)
         epoch = self.epoch
         if idx == None:
