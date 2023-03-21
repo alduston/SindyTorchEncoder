@@ -184,7 +184,7 @@ class SindyNet(nn.Module):
             Theta = sindy_library_torch_order2(z, dz, latent_dim, poly_order, include_sine, device = self.device)
         return Theta
 
-    def dist_mult(A_tensor, B_tensor):
+    def dist_mult(self, A_tensor, B_tensor):
         xa,ya = A_tensor.shape
         xb,yb,zb = B_tensor.shape
 
