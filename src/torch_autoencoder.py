@@ -205,8 +205,7 @@ class SindyNet(nn.Module):
                 self.coefficient_mask = self.coefficient_mask * torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
                 self.num_active_coeffs = torch.sum(copy(self.coefficient_mask)).cpu().detach().numpy()
         if scramble:
-            predict = torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
-            print(self.coefficient_mask * sindy_coefficients)
+            predict = torch.einsum('ij,jk->ki', Theta, self.coefficient_mask * sindy_coefficients)
             return predict
         return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
 
