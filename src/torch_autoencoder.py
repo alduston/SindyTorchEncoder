@@ -206,8 +206,9 @@ class SindyNet(nn.Module):
                 self.num_active_coeffs = torch.sum(copy(self.coefficient_mask)).cpu().detach().numpy()
         if scramble:
             predict = torch.einsum('ij,jk->ik', Theta, self.coefficient_mask * sindy_coefficients)
-            return predict
+            return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
         return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
+
 
 
     def calc_coefficient_mask(self):
@@ -343,3 +344,9 @@ class SindyNet(nn.Module):
         return loss
 
 
+'''
+TEST: Epoch: 0, Total: 0.035985537, Decoder: 0.034785271, Sindy_x: 0.001199497, Reg: 7.68e-07, Sindy_z: 0.0, Active_coeffs: 60, Coeff: 5
+TEST: Epoch: 50, Total: 0.002646168, Decoder: 0.00144647, Sindy_x: 0.001199697, Reg: 1e-09, Sindy_z: 0.0, Active_coeffs: 60, Coeff: 7
+TEST: Epoch: 100, Total: 0.001987437, Decoder: 0.000787857, Sindy_x: 0.001199579, Reg: 1e-09, Sindy_z: 0.0, Active_coeffs: 60, Coeff: 7
+TEST: Epoch: 150, Total: 0.001857645, Decoder: 0.000658096, Sindy_x: 0.001199548, Reg: 1e-09, Sindy_z: 0.0, Active_coeffs: 50, Coeff: 7
+'''
