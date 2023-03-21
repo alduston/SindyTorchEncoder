@@ -449,7 +449,6 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
                                        init_param = init_param, device = net.device))
         sub_model_losses_dict[f'{idx}'] = deepcopy(Loss_dict)
         if idx == 0:
-            print(bag)
             net.params['bag_size'] = len(bag['x_bag'])
 
     net.params['coeff_masks'] = get_masks(net)
