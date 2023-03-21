@@ -41,7 +41,6 @@ def make_samples(tensors, n_samples, sample_size, device, augment = False):
             Sample = augment_sample(Sample)
         shape = [n_samples * sample_size] + list(tensors[i].shape[1:])
         samples[i] = torch.stack(Sample).reshape(shape)
-
     return samples
 
 
