@@ -185,14 +185,12 @@ class SindyNet(nn.Module):
         return Theta
 
     def dist_mult(self, A_tensor, B_tensor):
-        #xa,ya = A_tensor.shape
-        #xb,yb,zb = B_tensor.shape
-        #A_tensor = A_tensor.reshape(xb, xa//xb, ya)
-        #output_tensor = torch.einsum('bij,bjk->bik', A_tensor, B_tensor)
-        #return output_tensor.reshape(xa, zb)
-        output_tensor = torch.matmul(A_tensor, B_tensor)
-        print(B_tensor)
-        return output_tensor
+        xa,ya = A_tensor.shape
+        xb,yb,zb = B_tensor.shape
+        A_tensor = A_tensor.reshape(xb, xa//xb, ya)
+        output_tensor = torch.einsum('bij,bjk->bik', A_tensor, B_tensor)
+        return output_tensor.reshape(xa, zb)
+
 
 
     def sindy_predict(self, z, x = None, dx = None, idx = None, scramble = False):
@@ -207,7 +205,8 @@ class SindyNet(nn.Module):
                 self.coefficient_mask = self.coefficient_mask * torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
                 self.num_active_coeffs = torch.sum(copy(self.coefficient_mask)).cpu().detach().numpy()
         if scramble:
-            predict = self.dist_mult(Theta, self.coefficient_mask * self.sub_model_coeffs[0])
+            predict = torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
+            print(self.coefficient_mask * sindy_coefficients)
             return predict
         return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
 
