@@ -184,6 +184,20 @@ class SindyNet(nn.Module):
             Theta = sindy_library_torch_order2(z, dz, latent_dim, poly_order, include_sine, device = self.device)
         return Theta
 
+    def dist_mult(A_tensor, B_tensor):
+        xa,ya = A_tensor.shape
+        xb,yb,zb = B_tensor.shape
+
+        print(f'Theta has shape {A_tensor.shape}')
+        print(f'Coeff tensor has shape {B_tensor.shape}')
+
+        A_tensor = A_tensor.reshape(xb, xa//xb, ya)
+        output_tensor = torch.matmul(B_tensor, A_tensor)
+
+        print(f'Output tensor has shape {output_tensor.shape}')
+        output_tensor.reshape(xa, zb)
+        return output_tensor
+
 
     def sindy_predict(self, z, x = None, dx = None, idx = None):
         Theta = self.Theta(z, x, dx)
@@ -196,8 +210,8 @@ class SindyNet(nn.Module):
             if epoch and (epoch % self.params['threshold_frequency'] == 0):
                 self.coefficient_mask = self.coefficient_mask * torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
                 self.num_active_coeffs = torch.sum(copy(self.coefficient_mask)).cpu().detach().numpy()
-        print(f'Theta has shape {Theta.shape}')
-        print(f'sub_model_coeffs has shape {self.sub_model_coeffs.shape}')
+
+        self.dist_mult((copy(Theta), copy(self.coefficient_mask * self.sub_model_coeffs)))
         return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
 
 
