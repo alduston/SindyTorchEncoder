@@ -411,8 +411,8 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
     return net, Loss_dict
 
 
-def get_masks(net, train_bag_loader):
-    batch_len = len(train_bag_loader[0]['x_bag'])
+def get_masks(net):
+    batch_len = net.params['bag_size']
     mask_shape = (batch_len, net.params['latent_dim'])
     l = batch_len // net.params['nbags']
     masks = []
@@ -422,7 +422,6 @@ def get_masks(net, train_bag_loader):
         mask[:, i*l:(i+1)*l] += 1.0
     masks.append(mask)
     return torch.stack(masks)
-
 
 
 
@@ -439,7 +438,6 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
 
     net = SindyNet(model_params).to(device)
     net.params['nbags'] = len(train_bag_loader)
-    net.params['coeff_masks'] =  get_masks(net, train_bag_loader)
     sub_model_coeffs = []
     sub_model_losses_dict = {}
 
@@ -450,6 +448,11 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
         sub_model_coeffs.append(get_initialized_weights([library_dim, latent_dim], initializer,
                                        init_param = init_param, device = net.device))
         sub_model_losses_dict[f'{idx}'] = deepcopy(Loss_dict)
+        if idx == 0:
+            print(bag)
+            net.params['bag_size'] = len(bag['x_bag'])
+
+    net.params['coeff_masks'] = get_masks(net)
     sub_model_test_losses_dict = deepcopy(sub_model_losses_dict)
 
     sub_model_coeffs = torch.stack(sub_model_coeffs)
