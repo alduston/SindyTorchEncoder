@@ -26,7 +26,7 @@ def augment_sample(sample, n_samples, indexes, device):
     return torch.stack(augmented_sample)
 
 
-def make_samples(tensors, n_samples, sample_size, device):
+def make_samples(tensors, n_samples, sample_size, device, augment = None):
     samples = [[] for tensor in tensors]
     indexes = list(range(0,tensors[0].shape[0]))
     for i in range(n_samples):
