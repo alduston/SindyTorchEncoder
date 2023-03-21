@@ -452,6 +452,7 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
             net.params['bag_size'] = len(bag['x_bag'])
 
     net.params['coeff_masks'] = get_masks(net)
+    print(net.params['coeff_masks'].shape)
     sub_model_test_losses_dict = deepcopy(sub_model_losses_dict)
 
     sub_model_coeffs = torch.stack(sub_model_coeffs)
