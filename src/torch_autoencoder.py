@@ -188,13 +188,7 @@ class SindyNet(nn.Module):
         xa,ya = A_tensor.shape
         xb,yb,zb = B_tensor.shape
         A_tensor = A_tensor.reshape(xb, xa//xb, ya)
-        output_tensor = torch.stack([torch.matmul(a_tensor, b_tensor)
-                                     for a_tensor, b_tensor in zip(A_tensor, B_tensor)])
-        if self.epoch==1:
-            alt_output = torch.einsum('bij,bjk->bik', A_tensor, B_tensor)
-            print(alt_output.shape)
-            print(output_tensor.shape)
-
+        output_tensor = torch.einsum('bij,bjk->bik', A_tensor, B_tensor)
         return output_tensor.reshape(xa, zb)
 
 
