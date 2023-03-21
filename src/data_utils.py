@@ -15,18 +15,22 @@ from torch.utils.data import Dataset, DataLoader
 warnings.filterwarnings("ignore")
 
 
-def augment_sample(sample, n_samples, indexes, device):
-    L = len(sample)
-    indexes = random.choices(indexes, k = L)
-    augmented_sample = []
-    for i,tensor in enumerate(sample):
-        #index_tensor = torch.tensor([indexes[i]], device = device, dtype = torch.float32)
-        #augmented_tensor = torch.cat((tensor, index_tensor))
-        augmented_sample.append(tensor)
-    return torch.stack(augmented_sample)
+def augment_sample(sample, device):
+    n_bags = len(sample)
+    shuffled_samples = []
+    l = len(sample[0])//n_bags
+    for i in range(len(sample)):
+        shuffled_sample = [bag[i*l:i*(l+1)] for bag in sample]
+        shuffle_shape = [n_bags*l] + sample[0].shape[1:]
+
+        shuffled_sample = torch.stack(shuffled_sample).reshape(*shuffle_shape)
+        shuffled_samples.append(shuffled_sample)
+    print(sample.shape)
+    print(torch.stack(shuffled_samples).shape)
+    return torch.stack(shuffled_samples)
 
 
-def make_samples(tensors, n_samples, sample_size, device, augment = None):
+def make_samples(tensors, n_samples, sample_size, device, augment = False):
     samples = [[] for tensor in tensors]
     indexes = list(range(0,tensors[0].shape[0]))
     for i in range(n_samples):
@@ -38,6 +42,8 @@ def make_samples(tensors, n_samples, sample_size, device, augment = None):
     for i,Sample in enumerate(samples):
         shape = [n_samples * sample_size] + list(tensors[i].shape[1:])
         samples[i] = torch.stack(Sample).reshape(shape)
+    if augment:
+        samples = augment(samples)
     return samples
 
 

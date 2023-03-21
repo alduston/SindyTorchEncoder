@@ -187,20 +187,14 @@ class SindyNet(nn.Module):
     def dist_mult(self, A_tensor, B_tensor):
         xa,ya = A_tensor.shape
         xb,yb,zb = B_tensor.shape
-
-        print(f'Theta has shape {A_tensor.shape}')
-        print(f'Coeff tensor has shape {B_tensor.shape}')
-
         A_tensor = A_tensor.reshape(xb, xa//xb, ya)
         output_tensor = torch.stack([torch.matmul(a_tensor, b_tensor)
                                      for a_tensor, b_tensor in zip(A_tensor, B_tensor)])
-
-        print(f'Output tensor has shape {output_tensor.shape}')
         output_tensor.reshape(xa, zb)
         return output_tensor
 
 
-    def sindy_predict(self, z, x = None, dx = None, idx = None):
+    def sindy_predict(self, z, x = None, dx = None, idx = None, scramble = False):
         Theta = self.Theta(z, x, dx)
         epoch = self.epoch
         if idx == None:
@@ -211,8 +205,8 @@ class SindyNet(nn.Module):
             if epoch and (epoch % self.params['threshold_frequency'] == 0):
                 self.coefficient_mask = self.coefficient_mask * torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
                 self.num_active_coeffs = torch.sum(copy(self.coefficient_mask)).cpu().detach().numpy()
-
-        self.dist_mult(copy(Theta), copy(self.coefficient_mask * self.sub_model_coeffs))
+        if scramble:
+            return self.dist_mult(copy(Theta), self.coefficient_mask * self.sub_model_coeffs)
         return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
 
 
@@ -231,16 +225,16 @@ class SindyNet(nn.Module):
         return sindy_coefficients * coefficient_mask
 
 
-    def dx_decode(self,z, x, dx = None, idx = None):
-        sindy_predict = self.sindy_predict(z, x, dx, idx)
+    def dx_decode(self,z, x, dx = None, idx = None, scramble = False):
+        sindy_predict = self.sindy_predict(z, x, dx, idx, scramble)
         decoder_weights, decoder_biases = self.decoder_weights()
         activation = self.params['activation']
         dx_decode = z_derivative(z, sindy_predict, decoder_weights, decoder_biases, activation=activation)
         return dx_decode
 
 
-    def ddx_decode(self,z, x, dx, idx = None):
-        sindy_predict = self.sindy_predict(z, x, dx, idx)
+    def ddx_decode(self,z, x, dx, idx = None, scramble = False):
+        sindy_predict = self.sindy_predict(z, x, dx, idx, scramble)
         decoder_weights, decoder_biases = self.decoder_weights()
         activation = self.params['activation']
         dz = self.dz(x,dx)
@@ -272,19 +266,19 @@ class SindyNet(nn.Module):
         return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sub_coeffs))
 
 
-    def sindy_z_loss(self, z, x, dx, ddx = None, idx = None):
+    def sindy_z_loss(self, z, x, dx, ddx = None, idx = None,  scramble = False):
         criterion = nn.MSELoss()
         if self.params['model_order'] == 1:
             dz = self.dz(x, dx)
-            dz_predict = torch.transpose(self.sindy_predict(z, x, dx, idx),0,1)
+            dz_predict = torch.transpose(self.sindy_predict(z, x, dx, idx, scramble),0,1)
             return self.params['loss_weight_sindy_z'] * criterion(dz, dz_predict)
         else:
             ddz = self.ddz(x, dx, ddx)[1]
-            ddz_predict = torch.transpose(self.sindy_predict(z, x, dx, idx),0,1)
+            ddz_predict = torch.transpose(self.sindy_predict(z, x, dx, idx, scramble),0,1)
             return  self.params['loss_weight_sindy_z'] * criterion(ddz , ddz_predict)
 
 
-    def sindy_x_loss(self, z, x, dx, ddx = None, idx = None):
+    def sindy_x_loss(self, z, x, dx, ddx = None, idx = None, scramble = False):
         criterion = nn.MSELoss()
         if self.params['model_order'] == 1:
             dx_decode = torch.transpose(self.dx_decode(z, x, dx, idx),0,1)
@@ -324,8 +318,8 @@ class SindyNet(nn.Module):
     def scramble_Loss(self, x, dx, ddx=None, penalize_self = False):
         x_decode, z = self.forward(x)
         decoder_loss = self.decoder_loss(x, x_decode)
-        sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx)
-        sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
+        sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx, scramble = True)
+        sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx, scramble = True)
         reg_loss = self.sindy_reg_loss()
         if penalize_self:
             self_loss = self.sindy_reg_loss(penalize_self)
