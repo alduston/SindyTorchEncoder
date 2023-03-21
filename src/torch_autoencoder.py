@@ -192,8 +192,8 @@ class SindyNet(nn.Module):
         return output_tensor.reshape(xa, zb)
 
 
-
     def sindy_predict(self, z, x = None, dx = None, idx = None, scramble = False):
+        scramble = False
         Theta = self.Theta(z, x, dx)
         epoch = self.epoch
         if idx == None:
