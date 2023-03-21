@@ -211,16 +211,6 @@ def train_sindy(model_params, train_params, training_data, validation_data, prin
                          mode = 'pretrain', print_freq = 50, test_loader = test_loader,
                          printout= printout, Loss_dict = Loss_dict)
 
-    #if train_params['bag_epochs']:
-        #bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
-        #shuffle_threshold = train_params['shuffle_threshold']
-        #for epoch in range(train_params['bag_epochs']):
-            #if epoch and not epoch%shuffle_threshold:
-                #bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
-            #net  = train_bag_epochs(net, bag_loader, model_params, train_params)
-            #net, loss_dict ,Loss_dict = subtrain_sindy(net, train_loader, model_params,train_params,
-                                            #mode='subtrain', print_freq = 50, test_loader = test_loader,
-                                            #printout= printout,  Loss_dict = Loss_dict)
     if train_params['refinement_epochs']:
         net.params['sequential_thresholding'] = False
         net, loss_dict,Loss_dict = subtrain_sindy(net, train_loader, model_params, train_params,
@@ -419,10 +409,6 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
 
     net, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict)
     return net, Loss_dict
-
-    #train_loader = get_loader(training_data, model_params, device=device)
-    #net, loss_dict, Loss_dict = subtrain_sindy(net, train_loader, model_params, train_params, mode='refinement',
-                                               #print_freq=50, test_loader=test_loader, printout=printout, Loss_dict=Loss_dict
 
 
 def scramble_train_sindy(model_params, train_params, training_data, validation_data, printout = False):
