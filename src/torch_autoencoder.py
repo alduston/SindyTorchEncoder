@@ -189,7 +189,7 @@ class SindyNet(nn.Module):
         xb,yb,zb = B_tensor.shape
         A_tensor = A_tensor.reshape(xb, xa//xb, ya)
         output_tensor = torch.einsum('bij,bjk->bik', A_tensor, B_tensor)
-        print(B_tensor[0])
+
         return output_tensor.reshape(xa, zb)
 
 
@@ -205,7 +205,7 @@ class SindyNet(nn.Module):
                 self.coefficient_mask = self.coefficient_mask * torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
                 self.num_active_coeffs = torch.sum(copy(self.coefficient_mask)).cpu().detach().numpy()
         if scramble:
-            predict = self.dist_mult(copy(Theta), self.coefficient_mask * self.sub_model_coeffs)
+            predict = self.dist_mult(Theta, self.coefficient_mask * self.sub_model_coeffs)
             return predict
         return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
 
