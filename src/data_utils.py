@@ -27,6 +27,7 @@ def augment_sample(sample):
     return shuffled_samples
 
 
+
 def make_samples(tensors, n_samples, sample_size, device, augment = False):
     samples = [[] for tensor in tensors]
     indexes = list(range(0,tensors[0].shape[0]))
@@ -40,7 +41,9 @@ def make_samples(tensors, n_samples, sample_size, device, augment = False):
         if augment:
             Sample = augment_sample(Sample)
         shape = [n_samples * sample_size] + list(tensors[i].shape[1:])
-        samples[i] = torch.stack(Sample).reshape(shape)
+        base = torch.zeros(shape, device = device)
+        base += torch.stack(Sample).reshape(len(Sample)//shape[0], shape[0])
+        samples[i] = base
     return samples
 
 
