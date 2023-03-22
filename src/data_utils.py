@@ -49,8 +49,7 @@ def make_samples(tensors, n_samples, sample_size, device, augment = False):
             sample_stack = sample_stack.reshape(l, shape[-1])
             paddings = (0,0, 0, shape[0]- sample_stack.shape[0])
             padded_stack = torch.nn.functional.pad(sample_stack,paddings, 'constant')
-            print(padded_stack.shape)
-            samples[i] = torch.pad(sample_stack,paddings, 'CONSTANT')
+            samples[i] = padded_stack
     return samples
 
 
