@@ -168,13 +168,6 @@ def run():
 
     bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
 
-    #training_data = model_data(training_data, params)
-    #validation_data = model_data(validation_data, params)
-
-    #train_loader = DataLoader(training_data, batch_size=params['batch_size'], num_workers=0)
-    #validate_loader = DataLoader(validation_data, batch_size=params['batch_size'], num_workers=4)
-    i = 0
-
 
 if __name__=='__main__':
     run()
