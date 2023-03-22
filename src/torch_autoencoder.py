@@ -20,7 +20,7 @@ def clear_plt():
 
 
 def plot_mask(mask, j):
-    mask = deepcopy(mask)
+    mask = copy(mask)
     mask = mask.detach().cpu().numpy()
     mask = mask.T
     strech_mask = torch.zeros(500, 600)
