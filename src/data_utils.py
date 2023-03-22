@@ -41,9 +41,15 @@ def make_samples(tensors, n_samples, sample_size, device, augment = False):
         if augment:
             Sample = augment_sample(Sample)
         shape = [n_samples * sample_size] + list(tensors[i].shape[1:])
-        base = torch.zeros(shape, device = device)
-        base += torch.stack(Sample).reshape(len(Sample)//shape[0], shape[0])
-        samples[i] = base
+        try:
+            torch.stack(Sample).reshape(shape)
+        except BaseException:
+            base = torch.zeros(shape, device = device)
+            print(base.shape)
+            print(shape)
+            print(sample.shape)
+            base += torch.stack(Sample).reshape(max(Sample.shape)//shape[0], shape[0])
+            samples[i] = base
     return samples
 
 
