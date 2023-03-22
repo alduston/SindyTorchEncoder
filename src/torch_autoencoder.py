@@ -222,7 +222,7 @@ class SindyNet(nn.Module):
             mask = masks[idx]
             sub_predict = mask * torch.matmul(Theta, coeff_m)
             sindy_predict += sub_predict
-            plot_mask(sindy_predict, idx)
+            #plot_mask(sindy_predict, idx)
         return sindy_predict
 
 

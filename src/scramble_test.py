@@ -171,16 +171,13 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 def run():
     PAparam_updates = {'coefficient_initialization': 'xavier'}
     param_updates = {'loss_weight_decoder': .1}
-    n_runs = 1
-    exp_label = 'test_run'
-
-    Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
-                                      exp_size=(20, 4000), PAparam_updates=PAparam_updates)
+    n_runs = 5
+    exp_label = 'masked_ensemble'
 
 
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates= param_updates,
-                                          exp_size=(200, np.inf), PAparam_updates = PAparam_updates)
+                                          exp_size=(128, np.inf), PAparam_updates = PAparam_updates)
     else:
         try:
             os.mkdir(f'../plots/{exp_label}')
