@@ -47,8 +47,12 @@ def make_samples(tensors, n_samples, sample_size, device, augment = False):
             base = torch.zeros(shape, device = device)
             print(base.shape)
             print(shape)
-            print(sample.shape)
-            base += torch.stack(Sample).reshape(max(Sample.shape)//shape[0], shape[0])
+            print(Sample.shape)
+            sample_stack = torch.stack(Sample)
+            sample_stack = sample_stack.reshape(max(sample_stack.shape)//shape[0], shape[0])
+            print(sample_stack.shape)
+            base = torch.zeros(shape, device)
+            base += sample_stack
             samples[i] = base
     return samples
 
