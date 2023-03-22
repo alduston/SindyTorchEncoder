@@ -6,6 +6,7 @@ from sindy_utils import z_derivative, z_derivative_order2,\
     get_initialized_weights, sindy_library_torch, sindy_library_torch_order2
 import warnings
 from copy import copy, deepcopy
+import numpy as np
 import matplotlib.pyplot as plt
 #import tensorflow as tf
 warnings.filterwarnings("ignore")
@@ -26,6 +27,7 @@ def plot_mask(mask, j):
     strech_mask = torch.zeros(500, 600)
     for i in range(200):
         strech_mask[:, 3*i: 3*(i+1)] += mask.T
+    strech_mask = np.abs(strech_mask) ** .00000001
     plt.imshow(strech_mask)
     plt.savefig(f'../data/misk/mask_{j}.png')
     clear_plt()
