@@ -36,7 +36,7 @@ def PAS_test(model_params, training_data, validation_data, run  = 0):
     model_params['sequential_thresholding'] = False
     model_params['use_activation_mask'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 5000, 'nbags': 10, 'bag_size': int(l//10), 'refinement_epochs': 0}
+    train_params = {'bag_epochs': 5000, 'nbags': 24, 'bag_size': int(l//8), 'refinement_epochs': 0}
     model_params['batch_size'] = int(l//2)
     model_params['crossval_freq'] = 100
     model_params['run'] = run
@@ -187,7 +187,7 @@ def run():
     PAparam_updates = {'coefficient_initialization': 'xavier'}
     param_updates = {'loss_weight_decoder': .1}
     n_runs = 8
-    exp_label = 'scramble_test2_sum_low_reg'
+    exp_label = 'many_bag'
 
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates= param_updates,
