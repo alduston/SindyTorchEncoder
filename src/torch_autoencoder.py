@@ -198,6 +198,9 @@ class SindyNet(nn.Module):
         for idx,coeff_m in enumerate(coeffs):
             mask = masks[idx]
             sub_predict = mask * torch.matmul(Theta, coeff_m)
+            print(mask.shape)
+            print(torch.matmul(Theta, coeff_m).shape)
+            print('\n\n')
             sindy_predict += sub_predict
         return sindy_predict
 
