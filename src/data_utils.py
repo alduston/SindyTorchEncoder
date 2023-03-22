@@ -44,15 +44,13 @@ def make_samples(tensors, n_samples, sample_size, device, augment = False):
         try:
             torch.stack(Sample).reshape(shape)
         except BaseException:
-            base = torch.zeros(shape, device = device)
-            print(base.shape)
-            print(shape)
             sample_stack = torch.stack(Sample)
             l = int(sample_stack.shape[0] * sample_stack.shape[1])
             sample_stack = sample_stack.reshape(l, shape[-1])
-            print(sample_stack.shape)
-            base += sample_stack
-            samples[i] = base
+            paddings = [[0, shape[0]- sample_stack.shape[0]], [0,0]]
+            padded_stack = torch.pad(sample_stack,paddings, 'CONSTANT')
+            print(padded_stack.shape)
+            samples[i] = torch.pad(sample_stack,paddings, 'CONSTANT')
     return samples
 
 
