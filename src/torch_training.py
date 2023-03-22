@@ -437,7 +437,6 @@ def get_masks(net):
     return torch.stack(masks)
 
 
-
 def scramble_train_sindy(model_params, train_params, training_data, validation_data, printout = False):
     Loss_dict = {'epoch': [], 'total': [], 'decoder': [], 'sindy_x': [],
                  'reg': [], 'sindy_z': [], 'active_coeffs': [], 'coeff': []}
