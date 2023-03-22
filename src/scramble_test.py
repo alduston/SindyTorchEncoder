@@ -38,9 +38,9 @@ def PAS_test(model_params, training_data, validation_data, run  = 0):
     l = len(training_data['x'])
     train_params = {'bag_epochs': 5000, 'nbags': 24, 'bag_size': int(l//8), 'refinement_epochs': 0}
     model_params['batch_size'] = int(l//2)
-    model_params['crossval_freq'] = 100
+    model_params['crossval_freq'] = 50
     model_params['run'] = run
-    model_params['pretrain_epochs'] = 100
+    model_params['pretrain_epochs'] = 3
     net, Loss_dict = scramble_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
@@ -187,7 +187,7 @@ def run():
     PAparam_updates = {'coefficient_initialization': 'xavier'}
     param_updates = {'loss_weight_decoder': .1}
     n_runs = 5
-    exp_label = 'many_bag'
+    exp_label = 'no_delay'
 
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates= param_updates,
