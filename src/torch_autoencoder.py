@@ -6,8 +6,29 @@ from sindy_utils import z_derivative, z_derivative_order2,\
     get_initialized_weights, sindy_library_torch, sindy_library_torch_order2
 import warnings
 from copy import copy, deepcopy
+import matplotlib.pyplot as plt
 #import tensorflow as tf
 warnings.filterwarnings("ignore")
+
+
+def clear_plt():
+    plt.figure().clear()
+    plt.close()
+    plt.cla()
+    plt.clf()
+    return True
+
+
+def plot_mask(mask, j):
+    mask = deepcopy(mask)
+    mask = mask.detach().cpu().numpy()
+    mask = mask.T
+    strech_mask = torch.zeros(500, 600)
+    for i in range(200):
+        strech_mask[:, 3*i: 3*(i+1)] += mask.T
+    plt.imshow(strech_mask)
+    plt.savefig(f'../data/misk/mask_{j}.png')
+    clear_plt()
 
 
 class SindyNet(nn.Module):
@@ -198,10 +219,8 @@ class SindyNet(nn.Module):
         for idx,coeff_m in enumerate(coeffs):
             mask = masks[idx]
             sub_predict = mask * torch.matmul(Theta, coeff_m)
-            print(mask.shape)
-            print(torch.matmul(Theta, coeff_m).shape)
-            print('\n\n')
             sindy_predict += sub_predict
+            plot_mask(sindy_predict, idx)
         return sindy_predict
 
 
