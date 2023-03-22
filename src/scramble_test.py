@@ -17,19 +17,19 @@ import warnings
 from data_utils import get_test_params, get_loader
 import matplotlib.pyplot as plt
 from copy import deepcopy, copy
-
 warnings.filterwarnings("ignore")
 
 
-#save_name = 'model1'
-#save_name = 'model2'
-
-#params = pickle.load(open(data_path + save_name + '_params.pkl', 'rb'))
-#params['save_name'] = data_path + save_name
-
-
-#x = torch.rand(params['input_dim'])
-#dx = torch.rand(params['input_dim'])
+def PA_test(model_params, training_data, validation_data, run  = 0):
+    model_params['sequential_thresholding'] = False
+    model_params['use_activation_mask'] = False
+    l = len(training_data['x'])
+    train_params = {'bag_epochs': 5000, 'nbags': 10, 'bag_size': int(l//10), 'refinement_epochs': 0}
+    model_params['batch_size'] = int(l//2)
+    model_params['run'] = run
+    model_params['pretrain_epochs'] = 100
+    net, Loss_dict = parallell_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
+    return net, Loss_dict
 
 
 def PAS_test(model_params, training_data, validation_data, run  = 0):
@@ -53,19 +53,6 @@ def A_test(model_params, training_data, validation_data, run = 0):
                     'refinement_epochs': 500}
     model_params['batch_size'] = int(l/2)
     model_params['threshold_frequency'] = 100
-    model_params['run'] = run
-    net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
-    return net, Loss_dict
-
-
-def A_test_small(model_params, training_data, validation_data, run = 0):
-    model_params['sequential_thresholding'] = True
-    l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 45, 'nbags': l // 6, 'bag_size': 100,
-                    'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                    'refinement_epochs': 5}
-    model_params['batch_size'] = int(l/2)
-    model_params['threshold_frequency'] = 25
     model_params['run'] = run
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
@@ -114,7 +101,6 @@ def Meta_test(runs = 5, exp_label = '', exp_size = (128,np.inf),
     for key in A_keys:
         if len(Meta_A_dict[key])!=l2:
             Meta_A_dict.pop(key, None)
-
     try:
         os.mkdir(f'../data/{exp_label}/')
     except OSError:
@@ -161,7 +147,6 @@ def avg_trajectory_plot(Meta_A_df, Meta_PA_df, A_avg, PA_avg, exp_label, plot_ke
     return True
 
 
-
 def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_","decoder_", "active_coeffs_"]):
     try:
         os.mkdir(f'../plots/{exp_label}')
@@ -188,6 +173,9 @@ def run():
     param_updates = {'loss_weight_decoder': .1}
     n_runs = 1
     exp_label = 'test_run'
+    Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
+                                      exp_size=(20, 4000), PAparam_updates=PAparam_updates)
+
 
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates= param_updates,

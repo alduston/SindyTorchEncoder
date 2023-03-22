@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from itertools import permutations
 import random
 import os
+from matplotlib.pyplot import figure
 
 
 def clear_plt():
@@ -411,16 +412,27 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
     return net, Loss_dict
 
 
+def plot_mask(mask, j):
+    mask = deepcopy(mask)
+    mask = mask.detach().cpu().numpy()
+    mask = mask.T
+    strech_mask = torch.zeros(500, 600)
+    for i in range(200):
+        strech_mask[:, 3*i: 3*(i+1)] += mask.T
+    plt.imshow(strech_mask)
+    plt.savefig(f'../data/misk/mask_{j}.png')
+    clear_plt()
+
+
 def get_masks(net):
     batch_len = net.params['bag_size']
     mask_shape = (batch_len, net.params['latent_dim'])
     l = batch_len // net.params['nbags']
     masks = []
     device = net.device
-    for i in range(net.params['nbags']):
+    for i in range(net.params['nbags'] + 1):
         mask = torch.zeros(mask_shape, device = device)
-        mask[:, i*l:(i+1)*l] += 1.0
-        masks.append(mask)
+        mask[i*l:(i+1)*l, :] += 1.0
     return torch.stack(masks)
 
 

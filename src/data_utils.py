@@ -27,7 +27,6 @@ def augment_sample(sample):
     return shuffled_samples
 
 
-
 def make_samples(tensors, n_samples, sample_size, device, augment = False):
     samples = [[] for tensor in tensors]
     indexes = list(range(0,tensors[0].shape[0]))

@@ -6,7 +6,7 @@ from sindy_utils import z_derivative, z_derivative_order2,\
     get_initialized_weights, sindy_library_torch, sindy_library_torch_order2
 import warnings
 from copy import copy, deepcopy
-import tensorflow as tf
+#import tensorflow as tf
 warnings.filterwarnings("ignore")
 
 
