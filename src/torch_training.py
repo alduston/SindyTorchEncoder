@@ -77,7 +77,9 @@ def coeff_var(coeff_tensor):
     return var
 
 
-def process_bag_coeffs(Bag_coeffs, model):
+def process_bag_coeffs(Bag_coeffs, model, noise_excess = 0):
+    noise_tensor = torch.randn(Bag_coeffs.shape) * np.sqrt(noise_excess)
+    noise_bag_coeffs = deepcopy(Bag_coeffs) + noise_tensor
     new_mask =  np.zeros(Bag_coeffs.shape[1:])
     x,y = new_mask.shape
 
@@ -87,12 +89,11 @@ def process_bag_coeffs(Bag_coeffs, model):
     ip_thresh = 2/3
     for ix in range(x):
         for iy in range(y):
-            coeffs_vec = Bag_coeffs[:,ix,iy]
+            coeffs_vec = noise_bag_coeffs[:,ix,iy]
             ip = sum([abs(val) > .1 for val in coeffs_vec])/len(coeffs_vec)
             if ip > ip_thresh:
                 new_mask[ix, iy] = 1
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = model.params['device'])
-    print(f'Coeffs had var {coeff_var(Bag_coeffs)}')
     return new_mask, avg_coeffs
 
 
@@ -283,9 +284,10 @@ def train_paralell_epoch(model, bag_loader, optimizer, scramble = False):
     return model
 
 
-def crossval(model):
+def crossval(model, Loss_dict):
+    noise_excess = 10*(Loss_dict['decoder'][-1] - np.exp(-12))
     Bag_coeffs = model.sub_model_coeffs
-    new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model)
+    new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model, noise_excess)
     model.coefficient_mask = model.coefficient_mask * new_mask
     model.num_active_coeffs = int(torch.sum(copy(model.coefficient_mask)).cpu().detach())
     model.sindy_coeffs = torch.nn.Parameter(model.coefficient_mask * avg_coeffs, requires_grad=True)
@@ -483,7 +485,7 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
 
     crossval_freq = net.params['crossval_freq']
     test_freq = net.params['test_freq']
-    optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'], capturable=True)
+    optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'], capturable = torch.cuda.is_available())
     true_coeffs = net.true_coeffs
     for epoch in range(train_params['bag_epochs']):
         if not epoch % test_freq:
@@ -491,7 +493,7 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
             if printout:
                 print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in Loss_dict.items()])}')
         if not epoch % crossval_freq and epoch >= net.params['pretrain_epochs']:
-            net = crossval(net)
+            net = crossval(net, Loss_dict)
         train_paralell_epoch(net, train_bag_loader, optimizer, scramble=True)
 
     net, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict)
