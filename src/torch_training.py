@@ -67,6 +67,15 @@ def frac_round(vec,val):
 def f_check(tensor, ix, iy):
     return torch.abs(tensor[ix, iy]) < .1
 
+def coeff_var(coeff_tensor):
+    coeff_tensor = copy(coeff_tensor)
+    m_shape = (coeff_tensor.shape[0],coeff_tensor.shape[1]*coeff_tensor.shape[2])
+    coeff_matrix = coeff_tensor.reshape(m_shape)
+    coeff_matrix = coeff_matrix.detach().cpu().numpy()
+    covar = np.cov(coeff_matrix)
+    var = np.trace(covar)
+    return var
+
 
 def process_bag_coeffs(Bag_coeffs, model):
     new_mask =  np.zeros(Bag_coeffs.shape[1:])
@@ -83,6 +92,7 @@ def process_bag_coeffs(Bag_coeffs, model):
             if ip > ip_thresh:
                 new_mask[ix, iy] = 1
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = model.params['device'])
+    print(f'Coeffs had var {coeff_var(Bag_coeffs)}')
     return new_mask, avg_coeffs
 
 
