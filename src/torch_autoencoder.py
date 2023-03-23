@@ -216,14 +216,15 @@ class SindyNet(nn.Module):
         return output_tensor.reshape(xa, zb)
 
 
-    def masked_predict(self, Theta, coeffs):
+    def masked_predict(self, Theta, coeffs, i):
         masks = self.params['coeff_masks']
         sindy_predict = torch.zeros(masks[0].shape, device = self.device)
         for idx,coeff_m in enumerate(coeffs):
-            mask = masks[idx]
-            sub_predict = mask * torch.matmul(Theta, coeff_m)
+            #mask = masks[idx]
+            #sub_predict = mask * torch.matmul(Theta, coeff_m)
+            if idx==i:
+                sub_predict = torch.matmul(Theta, coeff_m)
             sindy_predict += sub_predict
-
         return sindy_predict
 
 
@@ -239,7 +240,7 @@ class SindyNet(nn.Module):
                 self.coefficient_mask = self.coefficient_mask * torch.tensor(torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'], device=self.device)
                 self.num_active_coeffs = torch.sum(copy(self.coefficient_mask)).cpu().detach().numpy()
         if scramble:
-            return self.masked_predict(Theta,  self.sub_model_coeffs)
+            return self.masked_predict(Theta,  self.sub_model_coeffs, idx)
         return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
 
 
@@ -315,11 +316,11 @@ class SindyNet(nn.Module):
     def sindy_x_loss(self, z, x, dx, ddx = None, idx = None, scramble = False):
         criterion = nn.MSELoss()
         if self.params['model_order'] == 1:
-            dx_decode = torch.transpose(self.dx_decode(z, x, dx, idx),0,1)
+            dx_decode = torch.transpose(self.dx_decode(z, x, dx, idx, scramble),0,1)
             return self.params['loss_weight_sindy_x'] * criterion(dx , dx_decode)
         else:
-            dx_decode, ddx_decode = self.ddx_decode(z, x, dx, idx)
-            ddx_decode = torch.transpose(ddx_decode,0,1,)
+            dx_decode, ddx_decode = self.ddx_decode(z, x, dx, idx, scramble)
+            ddx_decode = torch.transpose(ddx_decode,0,1)
             return  self.params['loss_weight_sindy_x'] * criterion(ddx , ddx_decode)
 
 
