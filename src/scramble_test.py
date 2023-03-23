@@ -172,7 +172,7 @@ def run():
     PAparam_updates = {'coefficient_initialization': 'xavier'}
     param_updates = {'loss_weight_decoder': .1}
     n_runs = 4
-    exp_label = 'masked_ensemble'
+    exp_label = 'true_masked_ensemble'
 
 
     if torch.cuda.is_available():
