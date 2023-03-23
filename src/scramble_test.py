@@ -51,7 +51,7 @@ def A_test(model_params, training_data, validation_data, run = 0):
     train_params = {'bag_epochs': 0, 'pretrain_epochs': 4500, 'nbags': l // 6, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
                     'refinement_epochs': 500}
-    model_params['batch_size'] = int(l/2)
+    model_params['batch_size'] = int(l//2)
     model_params['threshold_frequency'] = 100
     model_params['run'] = run
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
@@ -163,7 +163,7 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
             trajectory_plot(Meta_A_df, Meta_PA_df, exp_label, key, i)
 
         avg_A *= (1/n_runs)
-        avg_PA *= (1 / n_runs)
+        avg_PA *= (1/n_runs)
         avg_trajectory_plot(Meta_A_df, Meta_PA_df, avg_A, avg_PA, exp_label, key)
     return True
 

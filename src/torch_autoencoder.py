@@ -215,6 +215,7 @@ class SindyNet(nn.Module):
         output_tensor = torch.einsum('bij,bjk->bik', A_tensor, B_tensor)
         return output_tensor.reshape(xa, zb)
 
+
     def masked_predict(self, Theta, coeffs):
         masks = self.params['coeff_masks']
         sindy_predict = torch.zeros(masks[0].shape, device = self.device)
@@ -222,7 +223,7 @@ class SindyNet(nn.Module):
             mask = masks[idx]
             sub_predict = mask * torch.matmul(Theta, coeff_m)
             sindy_predict += sub_predict
-            #plot_mask(sindy_predict, idx)
+
         return sindy_predict
 
 
@@ -314,11 +315,11 @@ class SindyNet(nn.Module):
     def sindy_x_loss(self, z, x, dx, ddx = None, idx = None, scramble = False):
         criterion = nn.MSELoss()
         if self.params['model_order'] == 1:
-            dx_decode = torch.transpose(self.dx_decode(z, x, dx, idx),0,1)
+            dx_decode = torch.transpose(self.dx_decode(z, x, dx, idx, scramble),0,1)
             return self.params['loss_weight_sindy_x'] * criterion(dx , dx_decode)
         else:
-            dx_decode, ddx_decode = self.ddx_decode(z, x, dx, idx)
-            ddx_decode = torch.transpose(ddx_decode,0,1)
+            dx_decode, ddx_decode = self.ddx_decode(z, x, dx, idx,scramble)
+            ddx_decode = torch.transpose(ddx_decode,0,1,)
             return  self.params['loss_weight_sindy_x'] * criterion(ddx , ddx_decode)
 
 
