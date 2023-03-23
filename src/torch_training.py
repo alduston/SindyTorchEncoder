@@ -78,7 +78,7 @@ def coeff_var(coeff_tensor):
 
 
 def process_bag_coeffs(Bag_coeffs, model, noise_excess = 0):
-    noise_tensor = torch.randn(Bag_coeffs.shape) * np.sqrt(noise_excess)
+    noise_tensor = torch.randn(Bag_coeffs.shape, device = model.device) * np.sqrt(noise_excess)
     noise_bag_coeffs = deepcopy(Bag_coeffs) + noise_tensor
     new_mask =  np.zeros(Bag_coeffs.shape[1:])
     x,y = new_mask.shape
