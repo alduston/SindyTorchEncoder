@@ -224,7 +224,7 @@ class SindyNet(nn.Module):
             #sub_predict = mask * torch.matmul(Theta, coeff_m)
             if idx==i:
                 sub_predict = torch.matmul(Theta, coeff_m)
-            sindy_predict += sub_predict
+                sindy_predict += sub_predict
         return sindy_predict
 
 
@@ -242,7 +242,6 @@ class SindyNet(nn.Module):
         if scramble:
             return self.masked_predict(Theta,  self.sub_model_coeffs, idx)
         return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
-
 
 
     def calc_coefficient_mask(self):
