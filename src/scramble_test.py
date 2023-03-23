@@ -36,9 +36,9 @@ def PAS_test(model_params, training_data, validation_data, run  = 0):
     model_params['sequential_thresholding'] = False
     model_params['use_activation_mask'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 5000, 'nbags': 24, 'bag_size': int(l//8), 'refinement_epochs': 0}
+    train_params = {'bag_epochs': 15000, 'nbags': 24, 'bag_size': int(l//8), 'refinement_epochs': 0}
     model_params['batch_size'] = int(l//2)
-    model_params['crossval_freq'] = 25
+    model_params['crossval_freq'] = 50
     model_params['run'] = run
     model_params['pretrain_epochs'] = 1
     net, Loss_dict = scramble_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
@@ -48,9 +48,9 @@ def PAS_test(model_params, training_data, validation_data, run  = 0):
 def A_test(model_params, training_data, validation_data, run = 0):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 4500, 'nbags': l // 6, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 13500, 'nbags': l // 6, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                    'refinement_epochs': 500}
+                    'refinement_epochs': 1500}
     model_params['batch_size'] = int(l//2)
     model_params['threshold_frequency'] = 50
     model_params['run'] = run
@@ -172,7 +172,7 @@ def run():
     PAparam_updates = {'coefficient_initialization': 'xavier'}
     param_updates = {'loss_weight_decoder': .1}
     n_runs = 5
-    exp_label = 'var_test'
+    exp_label = 'longer_test'
 
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates= param_updates,
