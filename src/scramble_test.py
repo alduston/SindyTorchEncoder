@@ -169,7 +169,7 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label, plot_keys = ["sindy_x_",
 
 
 def run():
-    PAparam_updates = {'coefficient_initialization': 'xavier'}
+    PAparam_updates = {'coefficient_initialization': 'xavier', 'add_noise': True}
     param_updates = {'loss_weight_decoder': .1}
     n_runs = 5
     exp_label = 'longer_test'

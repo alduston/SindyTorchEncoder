@@ -78,9 +78,10 @@ def coeff_var(coeff_tensor):
 
 
 def process_bag_coeffs(Bag_coeffs, model, noise_excess = 0):
-    noise_excess = 0
-    noise_tensor = torch.randn(Bag_coeffs.shape, device = model.device) * (noise_excess)
-    noise_bag_coeffs = deepcopy(Bag_coeffs) + noise_tensor
+    bag_coeffs = deepcopy(Bag_coeffs)
+    if noise_excess:
+        noise_tensor = torch.randn(Bag_coeffs.shape, device = model.device) * (noise_excess)
+        bag_coeffs += noise_tensor
     new_mask =  np.zeros(Bag_coeffs.shape[1:])
     x,y = new_mask.shape
 
@@ -90,7 +91,7 @@ def process_bag_coeffs(Bag_coeffs, model, noise_excess = 0):
     ip_thresh = 2/3
     for ix in range(x):
         for iy in range(y):
-            coeffs_vec = noise_bag_coeffs[:,ix,iy]
+            coeffs_vec = bag_coeffs[:,ix,iy]
             ip = sum([abs(val) > .1 for val in coeffs_vec])/len(coeffs_vec)
             if ip > ip_thresh:
                 new_mask[ix, iy] = 1
@@ -286,7 +287,10 @@ def train_paralell_epoch(model, bag_loader, optimizer, scramble = False):
 
 
 def crossval(model, Loss_dict):
-    noise_excess = np.sqrt(10 * Loss_dict['decoder'][-1]) - np.sqrt(10*np.exp(-12))
+    noise_excess = 0
+    if model.params['add_noise']:
+        noise_excess += np.sqrt(10 * Loss_dict['decoder'][-1]) - np.sqrt(10*np.exp(-12))
+        print(noise_excess)
     Bag_coeffs = model.sub_model_coeffs
     new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model, noise_excess)
     model.coefficient_mask = model.coefficient_mask * new_mask
