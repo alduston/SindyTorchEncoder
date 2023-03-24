@@ -322,7 +322,7 @@ def coeff_pattern_loss(pred_coeffs, true_coeffs, binary = True):
         leq_M = pred_coeffs[np.where(pred_coeffs + .1 < permutation)]
         L_minus = len(leq_M)
         losses.append(L_minus)
-    return min(losses)
+    return min(losses)/np.sum(true_coeffs > 0)
 
 
 def validate_paralell_epoch(model, data_loader, Loss_dict, true_coeffs = None):
@@ -502,7 +502,6 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
         train_paralell_epoch(net, train_bag_loader, optimizer, scramble=True)
 
     net, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict)
-    print(Loss_dict['coeff'])
     return net, Loss_dict
 
 
