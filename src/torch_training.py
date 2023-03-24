@@ -78,7 +78,7 @@ def coeff_var(coeff_tensor):
 
 
 def process_bag_coeffs(Bag_coeffs, model, noise_excess = 0):
-    bag_coeffs = deepcopy(Bag_coeffs)
+    bag_coeffs = copy(Bag_coeffs).detach()
     if noise_excess:
         noise_tensor = torch.randn(Bag_coeffs.shape, device = model.device) * (noise_excess)
         bag_coeffs += noise_tensor
