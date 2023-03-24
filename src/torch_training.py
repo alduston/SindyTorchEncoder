@@ -168,7 +168,7 @@ def validate_one_epoch(model, data_loader, true_coeffs = None):
                 for key, val in losses.items():
                     total_loss_dict[key] = val
     if true_coeffs!= None:
-        pred_coeffs = copy(model.sindy_coeffs) * copy(model.coefficient_mask)
+        pred_coeffs = copy(model.coefficient_mask)
         coeff_loss_val = coeff_pattern_loss(pred_coeffs, true_coeffs)
         total_loss_dict['coeff'] = coeff_loss_val
     return  total_loss, total_loss_dict
@@ -358,7 +358,7 @@ def validate_paralell_epoch(model, data_loader, Loss_dict, true_coeffs = None):
     Loss_dict['total'].append(float(total_loss.cpu().detach()))
 
     if true_coeffs != None:
-        pred_coeffs = val_model.sindy_coeffs * val_model.coefficient_mask
+        pred_coeffs = val_model.coefficient_mask
         coeff_loss_val = coeff_pattern_loss(pred_coeffs, true_coeffs)
         Loss_dict['coeff'].append(coeff_loss_val)
 
@@ -456,7 +456,7 @@ def get_masks(net):
 
 def scramble_train_sindy(model_params, train_params, training_data, validation_data, printout = False):
     Loss_dict = {'epoch': [], 'total': [], 'decoder': [], 'sindy_x': [],
-                 'reg': [], 'sindy_z': [], 'active_coeffs': [], 'coeff': []}
+                 'reg': [], 'sindy_z': [], 'active_coeffs': [], 'coeff': [0.0]}
     if torch.cuda.is_available():
         device = 'cuda:0'
     else:
@@ -494,7 +494,7 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
     true_coeffs = net.true_coeffs
     for epoch in range(train_params['bag_epochs']):
         if not epoch % test_freq:
-            validate_paralell_epoch(net, test_loader, Loss_dict, true_coeffs)
+            val_model, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict, true_coeffs)
             if printout:
                 print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in Loss_dict.items()])}')
         if not epoch % crossval_freq and epoch >= net.params['pretrain_epochs']:
@@ -502,6 +502,7 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
         train_paralell_epoch(net, train_bag_loader, optimizer, scramble=True)
 
     net, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict)
+    print(Loss_dict['coeff'])
     return net, Loss_dict
 
 
