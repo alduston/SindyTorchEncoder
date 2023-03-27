@@ -303,8 +303,8 @@ True
 def run():
     PAparam_updates = {'coefficient_initialization': 'xavier'}
     param_updates = {'loss_weight_decoder': .1}
-    n_runs = 1
-    exp_label = 'sub_test_1'
+    n_runs = 6
+    exp_label = 'sub_test'
 
     if torch.cuda.is_available():
         Meta_PA_df = Meta_sub_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
