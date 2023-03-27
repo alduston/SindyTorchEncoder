@@ -38,10 +38,10 @@ def PAS_test(model_params, training_data, validation_data, run  = 0):
     model_params['add_noise'] = False
     l = len(training_data['x'])
     train_params = {'bag_epochs': 8000, 'nbags': 24, 'bag_size': int(l//8), 'refinement_epochs': 0}
-    model_params['batch_size'] = int(l//8)
-    model_params['crossval_freq'] = 50
+    model_params['batch_size'] = int(l//2)
+    model_params['crossval_freq'] = 40
     model_params['run'] = run
-    model_params['pretrain_epochs'] = 1
+    model_params['pretrain_epochs'] = 50
     net, Loss_dict = scramble_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
@@ -52,8 +52,8 @@ def A_test(model_params, training_data, validation_data, run = 0):
     train_params = {'bag_epochs': 0, 'pretrain_epochs': 7000, 'nbags': l // 6, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
                     'refinement_epochs': 1000}
-    model_params['batch_size'] = int(l//8)
-    model_params['threshold_frequency'] = 50
+    model_params['batch_size'] = int(l//2)
+    model_params['threshold_frequency'] = 100
     model_params['run'] = run
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
@@ -173,12 +173,12 @@ def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label,
 def run():
     PAparam_updates = {'coefficient_initialization': 'xavier'}
     param_updates = {'loss_weight_decoder': .1}
-    n_runs = 10
-    exp_label = 'Ensemble_Results_Bscale'
+    n_runs = 20
+    exp_label = 'Ensemble_Results'
 
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates= param_updates,
-                                          exp_size=(512, np.inf), PAparam_updates = PAparam_updates)
+                                          exp_size=(128, np.inf), PAparam_updates = PAparam_updates)
     else:
         try:
             os.mkdir(f'../plots/{exp_label}')
