@@ -148,6 +148,7 @@ def train_one_epoch(model, data_loader, optimizer, scheduler = None):
 def validate_one_step(model, data):
     if model.params['model_order'] == 1:
             loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'])
+
     else:
         loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx=data['dxx'])
     return loss, loss_refinement, losses
@@ -308,6 +309,9 @@ def col_permutations(M):
     return M_permutes
 
 
+def coinflip():
+    return random.choice([True, False])
+
 def coeff_pattern_loss(pred_coeffs, true_coeffs, binary = True):
     pred_coeffs = copy(pred_coeffs).detach().cpu().numpy()
     true_coeffs = copy(true_coeffs).detach().cpu().numpy()
@@ -324,6 +328,7 @@ def coeff_pattern_loss(pred_coeffs, true_coeffs, binary = True):
         losses.append(L_minus)
     return min(losses)/np.sum(true_coeffs > 0)
 
+
 def validate_paralell_epochs(model, data_loader, Loss_dict, idx = None, true_coeffs = None):
     model.eval()
     total_loss = 0
@@ -331,6 +336,7 @@ def validate_paralell_epochs(model, data_loader, Loss_dict, idx = None, true_coe
     Bag_coeffs = copy(model.sub_model_coeffs)
     coeffs = Bag_coeffs[idx]
     val_model = copy(model)
+
     val_model.sindy_coeffs = torch.nn.Parameter(coeffs, requires_grad=True)
     for batch_index, data in enumerate(data_loader):
         with torch.no_grad():
@@ -342,6 +348,7 @@ def validate_paralell_epochs(model, data_loader, Loss_dict, idx = None, true_coe
             else:
                 for key, val in losses.items():
                     total_loss_dict[key] = val
+
     Loss_dict[f'bag{idx}_epoch'].append(int(model.epoch))
     Loss_dict[f'bag{idx}_active_coeffs'].append(int(torch.sum(val_model.coefficient_mask).cpu().detach()))
     Loss_dict[f'bag{idx}_total'].append(float(total_loss.cpu().detach()))
@@ -355,6 +362,14 @@ def validate_paralell_epochs(model, data_loader, Loss_dict, idx = None, true_coe
         Loss_dict[f'bag{idx}_{key}'].append(float(val.detach().cpu()))
     return val_model, Loss_dict
 
+#try:
+        #print(f'Pred:{model.params["pred_diffs"]}')
+        #print(f'Rand:{model.params["rand_diffs"]}')
+        #model.params['pred_diffs'] *= 0
+        #model.params['rand_diffs'] *= 0
+
+    #except BaseException:
+        #pass
 
 
 def validate_paralell_epoch(model, data_loader, Loss_dict, true_coeffs = None):
@@ -532,13 +547,13 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
     test_freq = net.params['test_freq']
     optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'], capturable = torch.cuda.is_available())
     true_coeffs = net.true_coeffs
+
     for epoch in range(train_params['bag_epochs']):
         if not epoch % test_freq:
             val_model, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict, true_coeffs)
             if sub_dicts:
                 for idx in range(len(sub_model_coeffs)):
                     sub_val_model, Sub_Loss_dict = validate_paralell_epochs(net, test_loader, Sub_Loss_dict, idx, true_coeffs)
-
             if printout:
                 print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in Loss_dict.items()])}')
         if not epoch % crossval_freq and epoch >= net.params['pretrain_epochs']:

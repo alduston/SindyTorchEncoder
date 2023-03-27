@@ -38,10 +38,10 @@ def PAS_test(model_params, training_data, validation_data, run  = 0):
     model_params['add_noise'] = False
     l = len(training_data['x'])
     train_params = {'bag_epochs': 8000, 'nbags': 12, 'bag_size': int(l//2), 'refinement_epochs': 0}
-    model_params['batch_size'] = int(l//8)
-    model_params['crossval_freq'] = 40
+    model_params['batch_size'] = int(l)
+    model_params['crossval_freq'] = 20
     model_params['run'] = run
-    model_params['pretrain_epochs'] = 50
+    model_params['pretrain_epochs'] = 20
     net, Loss_dict = scramble_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
@@ -51,8 +51,8 @@ def PAS_sub_test(model_params, training_data, validation_data, run  = 0):
     model_params['use_activation_mask'] = False
     model_params['add_noise'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 4000, 'nbags': 12, 'bag_size': int(l//2), 'refinement_epochs': 0}
-    model_params['batch_size'] = int(l//2)
+    train_params = {'bag_epochs': 8000, 'nbags': 12, 'bag_size': int(l//4), 'refinement_epochs': 0}
+    model_params['batch_size'] = int(l)
     model_params['crossval_freq'] = 40
     model_params['run'] = run
     model_params['pretrain_epochs'] = 50
@@ -80,7 +80,6 @@ def Meta_sub_test(runs = 5, exp_label = '', exp_size = (128,np.inf),
     Meta_PA_dict = {}
     param_updates['exp_label'] = exp_label
     for run_ix in range(runs):
-        print(exp_size)
         model_params, training_data, validation_data = get_test_params(exp_size[0], max_data=exp_size[1])
         model_params.update(param_updates)
 
@@ -284,27 +283,12 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
             avg_sub_trajectory_plot(sub_df, sub_df, avg_PA, avg_PA, exp_label, sub_label, key)
     return True
 
-'''
-torch.Size([4000, 128])
-torch.Size([4000, 128])
-8
-True
-2000
-'''
-
-'''
-torch.Size([4000, 128])
-torch.Size([4000, 128])
-8
-True
-2000
-'''
 
 def run():
     PAparam_updates = {'coefficient_initialization': 'xavier'}
     param_updates = {'loss_weight_decoder': .1}
-    n_runs = 6
-    exp_label = 'sub_test'
+    n_runs = 10
+    exp_label = 'sub_test_10'
 
     if torch.cuda.is_available():
         Meta_PA_df = Meta_sub_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
