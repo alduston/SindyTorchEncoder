@@ -286,8 +286,8 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
 def run():
     PAparam_updates = {'coefficient_initialization': 'xavier'}
     param_updates = {'loss_weight_decoder': .1}
-    n_runs = 4
-    exp_label = 'sub_test'
+    n_runs = 1
+    exp_label = 'sub_test_1'
 
     if torch.cuda.is_available():
         Meta_PA_df = Meta_sub_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
