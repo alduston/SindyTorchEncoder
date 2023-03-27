@@ -51,14 +51,13 @@ def PAS_sub_test(model_params, training_data, validation_data, run  = 0):
     model_params['use_activation_mask'] = False
     model_params['add_noise'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 4000, 'nbags': 8, 'bag_size': int(l//2), 'refinement_epochs': 0}
+    train_params = {'bag_epochs': 4000, 'nbags': 12, 'bag_size': int(l//2), 'refinement_epochs': 0}
     model_params['batch_size'] = int(l//8)
     model_params['crossval_freq'] = 40
     model_params['run'] = run
     model_params['pretrain_epochs'] = 50
-    model_params['test_freq'] = 50
     net, Loss_dict,Sub_Loss_dict = scramble_train_sindy(model_params, train_params, training_data,
-                                                       validation_data,  printout = True, sub_dicts=True)
+                                                       validation_data,  printout = True, sub_dicts=False)
     return net, Loss_dict,Sub_Loss_dict
 
 
@@ -75,12 +74,15 @@ def A_test(model_params, training_data, validation_data, run = 0):
     return net, Loss_dict
 
 
-def Meta_sub_test(runs = 5, exp_label = '', exp_size = (128,np.inf), param_updates = {}, PAparam_updates = {}):
+def Meta_sub_test(runs = 5, exp_label = '', exp_size = (128,np.inf),
+                  param_updates = {}, PAparam_updates = {}):
     Meta_PA_dict = {}
     param_updates['exp_label'] = exp_label
     for run_ix in range(runs):
+        print(exp_size)
         model_params, training_data, validation_data = get_test_params(exp_size[0], max_data=exp_size[1])
         model_params.update(param_updates)
+
         pa_params = copy(model_params)
         pa_params.update(PAparam_updates)
         PAnet, PALoss_dict, PASub_Loss_dict = PAS_sub_test(pa_params, training_data, validation_data, run=run_ix)
@@ -281,7 +283,21 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
             avg_sub_trajectory_plot(sub_df, sub_df, avg_PA, avg_PA, exp_label, sub_label, key)
     return True
 
+'''
+torch.Size([4000, 128])
+torch.Size([4000, 128])
+8
+True
+2000
+'''
 
+'''
+torch.Size([4000, 128])
+torch.Size([4000, 128])
+8
+True
+2000
+'''
 
 def run():
     PAparam_updates = {'coefficient_initialization': 'xavier'}
@@ -291,7 +307,7 @@ def run():
 
     if torch.cuda.is_available():
         Meta_PA_df = Meta_sub_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
-                                      exp_size=(64, np.inf), PAparam_updates=PAparam_updates)
+                                      exp_size=(128, np.inf), PAparam_updates=PAparam_updates)
     else:
         try:
             os.mkdir(f'../plots/{exp_label}')
@@ -302,7 +318,7 @@ def run():
 
     Meta_PA_df_avg = {key: val for (key,val) in Meta_PA_df.items() if not key.startswith(f'bag')}
     get_plots(Meta_PA_df_avg,Meta_PA_df_avg, n_runs, exp_label)
-    get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags = 8)
+    get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags = 12)
 
 
 
