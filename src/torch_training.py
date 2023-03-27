@@ -324,6 +324,38 @@ def coeff_pattern_loss(pred_coeffs, true_coeffs, binary = True):
         losses.append(L_minus)
     return min(losses)/np.sum(true_coeffs > 0)
 
+def validate_paralell_epochs(model, data_loader, Loss_dict, idx = None, true_coeffs = None):
+    model.eval()
+    total_loss = 0
+    total_loss_dict = {}
+    Bag_coeffs = copy(model.sub_model_coeffs)
+    coeffs = Bag_coeffs[idx]
+    val_model = copy(model)
+    val_model.sindy_coeffs = torch.nn.Parameter(coeffs, requires_grad=True)
+    for batch_index, data in enumerate(data_loader):
+        with torch.no_grad():
+            loss, loss_refinement, losses = validate_one_step(val_model, data)
+            total_loss += loss
+            if len(total_loss_dict.keys()):
+                for key in total_loss_dict.keys():
+                    total_loss_dict[key] += losses[key]
+            else:
+                for key, val in losses.items():
+                    total_loss_dict[key] = val
+    Loss_dict[f'bag{idx}_epoch'].append(int(model.epoch))
+    Loss_dict[f'bag{idx}_active_coeffs'].append(int(torch.sum(val_model.coefficient_mask).cpu().detach()))
+    Loss_dict[f'bag{idx}_total'].append(float(total_loss.cpu().detach()))
+
+    if true_coeffs != None:
+        pred_coeffs = val_model.coefficient_mask
+        coeff_loss_val = coeff_pattern_loss(pred_coeffs, true_coeffs)
+        Loss_dict[f'bag{idx}_coeff'].append(coeff_loss_val)
+
+    for key, val in total_loss_dict.items():
+        Loss_dict[f'bag{idx}_{key}'].append(float(val.detach().cpu()))
+    return val_model, Loss_dict
+
+
 
 def validate_paralell_epoch(model, data_loader, Loss_dict, true_coeffs = None):
     model.eval()
@@ -416,6 +448,7 @@ def parallell_train_sindy(model_params, train_params, training_data, validation_
     test_freq = net.params['test_freq']
     optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'])
     true_coeffs = net.true_coeffs
+
     for epoch in range(train_params['bag_epochs']):
         if not epoch % test_freq:
             validate_paralell_epoch(net, test_loader, Loss_dict, true_coeffs)
@@ -454,7 +487,8 @@ def get_masks(net):
     return torch.stack(masks)
 
 
-def scramble_train_sindy(model_params, train_params, training_data, validation_data, printout = False):
+def scramble_train_sindy(model_params, train_params, training_data, validation_data, printout = False,
+                         sub_dicts = False):
     Loss_dict = {'epoch': [], 'total': [], 'decoder': [], 'sindy_x': [],
                  'reg': [], 'sindy_z': [], 'active_coeffs': [], 'coeff': [0.0]}
     if torch.cuda.is_available():
@@ -488,6 +522,12 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
     net.sub_model_losses_dict = sub_model_losses_dict
     net.sub_model_test_losses_dict = sub_model_test_losses_dict
 
+    if sub_dicts:
+        Sub_Loss_dict = {}
+        for key, val in Loss_dict.items():
+            for i in range(len(sub_model_coeffs)):
+                Sub_Loss_dict[f'bag{i}_{key}'] = copy(val)
+
     crossval_freq = net.params['crossval_freq']
     test_freq = net.params['test_freq']
     optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'], capturable = torch.cuda.is_available())
@@ -495,6 +535,10 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
     for epoch in range(train_params['bag_epochs']):
         if not epoch % test_freq:
             val_model, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict, true_coeffs)
+            if sub_dicts:
+                for idx in range(len(sub_model_coeffs)):
+                    sub_val_model, Sub_Loss_dict = validate_paralell_epochs(net, test_loader, Sub_Loss_dict, idx, true_coeffs)
+
             if printout:
                 print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in Loss_dict.items()])}')
         if not epoch % crossval_freq and epoch >= net.params['pretrain_epochs']:
@@ -502,6 +546,8 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
         train_paralell_epoch(net, train_bag_loader, optimizer, scramble=True)
 
     net, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict)
+    if sub_dicts:
+        return net, Loss_dict, Sub_Loss_dict
     return net, Loss_dict
 
 
