@@ -85,7 +85,7 @@ def process_bag_coeffs(Bag_coeffs, model, noise_excess = 0):
     n_samples = bag_coeffs.shape[0]
     avg_coeffs = (1/n_samples) * torch.sum(bag_coeffs, dim = 0)
 
-    ip_thresh = 2/3
+    ip_thresh = .6
     for ix in range(x):
         for iy in range(y):
             coeffs_vec = bag_coeffs[:,ix,iy]
@@ -286,6 +286,7 @@ def crossval(model, Loss_dict):
     Bag_coeffs = model.sub_model_coeffs
     new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model, noise_excess)
     model.coefficient_mask = model.coefficient_mask * new_mask
+    model.anti_mask = model.get_anti_mask()
     model.num_active_coeffs = int(torch.sum(copy(model.coefficient_mask)).cpu().detach())
     model.sindy_coeffs = torch.nn.Parameter(model.coefficient_mask * avg_coeffs, requires_grad=True)
     return model
