@@ -297,13 +297,10 @@ def run():
     PAparam_updates = {'coefficient_initialization': 'xavier', 'replacement': False}
     param_updates = {'loss_weight_decoder': .1, 'nbags': 50, 'bagn_factor': 1}
     n_runs = 10
-    exp_label = 'avg_test'
-
-    Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
-                           exp_size=(16, np.inf), PAparam_updates=PAparam_updates)
+    exp_label = 'lit_informed'
 
     if torch.cuda.is_available():
-        Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
+        Meta_A_df, Meta_PA_df  = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
                                       exp_size=(128, np.inf), PAparam_updates=PAparam_updates)
     else:
         try:
@@ -313,11 +310,7 @@ def run():
         #Meta_A_df = pd.read_csv(f'../data/{exp_label}/Meta_A.csv')
         #Meta_PA_df = pd.read_csv(f'../data/{exp_label}/Meta_PA.csv')
 
-
-    #Meta_PA_df_avg = {key: val for (key,val) in Meta_PA_df.items() if not key.startswith(f'bag')}
-    #get_plots(Meta_PA_df_avg,Meta_PA_df_avg, n_runs, exp_label)
-    #get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags = 3)
-
+    get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label)
 
 
 if __name__=='__main__':

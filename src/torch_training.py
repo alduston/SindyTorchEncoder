@@ -89,11 +89,11 @@ def process_bag_coeffs(Bag_coeffs, model, noise_excess = 0):
     for ix in range(x):
         for iy in range(y):
             coeffs_vec = bag_coeffs[:,ix,iy]
-            #ip = sum([abs(val) > .1 for val in coeffs_vec])/len(coeffs_vec)
-            #if ip > ip_thresh:
-                #new_mask[ix, iy] = 1
-            if torch.abs(torch.mean(coeffs_vec)) > .1:
+            ip = sum([abs(val) > .1 for val in coeffs_vec])/len(coeffs_vec)
+            if ip > ip_thresh:
                 new_mask[ix, iy] = 1
+            #if torch.abs(torch.mean(coeffs_vec)) > .1:
+                #new_mask[ix, iy] = 1
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = model.params['device'])
     return new_mask, avg_coeffs
 
