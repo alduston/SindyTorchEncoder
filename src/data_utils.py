@@ -12,6 +12,8 @@ import warnings
 import random
 from sindy_utils import library_size
 from torch.utils.data import Dataset, DataLoader
+from copy import copy
+import matplotlib.pyplot as plt
 warnings.filterwarnings("ignore")
 
 
@@ -27,11 +29,14 @@ def augment_sample(sample):
     return shuffled_samples
 
 
-def make_samples(tensors, n_samples, sample_size, device, augment = False):
+def make_samples(tensors, n_samples, sample_size, device, replacement = True, augment = False):
     samples = [[] for tensor in tensors]
     indexes = list(range(0,tensors[0].shape[0]))
     for i in range(n_samples):
-        sub_indexes = random.choices(indexes, k = sample_size)
+        if replacement:
+            sub_indexes = random.choices(indexes, k = sample_size)
+        else:
+            sub_indexes = random.sample(indexes, k = sample_size)
         for i,tensor in enumerate(tensors):
             sample = torch.index_select(tensor, 0, torch.tensor(sub_indexes, device = device))
             samples[i].append(sample)
@@ -41,7 +46,7 @@ def make_samples(tensors, n_samples, sample_size, device, augment = False):
             Sample = augment_sample(Sample)
         shape = [n_samples * sample_size] + list(tensors[i].shape[1:])
         try:
-            torch.stack(Sample).reshape(shape)
+            samples[i] = torch.stack(Sample).reshape(shape)
         except BaseException:
             sample_stack = torch.stack(Sample)
             l = int(sample_stack.shape[0] * sample_stack.shape[1])
@@ -67,8 +72,9 @@ class model_data(Dataset):
         self.dx = torch.tensor(self.data_dict['dx'], dtype=torch.float32, device=self.device)
         self.n_samples = self.x.shape[0]
         if bag_params:
-            x_bags,dx_bags = make_samples([self.x,self.dx], n_samples = bag_params['nbags'], augment = bag_params['augment'],
-                                          sample_size = bag_params['bag_size'], device = self.device)
+            x_bags,dx_bags = make_samples([self.x,self.dx], n_samples = bag_params['nbags'],
+                                          augment = bag_params['augment'], sample_size = bag_params['bag_size'],
+                                          replacement = bag_params['replacement'], device = self.device)
             self.x_bags = x_bags
             self.dx_bags = dx_bags
             self.n_samples = self.x_bags.shape[0]
@@ -126,6 +132,7 @@ def get_test_params(train_size = 100, max_data = 100000):
     # training parameters
     params['epoch_size'] = training_data['x'].shape[0]
     params['batch_size'] = min([params['epoch_size']//8, train_size])
+    params['nbags'] = 1
     params['threshold_frequency'] = 5
     params['learning_rate'] = 1e-3
 
@@ -141,6 +148,8 @@ def get_test_params(train_size = 100, max_data = 100000):
     params['train_print_freq'] = np.inf
     params['update_freq'] = 50
     params['use_activation_mask'] = False
+    params['use_median'] = False
+    params['bagn_factor'] = 1
     params['true_coeffs'] = training_data['sindy_coefficients']
 
     return params,training_data, validation_data
@@ -151,8 +160,10 @@ def get_loader(data, params, workers = 0, device = 'cpu'):
     return DataLoader(data_class, batch_size=params['batch_size'], num_workers=workers, shuffle=False)
 
 
-def get_bag_loader(data, train_params, model_params,  workers = 0, device = 'cpu', augment = False):
+def get_bag_loader(data, train_params, model_params,  workers = 0,
+                   device = 'cpu', augment = False, replacement = True):
     train_params['augment'] = augment
+    train_params['replacement'] = replacement
     data_class = model_data(data, model_params, device, bag_params = train_params)
     return DataLoader(data_class, batch_size=train_params['bag_size'], num_workers=workers, shuffle=False)
 
@@ -164,7 +175,6 @@ def run():
         device = 'cuda:0'
     else:
         device = 'cpu'
-
     bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
 
 

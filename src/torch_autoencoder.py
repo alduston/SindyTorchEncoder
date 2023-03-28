@@ -241,28 +241,6 @@ class SindyNet(nn.Module):
             return self.masked_predict(Theta,  self.sub_model_coeffs)
         return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
 
-        #val = torch.matmul(Theta, self.coefficient_mask * self.sindy_coeffs)
-        #decoder_weights, decoder_biases = self.decoder_weights()
-        #activation = self.params['activation']
-        #decode = z_derivative(z, val, decoder_weights, decoder_biases, activation=activation)
-        #pred_diffs = []
-        #rand_diffs = []
-
-        #for i in range(len(self.sub_model_coeffs)):
-            #alt_val = torch.matmul(Theta, self.coefficient_mask * self.sub_model_coeffs[i])
-            #decoder_weights, decoder_biases = self.decoder_weights()
-            #activation = self.params['activation']
-            #alt_decode = z_derivative(z, alt_val, decoder_weights, decoder_biases, activation=activation)
-            #rand_diffs.append(np.round(torch.linalg.norm(torch.transpose(dx,0,1) - torch.randn(alt_decode.shape, device = self.device)).detach().float(),4))
-            #pred_diffs.append(np.round(torch.linalg.norm(torch.transpose(dx,0,1) - alt_decode).detach().float(), 4))
-        #rand_diffs = np.asarray(rand_diffs)
-        #pred_diffs = np.asarray(pred_diffs)
-        #if 'pred_diffs' in (self.params.keys()):
-            #self.params['pred_diffs'] += pred_diffs
-            #self.params['rand_diffs'] += rand_diffs
-        #else:
-            #self.params['pred_diffs'] = pred_diffs
-            #self.params['rand_diffs'] = rand_diffs
 
     def calc_coefficient_mask(self):
         sindy_coefficients = self.sindy_coeffs
@@ -304,8 +282,7 @@ class SindyNet(nn.Module):
 
     def decoder_loss(self, x, x_pred):
         criterion = nn.MSELoss()
-        return self.params['loss_weight_decoder'] * criterion(x, x_pred)
-
+        return self.params['loss_weight_decoder'] *  self.params['bagn_factor'] * criterion(x, x_pred)
 
     def sindy_reg_loss(self, idx = None, penalize_self = False, avg = False):
         if idx == None:

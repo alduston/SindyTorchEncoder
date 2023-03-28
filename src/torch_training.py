@@ -79,9 +79,6 @@ def coeff_var(coeff_tensor):
 
 def process_bag_coeffs(Bag_coeffs, model, noise_excess = 0):
     bag_coeffs = Bag_coeffs
-    #if noise_excess:
-        #noise_tensor = torch.randn(Bag_coeffs.shape, device = model.device) * (noise_excess)
-        #bag_coeffs += noise_tensor
     new_mask =  np.zeros(bag_coeffs.shape[1:])
     x,y = new_mask.shape
 
@@ -197,11 +194,6 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
         total_loss, total_loss_dict = train_one_epoch(net, train_loader, optimizer)
         if not (net.epoch % 1000)-1:
             pass
-            #plt.imshow(net.sindy_coeffs.detach().cpu().numpy(), vmin=0, vmax=1)
-            #run = net.params['run']
-            #plt.colorbar()
-            #plt.savefig(f'../plots/coeff_hmaps/A_run{run}_{net.epoch}_hmap.png')
-            #clear_plt()
 
     if len(Loss_dict.keys()):
         for key, val in loss_dict.items():
@@ -289,9 +281,6 @@ def train_paralell_epoch(model, bag_loader, optimizer, scramble = False):
 
 def crossval(model, Loss_dict):
     noise_excess = 0
-    #if model.params['add_noise']:
-        #noise_excess += np.sqrt(10 * Loss_dict['decoder'][-1]) - np.sqrt(10*np.exp(-12))
-        #print(noise_excess)
     Bag_coeffs = model.sub_model_coeffs
     new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model, noise_excess)
     model.coefficient_mask = model.coefficient_mask * new_mask
@@ -311,6 +300,7 @@ def col_permutations(M):
 
 def coinflip():
     return random.choice([True, False])
+
 
 def coeff_pattern_loss(pred_coeffs, true_coeffs, binary = True):
     pred_coeffs = copy(pred_coeffs).detach().cpu().numpy()
@@ -362,15 +352,9 @@ def validate_paralell_epochs(model, data_loader, Loss_dict, idx = None, true_coe
         Loss_dict[f'bag{idx}_{key}'].append(float(val.detach().cpu()))
     return val_model, Loss_dict
 
-#try:
-        #print(f'Pred:{model.params["pred_diffs"]}')
-        #print(f'Rand:{model.params["rand_diffs"]}')
-        #model.params['pred_diffs'] *= 0
-        #model.params['rand_diffs'] *= 0
 
-    #except BaseException:
-        #pass
-
+def tensor_median(tensor):
+    return True
 
 def validate_paralell_epoch(model, data_loader, Loss_dict, true_coeffs = None):
     model.eval()
@@ -378,17 +362,14 @@ def validate_paralell_epoch(model, data_loader, Loss_dict, true_coeffs = None):
     total_loss_dict = {}
     Bag_coeffs = copy(model.sub_model_coeffs)
     n_bags = Bag_coeffs.shape[0]
-    avg_coeffs = (1 / n_bags) * torch.sum(Bag_coeffs, dim=0)
     val_model = copy(model)
-    val_model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
 
-    if not (model.epoch % 1000)-1:
-        pass
-        #run =  model.params['run']
-        #plt.imshow(val_model.sindy_coeffs.detach().cpu().numpy(), vmin=0, vmax=1)
-        #plt.colorbar()
-        #plt.savefig(f'../plots/coeff_hmaps/PA_run{run}_{model.epoch}_hmap.png')
-        #clear_plt()
+    if model.params['use_median']:
+        med_coeffs = tensor_median(val_model.sub_model_coeffs)
+        val_model.sindy_coeffs = torch.nn.Parameter(med_coeffs, requires_grad=True)
+    else:
+        avg_coeffs = (1 / n_bags) * torch.sum(Bag_coeffs, dim=0)
+        val_model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
 
     for batch_index, data in enumerate(data_loader):
         with torch.no_grad():
@@ -497,8 +478,7 @@ def get_masks(net):
     device = net.device
     for i in range(net.params['nbags'] + 1):
         mask = torch.zeros(mask_shape, device = device)
-        if i:
-            mask[i*l:(i+1)*l, :] += 1.0
+        mask[i*l:(i+1)*l, :] += 1.0
         masks.append(mask)
     return torch.stack(masks)
 
@@ -512,7 +492,8 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
     else:
         device = 'cpu'
 
-    train_bag_loader = get_bag_loader(training_data, train_params, model_params, device=device, augment = True)
+    train_bag_loader = get_bag_loader(training_data, train_params, model_params, device=device,
+                                      augment = True, replacement = model_params['replacement'])
     test_loader = get_loader(validation_data, model_params, device=device)
 
     net = SindyNet(model_params).to(device)
