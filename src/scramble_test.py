@@ -297,7 +297,7 @@ def run():
     PAparam_updates = {'coefficient_initialization': 'xavier', 'replacement': False}
     param_updates = {'loss_weight_decoder': .1, 'nbags': 50, 'bagn_factor': 1}
     n_runs = 10
-    exp_label = 'avg_test'
+    exp_label = 'old_reg'
 
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df  = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,

@@ -288,7 +288,8 @@ class SindyNet(nn.Module):
         if idx == None:
             sub_coeffs = self.sindy_coeffs
         else:
-            if penalize_self:
+            if True:
+            #if penalize_self:
                 sub_coeffs = self.sub_model_coeffs[idx]
             else:
                 sub_coeffs = torch.sum(self.sub_model_coeffs, dim=0)
