@@ -51,7 +51,7 @@ def PAS_sub_test(model_params, training_data, validation_data, run  = 0):
     model_params['use_activation_mask'] = False
     model_params['add_noise'] = False
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 8000, 'nbags': 12, 'bag_size': int(l//4), 'refinement_epochs': 0}
+    train_params = {'bag_epochs': 3001, 'nbags': 3, 'bag_size': int(l//3), 'refinement_epochs': 0}
     model_params['batch_size'] = int(l)
     model_params['crossval_freq'] = 40
     model_params['run'] = run
@@ -273,7 +273,6 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
         sub_df['epoch'] = Meta_PA_df['epoch']
         for key in plot_keys:
             avg_PA = np.zeros(len(Meta_PA_df[f'epoch']))
-
             for i in range(n_runs):
                 avg_PA += sub_df[f'{sub_label}_{key}{i}']
                 sub_trajectory_plot([sub_df], exp_label, key, i,
@@ -287,23 +286,23 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
 def run():
     PAparam_updates = {'coefficient_initialization': 'xavier'}
     param_updates = {'loss_weight_decoder': .1}
-    n_runs = 3
-    exp_label = 'sub_test_10'
+    n_runs = 1
+    exp_label = 'indep_test'
 
     if torch.cuda.is_available():
         Meta_PA_df = Meta_sub_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
-                                      exp_size=(128, np.inf), PAparam_updates=PAparam_updates)
+                                      exp_size=(64, np.inf), PAparam_updates=PAparam_updates)
     else:
         try:
             os.mkdir(f'../plots/{exp_label}')
         except OSError:
             pass
-        Meta_A_df = pd.read_csv(f'../data/{exp_label}/Meta_A.csv')
-        Meta_PA_df = pd.read_csv(f'../data/{exp_label}/Meta_PA.csv')
+        #Meta_A_df = pd.read_csv(f'../data/{exp_label}/Meta_A.csv')
+        #Meta_PA_df = pd.read_csv(f'../data/{exp_label}/Meta_PA.csv')
 
     Meta_PA_df_avg = {key: val for (key,val) in Meta_PA_df.items() if not key.startswith(f'bag')}
     get_plots(Meta_PA_df_avg,Meta_PA_df_avg, n_runs, exp_label)
-    get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags = 12)
+    get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags = 3)
 
 
 
