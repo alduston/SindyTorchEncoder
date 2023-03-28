@@ -90,10 +90,10 @@ def process_bag_coeffs(Bag_coeffs, model, noise_excess = 0):
         for iy in range(y):
             coeffs_vec = bag_coeffs[:,ix,iy]
             ip = sum([abs(val) > .1 for val in coeffs_vec])/len(coeffs_vec)
-            if ip > ip_thresh:
-                new_mask[ix, iy] = 1
-            #if torch.abs(torch.mean(coeffs_vec)) > .1:
+            #if ip > ip_thresh:
                 #new_mask[ix, iy] = 1
+            if torch.abs(torch.mean(coeffs_vec)) > .1:
+                new_mask[ix, iy] = 1
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = model.params['device'])
     return new_mask, avg_coeffs
 
@@ -370,6 +370,7 @@ def validate_paralell_epoch(model, data_loader, Loss_dict, true_coeffs = None):
     if model.params['use_median']:
         med_coeffs = tensor_median(val_model.sub_model_coeffs)
         val_model.sindy_coeffs = torch.nn.Parameter(med_coeffs, requires_grad=True)
+
     else:
         avg_coeffs = (1 / n_bags) * torch.sum(Bag_coeffs, dim=0)
         val_model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
