@@ -221,8 +221,6 @@ class SindyNet(nn.Module):
         sindy_predict = torch.zeros(masks[0].shape, device = self.device)
         for idx,coeff_m in enumerate(coeffs):
             mask = masks[idx]
-            if not idx:
-                mask *= 0
             sub_predict = mask * torch.matmul(Theta, self.coefficient_mask * coeff_m)
             sindy_predict += sub_predict
         return sindy_predict
