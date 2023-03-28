@@ -20,7 +20,7 @@ from copy import deepcopy, copy
 warnings.filterwarnings("ignore")
 
 
-def PA_test(model_params, training_data, validation_data, run  = 0):
+def pa_test(model_params, training_data, validation_data, run  = 0):
     model_params['sequential_thresholding'] = False
     model_params['use_activation_mask'] = False
     l = len(training_data['x'])
@@ -46,7 +46,7 @@ def pas_test(model_params, training_data, validation_data, run  = 0):
     model_params['batch_size'] = int(l//8)
     model_params['crossval_freq'] = 50
     model_params['run'] = run
-    model_params['pretrain_epochs'] = 50
+    model_params['pretrain_epochs'] = 100
     net, Loss_dict = scramble_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
@@ -297,7 +297,10 @@ def run():
     PAparam_updates = {'coefficient_initialization': 'xavier', 'replacement': False}
     param_updates = {'loss_weight_decoder': .1, 'nbags': 50, 'bagn_factor': 1}
     n_runs = 10
-    exp_label = 'lit_informed'
+    exp_label = 'avg_test'
+
+    Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
+                           exp_size=(16, np.inf), PAparam_updates=PAparam_updates)
 
     if torch.cuda.is_available():
         Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
