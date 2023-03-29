@@ -10,7 +10,7 @@ from example_lorenz import get_lorenz_data
 import torch
 from sindy_utils import library_size
 import torch_training
-from torch_training import parallell_train_sindy, train_sindy, scramble_train_sindy
+from torch_training import train_sindy, scramble_train_sindy
 from torch_autoencoder import SindyNet
 import pickle
 import warnings
@@ -18,18 +18,6 @@ from data_utils import get_test_params, get_loader
 import matplotlib.pyplot as plt
 from copy import deepcopy, copy
 warnings.filterwarnings("ignore")
-
-
-def pa_test(model_params, training_data, validation_data, run  = 0):
-    model_params['sequential_thresholding'] = False
-    model_params['use_activation_mask'] = False
-    l = len(training_data['x'])
-    train_params = {'bag_epochs': 5000, 'nbags': 10, 'bag_size': int(l//10), 'refinement_epochs': 0}
-    model_params['batch_size'] = int(l//2)
-    model_params['run'] = run
-    model_params['pretrain_epochs'] = 100
-    net, Loss_dict = parallell_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
-    return net, Loss_dict
 
 
 def pas_test(model_params, training_data, validation_data, run  = 0):
@@ -43,10 +31,10 @@ def pas_test(model_params, training_data, validation_data, run  = 0):
     train_params = {'bag_epochs': 5000, 'nbags': model_params['nbags'],
                     'bag_size': int(l//2), 'refinement_epochs': 0}
 
-    model_params['batch_size'] = int(l//8)
+    model_params['batch_size'] = int(l//2)
     model_params['crossval_freq'] = 50
     model_params['run'] = run
-    model_params['pretrain_epochs'] = 100
+    model_params['pretrain_epochs'] = 40
     net, Loss_dict = scramble_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
@@ -294,11 +282,12 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
 
 
 def run():
-    PAparam_updates = {'coefficient_initialization': 'xavier', 'replacement': True}
+    PAparam_updates = {'coefficient_initialization': 'xavier',
+                       'replacement': True, 'avg_crossval': True, 'c_loss': True}
     param_updates = {'loss_weight_decoder': .1, 'nbags': 50, 'bagn_factor': 1}
-    n_runs = 10
-    exp_label = 'avg_reg'
-    
+    n_runs = 6
+    exp_label = 'new_reg'
+
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df  = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
                                       exp_size=(128, np.inf), PAparam_updates=PAparam_updates)

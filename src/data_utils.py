@@ -124,7 +124,7 @@ def get_test_params(train_size = 100, max_data = 100000):
     params['loss_weight_sindy_z'] = 0.00
     params['loss_weight_sindy_x'] = 1e-4
     params['loss_weight_sindy_regularization'] = 1e-5
-    params['loss_weight_consistency'] = 1e-3
+    params['loss_weight_consistency'] = 5e-2
 
     params['activation'] = 'sigmoid'
     params['widths'] = [64,32]
@@ -149,6 +149,10 @@ def get_test_params(train_size = 100, max_data = 100000):
     params['update_freq'] = 50
     params['use_activation_mask'] = False
     params['use_median'] = False
+    params['avg_crossval'] = False
+    params['c_loss'] = False
+    params['scramble'] = False
+    params['eval'] = False
     params['bagn_factor'] = 1
     params['true_coeffs'] = training_data['sindy_coefficients']
 
