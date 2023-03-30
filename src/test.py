@@ -68,7 +68,7 @@ def a_test(model_params, training_data, validation_data, run = 0):
     return net, Loss_dict
 
 
-def a_test(runs = 5, exp_label = '', exp_size = (256,np.inf),
+def PA_test(runs = 5, exp_label = '', exp_size = (256,np.inf),
                   param_updates = {}, PAparam_updates = {}, sub = False):
     Meta_PA_dict = {}
     param_updates['exp_label'] = exp_label
