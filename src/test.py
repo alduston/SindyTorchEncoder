@@ -26,12 +26,12 @@ def pas_test(model_params, training_data, validation_data, run  = 0):
     model_params['add_noise'] = False
     l = len(training_data['x'])
 
-    if model_params['nbags'] == 1:
-        model_params['nbags'] = 50
-    train_params = {'bag_epochs': 5000, 'nbags': model_params['nbags'],
-                    'bag_size': int(l//2), 'refinement_epochs': 0}
+    #if model_params['nbags'] == 1:
+        #model_params['nbags'] = 50
+    train_params = {'bag_epochs': 2000, 'nbags': model_params['nbags'],
+                    'bag_size': int(l), 'refinement_epochs': 0}
 
-    model_params['batch_size'] = int(l//2)
+    model_params['batch_size'] = l
     model_params['crossval_freq'] = 50
     model_params['run'] = run
     model_params['pretrain_epochs'] = 50
@@ -58,17 +58,17 @@ def pas_sub_test(model_params, training_data, validation_data, run  = 0):
 def a_test(model_params, training_data, validation_data, run = 0):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 4500, 'nbags': 1, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 1750, 'nbags': 1, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                    'refinement_epochs': 500}
-    model_params['batch_size'] = int(l//8)
+                    'refinement_epochs': 250}
+    model_params['batch_size'] = l
     model_params['threshold_frequency'] = 50
     model_params['run'] = run
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
 
 
-def PAS_test(runs = 5, exp_label = '', exp_size = (256,np.inf),
+def a_test(runs = 5, exp_label = '', exp_size = (256,np.inf),
                   param_updates = {}, PAparam_updates = {}, sub = False):
     Meta_PA_dict = {}
     param_updates['exp_label'] = exp_label
@@ -282,10 +282,10 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
 
 def run():
     PAparam_updates = {'coefficient_initialization': 'xavier',
-                       'replacement': True, 'avg_crossval': False, 'c_loss': False}
-    param_updates = {'loss_weight_decoder': .1, 'nbags': 25, 'bagn_factor': 1}
+                       'replacement': True, 'avg_crossval': False, 'c_loss': True}
+    param_updates = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1}
     n_runs = 1
-    exp_label = 'old_reg_1'
+    exp_label = 'one_v_one'
 
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df  = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
@@ -301,5 +301,8 @@ def run():
     get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label)
 
 
+
 if __name__=='__main__':
     run()
+
+'Important commit: 9ee60e3 '
