@@ -73,6 +73,7 @@ class SindyNet(nn.Module):
         self.sub_model_masks = {}
         self.sub_model_losses_dict = {}
 
+
     def get_anti_mask(self):
         anti_mask = copy(self.coefficient_mask) - torch.ones(self.coefficient_mask.shape, device = self.device)
         return torch.abs(anti_mask)
@@ -223,11 +224,10 @@ class SindyNet(nn.Module):
 
     def masked_predict(self, Theta, coeffs):
         masks = self.params['coeff_masks']
-        c_loss = self.params['c_loss']
+        #c_loss = self.params['c_loss']
         sindy_predict = torch.zeros(masks[0].shape, device = self.device)
         coeff_mask = self.coefficient_mask
-        if c_loss:
-            pass
+        #if c_loss:
             #coeff_mask = torch.ones(self.coefficient_mask.shape, device = self.device)
         for idx,coeff_m in enumerate(coeffs):
             mask = masks[idx]
@@ -325,7 +325,7 @@ class SindyNet(nn.Module):
     def consistency_loss(self):
         n_bags = self.sub_model_coeffs.shape[0]
         avg_coeffs = torch.sum(self.sub_model_coeffs) * (1/n_bags)
-        return self.params['loss_weight_consistency'] * torch.linalg.norm(self.anti_mask * avg_coeffs)
+        return self.params['loss_weight_consistency'] * torch.linalg.norm(self.anti_mask * avg_coeffs, float('inf'))
 
 
     def sindy_x_loss(self, z, x, dx, ddx = None, idx = None):
@@ -382,7 +382,6 @@ class SindyNet(nn.Module):
         sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx, idx = idx)
         reg_loss = self.sindy_reg_loss(idx = idx, avg = True, alt = True)
         #consistency_loss = self.consistency_loss()
-
 
         loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss
         loss = loss_refinement + reg_loss #+ consistency_loss

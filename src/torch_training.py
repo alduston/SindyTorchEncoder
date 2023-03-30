@@ -43,6 +43,7 @@ def frac_round(vec,val):
 def f_check(tensor, ix, iy):
     return torch.abs(tensor[ix, iy]) < .1
 
+
 def coeff_var(coeff_tensor):
     coeff_tensor = copy(coeff_tensor)
     m_shape = (coeff_tensor.shape[0],coeff_tensor.shape[1]*coeff_tensor.shape[2])
@@ -53,7 +54,7 @@ def coeff_var(coeff_tensor):
     return var
 
 
-def process_bag_coeffs(Bag_coeffs, model, noise_excess = 0, avg = False):
+def process_bag_coeffs(Bag_coeffs, model, avg = False):
     bag_coeffs = Bag_coeffs
     new_mask =  np.zeros(bag_coeffs.shape[1:])
     x,y = new_mask.shape
@@ -246,9 +247,8 @@ def train_paralell_epoch(model, bag_loader, optimizer):
 
 
 def crossval(model):
-    noise_excess = 0
     Bag_coeffs = model.sub_model_coeffs
-    new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model,noise_excess, avg = model.params['avg_crossval'])
+    new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model, avg = model.params['avg_crossval'])
     model.coefficient_mask = model.coefficient_mask * new_mask
     model.anti_mask = model.get_anti_mask()
     model.num_active_coeffs = int(torch.sum(copy(model.coefficient_mask)).cpu().detach())
@@ -323,6 +323,7 @@ def validate_paralell_epochs(model, data_loader, Loss_dict, idx = None, true_coe
 def tensor_median(tensor):
     return True
 
+
 def validate_paralell_epoch(model, data_loader, Loss_dict, true_coeffs = None):
     model.eval()
     model.params['eval'] = True
@@ -380,18 +381,6 @@ def print_keyval(key,val_list):
     return ''
 
 
-def plot_mask(mask, j):
-    mask = deepcopy(mask)
-    mask = mask.detach().cpu().numpy()
-    mask = mask.T
-    strech_mask = torch.zeros(500, 600)
-    for i in range(200):
-        strech_mask[:, 3*i: 3*(i+1)] += mask.T
-    plt.imshow(strech_mask)
-    plt.savefig(f'../data/misk/mask_{j}.png')
-    clear_plt()
-
-
 def get_masks(net):
     batch_len = net.params['bag_size']
     mask_shape = (batch_len, net.params['latent_dim'])
@@ -443,7 +432,8 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
 
     crossval_freq = net.params['crossval_freq']
     test_freq = net.params['test_freq']
-    optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'], capturable = torch.cuda.is_available())
+    optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'],
+                                 capturable = torch.cuda.is_available())
     true_coeffs = net.true_coeffs
 
     for epoch in range(train_params['bag_epochs']):
@@ -457,14 +447,4 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
 
     net, Loss_dict = validate_paralell_epoch(net, test_loader, Loss_dict)
     return net, Loss_dict
-
-
-
-
-
-
-
-
-
-
 
