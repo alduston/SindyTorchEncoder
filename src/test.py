@@ -283,7 +283,8 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
 def run():
     PAparam_updates = {'coefficient_initialization': 'xavier',
                        'replacement': True, 'avg_crossval': False, 'c_loss': True}
-    param_updates = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1}
+    param_updates = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1,
+                     'coefficient_initialization': 'xavier'}
     n_runs = 1
     exp_label = 'one_v_one'
 
