@@ -119,8 +119,8 @@ def Meta_test(runs = 5, exp_label = '', exp_size = (128,np.inf),
         a_params = copy(model_params)
         a_params.update(Aparam_updates)
 
-        PAnet, PALoss_dict = pas_test(pa_params, training_data, validation_data, run=run_ix)
         Anet, ALoss_dict = a_test(a_params, training_data, validation_data, run=run_ix)
+        PAnet, PALoss_dict = pas_test(pa_params, training_data, validation_data, run=run_ix)
 
         for key,val in ALoss_dict.items():
             if key=='epoch':
@@ -281,14 +281,16 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
 def run():
     PAparam_updates = {'coefficient_initialization': 'xavier',
                        'replacement': True, 'avg_crossval': False, 'c_loss': True}
-    param_updates = {'loss_weight_decoder': .1, 'nbags': 25, 'bagn_factor': 1, 'expand_sample': True}
+    param_updates = {'loss_weight_decoder': .1, 'nbags': 25, 'bagn_factor': 1, 'expand_sample': False}
     n_runs = 1
     exp_label = 'please_2'
 
+    Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
+                                      exp_size=(100, np.inf), PAparam_updates=PAparam_updates, noise=1e-6)
 
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df  = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
-                                      exp_size=(500, np.inf), PAparam_updates=PAparam_updates, noise= 1e-6)
+                                      exp_size=(100, np.inf), PAparam_updates=PAparam_updates, noise= 1e-6)
     else:
         try:
             os.mkdir(f'../plots/{exp_label}')

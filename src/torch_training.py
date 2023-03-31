@@ -92,6 +92,9 @@ def train_one_epoch(model, data_loader, optimizer, scheduler = None):
     model.train()
     total_loss = 0
     total_loss_dict = {}
+    print(len(data_loader))
+    print([batch['x'].shape for batch in data_loader])
+
     for batch_index, data in enumerate(data_loader):
         loss, loss_refinement, losses = train_one_step(model, data, optimizer)
         if scheduler:
