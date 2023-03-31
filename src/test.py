@@ -26,10 +26,8 @@ def pas_test(model_params, training_data, validation_data, run  = 0):
     model_params['add_noise'] = False
     l = len(training_data['x'])
 
-    #if model_params['nbags'] == 1:
-        #model_params['nbags'] = 50
-    train_params = {'bag_epochs': 2000, 'nbags': model_params['nbags'],
-                    'bag_size': int(l//2), 'refinement_epochs': 0}
+    train_params = {'bag_epochs': 4000, 'nbags': model_params['nbags'],
+                    'bag_size': l//2, 'refinement_epochs': 0}
 
     model_params['batch_size'] = l//2
     model_params['crossval_freq'] = 50
@@ -58,9 +56,9 @@ def pas_sub_test(model_params, training_data, validation_data, run  = 0):
 def a_test(model_params, training_data, validation_data, run = 0):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 1750, 'nbags': 1, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 3500, 'nbags': 1, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                    'refinement_epochs': 250}
+                    'refinement_epochs': 500}
     model_params['batch_size'] = l//2
     model_params['threshold_frequency'] = 50
     model_params['run'] = run
@@ -120,7 +118,6 @@ def Meta_test(runs = 5, exp_label = '', exp_size = (128,np.inf),
         pa_params.update(PAparam_updates)
         a_params = copy(model_params)
         a_params.update(Aparam_updates)
-
 
         PAnet, PALoss_dict = pas_test(pa_params, training_data, validation_data, run=run_ix)
         Anet, ALoss_dict = a_test(a_params, training_data, validation_data, run=run_ix)
@@ -284,16 +281,15 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
 def run():
     PAparam_updates = {'coefficient_initialization': 'xavier',
                        'replacement': True, 'avg_crossval': False, 'c_loss': True}
-    param_updates = {'loss_weight_decoder': .1, 'nbags': 12, 'bagn_factor': 1}
-    n_runs = 1
-    exp_label = 'one_v_twelve'
+    param_updates = {'loss_weight_decoder': .1, 'nbags': 50, 'bagn_factor': 1, 'expand_sample': False}
+    n_runs = 4
+    exp_label = 'true_masked_ensemble_2'
 
-    Meta_A_df, Meta_PA_df = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
-                                      exp_size=(64, np.inf), PAparam_updates=PAparam_updates)
+
 
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df  = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
-                                      exp_size=(64, np.inf), PAparam_updates=PAparam_updates)
+                                      exp_size=(100, np.inf), PAparam_updates=PAparam_updates)
     else:
         try:
             os.mkdir(f'../plots/{exp_label}')

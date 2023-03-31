@@ -32,6 +32,7 @@ def augment_sample(sample):
 def make_samples(tensors, n_samples, sample_size, device, replacement = True, augment = False):
     samples = [[] for tensor in tensors]
     indexes = list(range(0,tensors[0].shape[0]))
+    #sample_size = tensors[0].shape[0]
     for i in range(n_samples):
         if replacement:
             sub_indexes = random.choices(indexes, k = sample_size)

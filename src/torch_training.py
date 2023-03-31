@@ -232,7 +232,6 @@ def train_paralell_epoch(model, bag_loader, optimizer):
         print_dict['epoch'] = model.epoch
         print_dict['active_coeffs'] = model.num_active_coeffs
 
-
     for idx, bag in enumerate(bag_loader):
         loss, loss_refinement, losses = train_parallel_step(model, bag, optimizer, idx)
         epoch_loss += loss
