@@ -56,9 +56,13 @@ def make_samples(tensors, n_samples, sample_size, device, replacement = True, au
             samples[i] = padded_stack
     return samples
 
+def expand_tensor(tensor, expansion_factor):
+    tensor_shape = tensor.shape
+    expanded_tensor = torch.stack([tensor for i in range(expansion_factor)]).reshape(tensor_shape[0] * expansion_factor, *tensor_shape[1:])
+    return expanded_tensor
 
 class model_data(Dataset):
-    def __init__(self, data={}, params = {}, device = None, bag_params ={}):
+    def __init__(self, data={}, params = {}, device = None, bag_params ={}, expand_factor = None):
         super().__init__()
         if device:
             self.device = device
@@ -75,9 +79,14 @@ class model_data(Dataset):
             x_bags,dx_bags = make_samples([self.x,self.dx], n_samples = bag_params['nbags'],
                                           augment = bag_params['augment'], sample_size = bag_params['bag_size'],
                                           replacement = bag_params['replacement'], device = self.device)
+
             self.x_bags = x_bags
             self.dx_bags = dx_bags
             self.n_samples = self.x_bags.shape[0]
+        if expand_factor:
+            self.x = expand_tensor(self.x, expand_factor)
+            self.dx = expand_tensor(self.dx, expand_factor)
+            self.n_samples = self.x.shape[0]
         self.params = params
         self.bag_params = bag_params
         if self.params['model_order'] == 2:
@@ -153,14 +162,15 @@ def get_test_params(train_size = 100, max_data = 100000):
     params['c_loss'] = False
     params['scramble'] = False
     params['eval'] = False
+    params['expand_sample'] = True
     params['bagn_factor'] = 1
     params['true_coeffs'] = training_data['sindy_coefficients']
 
     return params,training_data, validation_data
 
 
-def get_loader(data, params, workers = 0, device = 'cpu'):
-    data_class = model_data(data, params, device)
+def get_loader(data, params, workers = 0, device = 'cpu', expand_factor = None):
+    data_class = model_data(data, params, device, expand_factor = expand_factor)
     return DataLoader(data_class, batch_size=params['batch_size'], num_workers=workers, shuffle=False)
 
 
@@ -169,6 +179,7 @@ def get_bag_loader(data, train_params, model_params,  workers = 0,
     train_params['augment'] = augment
     train_params['replacement'] = replacement
     data_class = model_data(data, model_params, device, bag_params = train_params)
+    print()
     return DataLoader(data_class, batch_size=train_params['bag_size'], num_workers=workers, shuffle=False)
 
 

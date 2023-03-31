@@ -26,6 +26,7 @@ def train_one_step(model, data, optimizer, mode = None):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
         loss, loss_refinement, losses = model.auto_Loss(x = data['x'], dx = data['dx'])
+
     else:
         loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'])
     loss.backward()
@@ -85,6 +86,7 @@ def get_choice_tensor(shape, prob, device):
                         dtype=torch.float32, device = device).reshape(shape)
     return vals
 
+#24 by 8000
 
 def train_one_epoch(model, data_loader, optimizer, scheduler = None):
     model.train()
@@ -173,7 +175,10 @@ def train_sindy(model_params, train_params, training_data, validation_data, prin
     else:
         device = 'cpu'
 
-    train_loader = get_loader(training_data, model_params, device=device)
+    expansion_factor = None
+    if model_params['expand_sample']:
+        expansion_factor = model_params['nbags']//2
+    train_loader = get_loader(training_data, model_params, device=device, expand_factor = expansion_factor)
     test_loader = get_loader(validation_data, model_params, device=device)
 
     net = SindyNet(model_params).to(device)
@@ -226,6 +231,7 @@ def train_paralell_epoch(model, bag_loader, optimizer):
         print_dict = {key: 0 for key in sub_model_losses_dict['0']}
         print_dict['epoch'] = model.epoch
         print_dict['active_coeffs'] = model.num_active_coeffs
+
 
     for idx, bag in enumerate(bag_loader):
         loss, loss_refinement, losses = train_parallel_step(model, bag, optimizer, idx)
