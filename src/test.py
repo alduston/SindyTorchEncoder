@@ -27,9 +27,9 @@ def pas_test(model_params, training_data, validation_data, run  = 0):
     l = len(training_data['x'])
 
     train_params = {'bag_epochs': 1000, 'nbags': model_params['nbags'],
-                    'bag_size': l//2, 'refinement_epochs': 0}
+                    'bag_size': l//25, 'refinement_epochs': 0}
 
-    model_params['batch_size'] = l//2
+    model_params['batch_size'] = l//25
     model_params['crossval_freq'] = 50
     model_params['run'] = run
     model_params['pretrain_epochs'] = 50
@@ -281,14 +281,14 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
 def run():
     PAparam_updates = {'coefficient_initialization': 'xavier',
                        'replacement': True, 'avg_crossval': False, 'c_loss': True}
-    param_updates = {'loss_weight_decoder': .1, 'nbags': 50, 'bagn_factor': 1, 'expand_sample': True}
+    param_updates = {'loss_weight_decoder': .1, 'nbags': 25, 'bagn_factor': 1, 'expand_sample': True}
     n_runs = 1
-    exp_label = 'low_data'
+    exp_label = 'please_2'
 
 
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df  = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
-                                      exp_size=(40, np.inf), PAparam_updates=PAparam_updates, noise= 1e-6)
+                                      exp_size=(500, np.inf), PAparam_updates=PAparam_updates, noise= 1e-6)
     else:
         try:
             os.mkdir(f'../plots/{exp_label}')
