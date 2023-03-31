@@ -106,12 +106,12 @@ def PA_test(runs = 5, exp_label = '', exp_size = (256,np.inf),
 
 
 def Meta_test(runs = 5, exp_label = '', exp_size = (128,np.inf),
-              param_updates = {}, PAparam_updates = {}, Aparam_updates = {}):
+              param_updates = {}, PAparam_updates = {}, Aparam_updates = {}, noise = 1e-6):
     Meta_PA_dict = {}
     Meta_A_dict = {}
     param_updates['exp_label'] = exp_label
     for run_ix in range(runs):
-        model_params, training_data, validation_data = get_test_params(exp_size[0], max_data=exp_size[1])
+        model_params, training_data, validation_data = get_test_params(exp_size[0], max_data=exp_size[1], noise = noise)
         model_params.update(param_updates)
 
         pa_params = copy(model_params)
@@ -281,15 +281,15 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
 def run():
     PAparam_updates = {'coefficient_initialization': 'xavier',
                        'replacement': True, 'avg_crossval': False, 'c_loss': True}
-    param_updates = {'loss_weight_decoder': .1, 'nbags': 50, 'bagn_factor': 1, 'expand_sample': False}
-    n_runs = 4
-    exp_label = 'true_masked_ensemble_2'
+    param_updates = {'loss_weight_decoder': .1, 'nbags': 50, 'bagn_factor': 1, 'expand_sample': True}
+    n_runs = 1
+    exp_label = 'noise_test'
 
 
 
     if torch.cuda.is_available():
         Meta_A_df, Meta_PA_df  = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
-                                      exp_size=(100, np.inf), PAparam_updates=PAparam_updates)
+                                      exp_size=(50, np.inf), PAparam_updates=PAparam_updates, noise= 1e-4)
     else:
         try:
             os.mkdir(f'../plots/{exp_label}')
