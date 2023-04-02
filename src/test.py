@@ -239,7 +239,7 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
 
 
 def run():
-    exp_label = 'AA_comparison_test'
+    exp_label = 'Avg_v_Inclusion'
     params_1 = {'coefficient_initialization': 'xavier',
                 'replacement': True, 'avg_crossval': False, 'c_loss': True,
                 'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
@@ -248,7 +248,7 @@ def run():
                 'expand_sample': False}
 
     params_3 = {'coefficient_initialization': 'xavier',
-                 'replacement': True, 'avg_crossval': False, 'c_loss': False,
+                 'replacement': True, 'avg_crossval': True, 'c_loss': True,
                  'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
 
     model_1 = {'params_updates': params_1, 'run_function': pas_test, 'label': 'EA_results'}
