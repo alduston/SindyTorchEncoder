@@ -103,7 +103,7 @@ def comparison_test(models, exp_label = '', exp_size = (128,np.inf), noise = 1e-
     base_params, training_data, validation_data = get_test_params(exp_size[0], max_data=exp_size[1], noise=noise)
     base_params['exp_label'] = exp_label
     for model, model_dict in models.items():
-        model_params = copy(base_params)
+        model_params = deepcopy(base_params)
         model_params.update(model_dict['params_updates'])
         run_function = model_dict['run_function']
         net, loss_dict = run_function(model_params, training_data, validation_data)
@@ -115,17 +115,18 @@ def comparison_test(models, exp_label = '', exp_size = (128,np.inf), noise = 1e-
     return True
 
 
-def trajectory_plot(Meta_A_df, Meta_PA_df, exp_label, plot_key, runix):
+def trajectory_plot(model1_df, model2_df, exp_label, plot_key, runix, model_labels = ['A', 'PA']):
+    label1, label2 = model_labels
     if plot_key in ["sindy_x_","decoder_", "sindy_z"]:
-        plt.plot(Meta_A_df['epoch'], np.log(Meta_A_df[f'{plot_key}{runix}']), label='A_test')
-        plt.plot(Meta_PA_df['epoch'], np.log(Meta_PA_df[f'{plot_key}{runix}']), label='PA_test')
+        plt.plot(model1_df['epoch'], np.log(model1_df[f'{plot_key}{runix}']), label=label1)
+        plt.plot(model2_df['epoch'], np.log(model2_df[f'{plot_key}{runix}']), label=label2)
         plt.ylabel(f'Log {plot_key}')
     else:
-        plt.plot(Meta_A_df['epoch'], Meta_A_df[f'{plot_key}{runix}'], label='A_test')
-        plt.plot(Meta_PA_df['epoch'], Meta_PA_df[f'{plot_key}{runix}'], label='PA_test')
+        plt.plot(model1_df['epoch'], model1_df[f'{plot_key}{runix}'], label=label1)
+        plt.plot(model2_df['epoch'], model2_df[f'{plot_key}{runix}'], label=label2)
     plt.xlabel('epoch')
     plt.legend()
-    plt.title(f'A v PA {plot_key} run {runix}')
+    plt.title(f'{label1} v {label2} {plot_key} run {runix}')
     plt.savefig(f'../data/{exp_label}/{exp_label}_exp_{plot_key}_{runix}.png')
     torch_training.clear_plt()
     return True
@@ -151,17 +152,18 @@ def sub_trajectory_plot(dfs, exp_label, plot_key, runix, df_labels = ['A','PA'],
     return True
 
 
-def avg_trajectory_plot(Meta_A_df, Meta_PA_df, A_avg, PA_avg, exp_label, plot_key):
+def avg_trajectory_plot(model1_df, model2_df, avg1, avg2, exp_label, plot_key, model_labels = ['A', 'PA']):
+    label1,label2 = model_labels
     if plot_key in ["sindy_x_","decoder_","sindy_z_"]:
-        plt.plot(Meta_A_df['epoch'], np.log(A_avg), label='A_test')
-        plt.plot(Meta_PA_df['epoch'], np.log(PA_avg), label='PA_test')
+        plt.plot(model1_df['epoch'], np.log(avg1), label=label1)
+        plt.plot(model2_df['epoch'], np.log(avg2), label=label2)
         plt.ylabel(f'Log {plot_key}')
     else:
-        plt.plot(Meta_A_df['epoch'], A_avg, label='A_test')
-        plt.plot(Meta_PA_df['epoch'], PA_avg, label='PA_test')
+        plt.plot(model1_df['epoch'], avg1,  label=label1)
+        plt.plot(model2_df['epoch'], avg2, label=label2)
     plt.xlabel('epoch')
     plt.legend()
-    plt.title(f'A v PA {plot_key} avg')
+    plt.title(f'{label1} v {label2} {plot_key} avg')
     plt.savefig(f'../data/{exp_label}/{exp_label}_exp_{plot_key}_avg.png')
     torch_training.clear_plt()
     return True
@@ -183,29 +185,29 @@ def avg_sub_trajectory_plot(Meta_A_df, Meta_PA_df, A_avg, PA_avg, exp_label, sub
     return True
 
 
-def get_plots(Meta_A_df, Meta_PA_df, exp_label,
-              plot_keys = ["sindy_x_","decoder_", "active_coeffs_", "coeff_"]):
+def get_plots(model1_df, model2_df, exp_label,
+              plot_keys = ["sindy_x_","decoder_", "active_coeffs_", "coeff_"], model_labels = ['A', 'EA']):
     try:
         os.mkdir(f'../plots/{exp_label}/')
     except OSError:
         pass
 
-    A_runs = max([int(key[-1]) for key in Meta_A_df.columns if key.startswith('coeff')])
-    PA_runs = max([int(key[-1]) for key in Meta_PA_df.columns if key.startswith('coeff')])
-    n_runs = min(A_runs, PA_runs)
+    runs_1 = max([int(key[-1]) for key in model1_df.columns if key.startswith('coeff')])
+    runs_2 = max([int(key[-1]) for key in model2_df.columns if key.startswith('coeff')])
+    n_runs = min(runs_1, runs_2) + 1
 
     for key in plot_keys:
-        avg_A = np.zeros(len(Meta_A_df[f'epoch']))
-        avg_PA = np.zeros(len(Meta_PA_df[f'epoch']))
+        avg_1 = np.zeros(len(model1_df[f'epoch']))
+        avg_2 = np.zeros(len(model2_df[f'epoch']))
 
         for i in range(n_runs):
-            avg_A += Meta_A_df[f'{key}{i}']
-            avg_PA += Meta_PA_df[f'{key}{i}']
-            trajectory_plot(Meta_A_df, Meta_PA_df, exp_label, key, i)
+            avg_1 += model1_df[f'{key}{i}']
+            avg_2 += model2_df[f'{key}{i}']
+            trajectory_plot(model1_df, model2_df, exp_label, key, i, model_labels = model_labels)
 
-        avg_A *= (1/n_runs)
-        avg_PA *= (1/n_runs)
-        avg_trajectory_plot(Meta_A_df, Meta_PA_df, avg_A, avg_PA, exp_label, key)
+        avg_1 *= (1/n_runs)
+        avg_2 *= (1/n_runs)
+        avg_trajectory_plot(model1_df, model1_df, avg_1, avg_2, exp_label, key, model_labels = model_labels)
     return True
 
 
@@ -237,7 +239,7 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
 
 
 def run():
-    exp_label = 'comparison_test'
+    exp_label = 'AA_comparison_test'
     params_1 = {'coefficient_initialization': 'xavier',
                 'replacement': True, 'avg_crossval': False, 'c_loss': True,
                 'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
@@ -249,10 +251,10 @@ def run():
                  'replacement': True, 'avg_crossval': False, 'c_loss': False,
                  'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
 
-    model_1 = {'params_updates':params_1, 'run_function': pas_test, 'label': 'EA_results'}
-    model_2 = {'params_updates': params_2, 'run_function': a_test, 'label': 'A_results'}
+    model_1 = {'params_updates': params_1, 'run_function': pas_test, 'label': 'EA_results'}
+    model_2 = {'params_updates': params_3, 'run_function': pas_test, 'label': 'EAalt_results'}
 
-    models_dict = {'PA': model_1, 'A': model_2}
+    models_dict = {'EA': model_1, 'EA_alt': model_2}
 
     if torch.cuda.is_available():
         comparison_test(models_dict, exp_label, exp_size=(100, np.inf))
@@ -264,7 +266,7 @@ def run():
         Meta_df_1 = pd.read_csv(f'../data/{exp_label}/{model_1["label"]}.csv')
         Meta_df_2 = pd.read_csv(f'../data/{exp_label}/{model_2["label"]}.csv')
 
-        get_plots(Meta_df_1, Meta_df_2, exp_label)
+        get_plots(Meta_df_1, Meta_df_2, exp_label,model_labels = ['EA', 'EAalt'])
 
 if __name__=='__main__':
     run()
