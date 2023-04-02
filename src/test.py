@@ -26,7 +26,7 @@ def pas_test(model_params, training_data, validation_data, run  = 0):
     model_params['add_noise'] = False
     l = len(training_data['x'])
 
-    train_params = {'bag_epochs': 5000, 'nbags': model_params['nbags'],
+    train_params = {'bag_epochs': 1000, 'nbags': model_params['nbags'],
                     'bag_size': l//2, 'refinement_epochs': 0}
 
     model_params['batch_size'] = l//2
@@ -56,53 +56,14 @@ def pas_sub_test(model_params, training_data, validation_data, run  = 0):
 def a_test(model_params, training_data, validation_data, run = 0):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 4500, 'nbags': 1, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 900, 'nbags': 1, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                    'refinement_epochs': 500}
+                    'refinement_epochs': 100}
     model_params['batch_size'] = l//8
     model_params['threshold_frequency'] = 50
     model_params['run'] = run
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
-
-
-def PA_test(runs = 5, exp_label = '', exp_size = (256,np.inf),
-                  param_updates = {}, PAparam_updates = {}, sub = False):
-    Meta_PA_dict = {}
-    param_updates['exp_label'] = exp_label
-    for run_ix in range(runs):
-        model_params, training_data, validation_data = get_test_params(exp_size[0], max_data=exp_size[1])
-        model_params.update(param_updates)
-
-        pa_params = copy(model_params)
-        pa_params.update(PAparam_updates)
-
-        if sub:
-            PAnet, PALoss_dict, PASub_Loss_dict = pas_sub_test(pa_params, training_data,
-                                                               validation_data, run=run_ix)
-            PALoss_dict.update(PASub_Loss_dict)
-        else:
-            PAnet, PALoss_dict = pas_test(pa_params, training_data,  validation_data, run=run_ix)
-
-        for key, val in PALoss_dict.items():
-            if key == ('epoch'):
-                if not run_ix:
-                    Meta_PA_dict[f'{key}'] = val
-            else:
-                Meta_PA_dict[f'{key}_{run_ix}'] = val
-
-    l1 = min([len(val) for val in Meta_PA_dict.values()])
-    for key,val in Meta_PA_dict.items():
-        Meta_PA_dict[key] = val[:l1]
-    try:
-        os.mkdir(f'../data/{exp_label}/')
-    except OSError:
-        pass
-
-    Meta_PA_df = pd.DataFrame.from_dict(Meta_PA_dict, orient='columns')
-    Meta_PA_df.to_csv(f'../data/{exp_label}/Meta_PA.csv')
-
-    return Meta_PA_df
 
 
 def drop_index(df):
@@ -152,64 +113,6 @@ def comparison_test(models, exp_label = '', exp_size = (128,np.inf), noise = 1e-
         loss_df = pd.DataFrame.from_dict(loss_dict, orient='columns')
         update_loss_df(model_dict, loss_df, exp_dir)
     return True
-
-
-
-
-def Meta_test(runs = 5, exp_label = '', exp_size = (128,np.inf),
-              param_updates = {}, PAparam_updates = {}, Aparam_updates = {}, noise = 1e-6):
-    Meta_PA_dict = {}
-    Meta_A_dict = {}
-    param_updates['exp_label'] = exp_label
-    for run_ix in range(runs):
-        model_params, training_data, validation_data = get_test_params(exp_size[0], max_data=exp_size[1], noise = noise)
-        model_params.update(param_updates)
-
-        pa_params = copy(model_params)
-        pa_params.update(PAparam_updates)
-        a_params = copy(model_params)
-        a_params.update(Aparam_updates)
-
-        Anet, ALoss_dict = a_test(a_params, training_data, validation_data, run=run_ix)
-        PAnet, PALoss_dict = pas_test(pa_params, training_data, validation_data, run=run_ix)
-
-        for key,val in ALoss_dict.items():
-            if key=='epoch':
-                if not run_ix:
-                    Meta_A_dict[f'{key}'] = val
-            else:
-                Meta_A_dict[f'{key}_{run_ix}'] = val
-
-        for key,val in PALoss_dict.items():
-            if key == 'epoch':
-                if not run_ix:
-                    Meta_PA_dict[f'{key}'] = val
-            else:
-                Meta_PA_dict[f'{key}_{run_ix}'] = val
-
-    PA_keys = copy(list(Meta_PA_dict.keys()))
-    l1 = len(Meta_PA_dict['epoch'])
-    for key in PA_keys:
-        if len(Meta_PA_dict[key])!=l1:
-            Meta_PA_dict.pop(key, None)
-
-    A_keys = copy(list(Meta_A_dict.keys()))
-    l2 = len(Meta_A_dict['epoch'])
-    for key in A_keys:
-        if len(Meta_A_dict[key])!=l2:
-            Meta_A_dict.pop(key, None)
-    try:
-        os.mkdir(f'../data/{exp_label}/')
-    except OSError:
-        pass
-
-    Meta_A_df = pd.DataFrame.from_dict(Meta_A_dict, orient='columns')
-    Meta_A_df.to_csv(f'../data/{exp_label}/Meta_A.csv')
-
-    Meta_PA_df = pd.DataFrame.from_dict(Meta_PA_dict, orient='columns')
-    Meta_PA_df.to_csv(f'../data/{exp_label}/Meta_PA.csv')
-
-    return Meta_A_df, Meta_PA_df
 
 
 def trajectory_plot(Meta_A_df, Meta_PA_df, exp_label, plot_key, runix):
