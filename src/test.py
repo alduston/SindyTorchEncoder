@@ -26,13 +26,13 @@ def pas_test(model_params, training_data, validation_data, run  = 0):
     model_params['add_noise'] = False
     l = len(training_data['x'])
 
-    train_params = {'bag_epochs': 2000, 'nbags': model_params['nbags'],
+    train_params = {'bag_epochs': 5000, 'nbags': model_params['nbags'],
                     'bag_size': l//2, 'refinement_epochs': 0}
 
     model_params['batch_size'] = l//2
-    model_params['crossval_freq'] = 50
+    model_params['crossval_freq'] = 40
     model_params['run'] = run
-    model_params['pretrain_epochs'] = 50
+    model_params['pretrain_epochs'] = 51
     net, Loss_dict = scramble_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
@@ -56,9 +56,9 @@ def pas_sub_test(model_params, training_data, validation_data, run  = 0):
 def a_test(model_params, training_data, validation_data, run = 0):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 1700, 'nbags': 1, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 4500, 'nbags': 1, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                    'refinement_epochs': 300}
+                    'refinement_epochs': 500}
     model_params['batch_size'] = l//8
     model_params['threshold_frequency'] = 50
     model_params['run'] = run
@@ -103,6 +103,57 @@ def PA_test(runs = 5, exp_label = '', exp_size = (256,np.inf),
     Meta_PA_df.to_csv(f'../data/{exp_label}/Meta_PA.csv')
 
     return Meta_PA_df
+
+
+def drop_index(df):
+    for col in df.columns:
+        if col.startswith('Unnamed'):
+            df = df.drop(col, axis = 1)
+    return df
+
+
+def update_loss_df(model_dict, loss_df, exp_dir):
+    csv_name = f'{model_dict["label"]}.csv'
+    if csv_name in os.listdir(exp_dir):
+        current_loss_df =  drop_index(pd.read_csv(f'{exp_dir}{csv_name}'))
+
+        k = (len(current_loss_df.columns) - 1)//(len(loss_df.columns) - 1)
+        for col in loss_df.columns:
+            if col not in ['epoch']:
+                if not col.startswith('Unnamed'):
+                    current_loss_df[f'{col}_{k}'] = loss_df[col]
+    else:
+        current_loss_df = pd.DataFrame()
+        current_loss_df['epoch'] = loss_df['epoch']
+        for col in loss_df.columns:
+            if col not in ['epoch']:
+                current_loss_df[f'{col}_0'] = loss_df[col]
+    drop_index(current_loss_df).to_csv(f'{exp_dir}{csv_name}')
+    return current_loss_df
+
+
+def comparison_test(models, exp_label = '', exp_size = (128,np.inf), noise = 1e-6):
+    exp_dir = f'../data/{exp_label}/'
+    try:
+        os.mkdir(exp_dir)
+    except OSError:
+        pass
+
+    base_params, training_data, validation_data = get_test_params(exp_size[0], max_data=exp_size[1], noise=noise)
+    base_params['exp_label'] = exp_label
+    for model, model_dict in models.items():
+        model_params = copy(base_params)
+        model_params.update(model_dict['params_updates'])
+        run_function = model_dict['run_function']
+        net, loss_dict = run_function(model_params, training_data, validation_data)
+
+        l = len(loss_dict['epoch'])
+        loss_dict = {key:val[:l] for key,val in loss_dict.items()}
+        loss_df = pd.DataFrame.from_dict(loss_dict, orient='columns')
+        update_loss_df(model_dict, loss_df, exp_dir)
+    return True
+
+
 
 
 def Meta_test(runs = 5, exp_label = '', exp_size = (128,np.inf),
@@ -229,12 +280,16 @@ def avg_sub_trajectory_plot(Meta_A_df, Meta_PA_df, A_avg, PA_avg, exp_label, sub
     return True
 
 
-def get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label,
+def get_plots(Meta_A_df, Meta_PA_df, exp_label,
               plot_keys = ["sindy_x_","decoder_", "active_coeffs_", "coeff_"]):
     try:
         os.mkdir(f'../plots/{exp_label}/')
     except OSError:
         pass
+
+    A_runs = max([int(key[-1]) for key in Meta_A_df.columns if key.startswith('coeff')])
+    PA_runs = max([int(key[-1]) for key in Meta_PA_df.columns if key.startswith('coeff')])
+    n_runs = min(A_runs, PA_runs)
 
     for key in plot_keys:
         avg_A = np.zeros(len(Meta_A_df[f'epoch']))
@@ -279,26 +334,30 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
 
 
 def run():
-    PAparam_updates = {'coefficient_initialization': 'xavier',
-                       'replacement': True, 'avg_crossval': False, 'c_loss': True}
-    param_updates = {'loss_weight_decoder': .1, 'nbags': 40, 'bagn_factor': 1, 'expand_sample': True}
-    n_runs = 1
-    exp_label = 'low_data'
+    exp_label = 'comparison_test'
+    PA_params = {'coefficient_initialization': 'xavier',
+                'replacement': True, 'avg_crossval': False, 'c_loss': True,
+                'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
+
+    A_params = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1,
+                'expand_sample': False}
+
+    PA_dict = {'params_updates':PA_params, 'run_function': pas_test, 'label': 'EA_results'}
+    A_dict = {'params_updates': A_params, 'run_function': a_test, 'label': 'A_results'}
+    models_dict = {'PA': PA_dict, 'A': A_dict}
 
 
     if torch.cuda.is_available():
-        Meta_A_df, Meta_PA_df  = Meta_test(runs=n_runs, exp_label=exp_label, param_updates=param_updates,
-                                      exp_size=(40, np.inf), PAparam_updates=PAparam_updates, noise= 1e-6)
+        comparison_test(models_dict, exp_label, exp_size=(128, np.inf))
     else:
         try:
             os.mkdir(f'../plots/{exp_label}')
         except OSError:
             pass
-        Meta_A_df = pd.read_csv(f'../data/{exp_label}/Meta_A.csv')
-        Meta_PA_df = pd.read_csv(f'../data/{exp_label}/Meta_PA.csv')
+        Meta_A_df = pd.read_csv(f'../data/{exp_label}/A_results.csv')
+        Meta_PA_df = pd.read_csv(f'../data/{exp_label}/EA_results.csv')
 
-    get_plots(Meta_A_df, Meta_PA_df, n_runs, exp_label)
-
+        get_plots(Meta_A_df, Meta_PA_df, exp_label)
 
 
 if __name__=='__main__':

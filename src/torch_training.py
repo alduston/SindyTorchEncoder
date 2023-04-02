@@ -92,8 +92,6 @@ def train_one_epoch(model, data_loader, optimizer, scheduler = None):
     model.train()
     total_loss = 0
     total_loss_dict = {}
-    print(len(data_loader))
-    print([batch['x'].shape for batch in data_loader])
 
     for batch_index, data in enumerate(data_loader):
         loss, loss_refinement, losses = train_one_step(model, data, optimizer)
@@ -186,7 +184,7 @@ def train_sindy(model_params, train_params, training_data, validation_data, prin
 
     net = SindyNet(model_params).to(device)
     net, loss_dict, Loss_dict = subtrain_sindy(net, train_loader, model_params, train_params,
-                         mode = 'pretrain', print_freq = 50, test_loader = test_loader,
+                         mode = 'pretrain', print_freq = model_params['print_freq'], test_loader = test_loader,
                          printout= printout, Loss_dict = Loss_dict)
 
     if train_params['refinement_epochs']:
