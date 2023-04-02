@@ -254,10 +254,9 @@ def run():
 
     models_dict = {'PA': PA_dict, 'A': PA_dict_alt}
 
-    comparison_test(models_dict, exp_label, exp_size=(16, np.inf))
 
     if torch.cuda.is_available():
-        comparison_test(models_dict, exp_label, exp_size=(16, np.inf))
+        comparison_test(models_dict, exp_label, exp_size=(64, np.inf))
     else:
         try:
             os.mkdir(f'../plots/{exp_label}')
