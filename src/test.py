@@ -237,21 +237,27 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
 
 
 def run():
-    exp_label = 'comparison_test'
+    exp_label = 'AA_comparison_test'
     PA_params = {'coefficient_initialization': 'xavier',
                 'replacement': True, 'avg_crossval': False, 'c_loss': True,
                 'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
+
+    PA_params_alt = {'coefficient_initialization': 'xavier',
+                 'replacement': True, 'avg_crossval': False, 'c_loss': False,
+                 'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
 
     A_params = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1,
                 'expand_sample': False}
 
     PA_dict = {'params_updates':PA_params, 'run_function': pas_test, 'label': 'EA_results'}
-    A_dict = {'params_updates': A_params, 'run_function': a_test, 'label': 'A_results'}
-    models_dict = {'PA': PA_dict, 'A': A_dict}
+    PA_dict_alt = {'params_updates': PA_params_alt, 'run_function': pas_test, 'label': 'EAalt_results'}
 
+    models_dict = {'PA': PA_dict, 'A': PA_dict_alt}
+
+    comparison_test(models_dict, exp_label, exp_size=(16, np.inf))
 
     if torch.cuda.is_available():
-        comparison_test(models_dict, exp_label, exp_size=(128, np.inf))
+        comparison_test(models_dict, exp_label, exp_size=(16, np.inf))
     else:
         try:
             os.mkdir(f'../plots/{exp_label}')
