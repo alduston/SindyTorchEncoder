@@ -237,36 +237,34 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
 
 
 def run():
-    exp_label = 'AA_comparison_test'
-    PA_params = {'coefficient_initialization': 'xavier',
+    exp_label = 'comparison_test'
+    params_1 = {'coefficient_initialization': 'xavier',
                 'replacement': True, 'avg_crossval': False, 'c_loss': True,
                 'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
 
-    PA_params_alt = {'coefficient_initialization': 'xavier',
+    params_2 = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1,
+                'expand_sample': False}
+
+    params_3 = {'coefficient_initialization': 'xavier',
                  'replacement': True, 'avg_crossval': False, 'c_loss': False,
                  'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
 
-    A_params = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1,
-                'expand_sample': False}
+    model_1 = {'params_updates':params_1, 'run_function': pas_test, 'label': 'EA_results'}
+    model_2 = {'params_updates': params_2, 'run_function': a_test, 'label': 'A_results'}
 
-    PA_dict = {'params_updates':PA_params, 'run_function': pas_test, 'label': 'EA_results'}
-    PA_dict_alt = {'params_updates': PA_params_alt, 'run_function': pas_test, 'label': 'EAalt_results'}
-
-    models_dict = {'PA': PA_dict, 'A': PA_dict_alt}
-
+    models_dict = {'PA': model_1, 'A': model_2}
 
     if torch.cuda.is_available():
-        comparison_test(models_dict, exp_label, exp_size=(64, np.inf))
+        comparison_test(models_dict, exp_label, exp_size=(100, np.inf))
     else:
         try:
             os.mkdir(f'../plots/{exp_label}')
         except OSError:
             pass
-        Meta_A_df = pd.read_csv(f'../data/{exp_label}/A_results.csv')
-        Meta_PA_df = pd.read_csv(f'../data/{exp_label}/EA_results.csv')
+        Meta_df_1 = pd.read_csv(f'../data/{exp_label}/{model_1["label"]}.csv')
+        Meta_df_2 = pd.read_csv(f'../data/{exp_label}/{model_2["label"]}.csv')
 
-        get_plots(Meta_A_df, Meta_PA_df, exp_label)
-
+        get_plots(Meta_df_1, Meta_df_2, exp_label)
 
 if __name__=='__main__':
     run()

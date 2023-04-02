@@ -149,6 +149,7 @@ def get_test_params(train_size = 100, max_data = 100000, noise = 1e-6):
     params['data_path'] = os.getcwd() + '/'
     params['print_progress'] = True
     params['print_frequency'] = 1
+    params['print_freq'] = 50
 
     # training time cutoffs
     params['max_epochs'] = 5000
@@ -180,7 +181,7 @@ def get_bag_loader(data, train_params, model_params,  workers = 0,
     train_params['augment'] = augment
     train_params['replacement'] = replacement
     data_class = model_data(data, model_params, device, bag_params = train_params)
-    print()
+
     return DataLoader(data_class, batch_size=train_params['bag_size'], num_workers=workers, shuffle=False)
 
 

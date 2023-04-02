@@ -389,7 +389,8 @@ def print_keyval(key,val_list):
 
 def get_masks(net):
     batch_len = net.params['bag_size']
-    mask_shape = (batch_len, net.params['latent_dim'])
+    mask_shape = (batch_len, net.params['library_dim'])
+    #mask_shape = (batch_len, net.params['latent_dim'])
     l = batch_len // net.params['nbags']
     masks = []
     device = net.device

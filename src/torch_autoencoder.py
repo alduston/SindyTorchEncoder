@@ -222,17 +222,31 @@ class SindyNet(nn.Module):
         return output_tensor.reshape(xa, zb)
 
 
-    def masked_predict(self, Theta, coeffs):
+    def old_masked_predict(self, Theta, coeffs):
         masks = self.params['coeff_masks']
-        #c_loss = self.params['c_loss']
-        sindy_predict = torch.zeros(masks[0].shape, device = self.device)
         coeff_mask = self.coefficient_mask
-        #if c_loss:
-            #coeff_mask = torch.ones(self.coefficient_mask.shape, device = self.device)
+        sindy_predict = torch.zeros(masks[0].shape, device=self.device)
         for idx,coeff_m in enumerate(coeffs):
             mask = masks[idx]
             sub_predict = mask * torch.matmul(Theta, coeff_mask * coeff_m)
             sindy_predict += sub_predict
+        return sindy_predict
+
+    def masked_predict(self, Theta, coeffs):
+        masks = self.params['coeff_masks']
+        #c_loss = self.params['c_loss']
+        coeff_mask = self.coefficient_mask
+        #sindy_predict = torch.zeros(masks[0].shape, device=self.device)
+        #if c_loss:
+            #coeff_mask = torch.ones(self.coefficient_mask.shape, device = self.device)
+        for idx,coeff_m in enumerate(coeffs):
+            mask = masks[idx]
+            sub_predict = torch.matmul(mask * Theta, coeff_mask * coeff_m)
+            #sub_predict = mask * torch.matmul(Theta, coeff_mask * coeff_m)
+            if not idx:
+                sindy_predict = sub_predict
+            else:
+                sindy_predict += sub_predict
         return sindy_predict
 
 
