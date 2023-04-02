@@ -56,9 +56,9 @@ def pas_sub_test(model_params, training_data, validation_data, run  = 0):
 def a_test(model_params, training_data, validation_data, run = 0):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 900, 'nbags': 1, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 1800, 'nbags': 1, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                    'refinement_epochs': 100}
+                    'refinement_epochs': 200}
     model_params['batch_size'] = l//8
     model_params['threshold_frequency'] = 50
     model_params['run'] = run
@@ -251,10 +251,10 @@ def run():
                  'replacement': True, 'avg_crossval': True, 'c_loss': True,
                  'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
 
-    model_1 = {'params_updates': params_1, 'run_function': pas_test, 'label': 'EA_results'}
-    model_2 = {'params_updates': params_3, 'run_function': pas_test, 'label': 'EAalt_results'}
+    model_1 = {'params_updates': params_1, 'run_function': pas_test, 'label': 'EA_avg_results'}
+    model_2 = {'params_updates': params_3, 'run_function': pas_test, 'label': 'EA_inclusion_results'}
 
-    models_dict = {'EA': model_1, 'EA_alt': model_2}
+    models_dict = {'EA_avg': model_1, 'EA_inclusion': model_2}
 
     if torch.cuda.is_available():
         comparison_test(models_dict, exp_label, exp_size=(100, np.inf))
