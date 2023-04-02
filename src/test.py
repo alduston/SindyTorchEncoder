@@ -26,7 +26,7 @@ def pas_test(model_params, training_data, validation_data, run  = 0):
     model_params['add_noise'] = False
     l = len(training_data['x'])
 
-    train_params = {'bag_epochs': 1000, 'nbags': model_params['nbags'],
+    train_params = {'bag_epochs': 2000, 'nbags': model_params['nbags'],
                     'bag_size': l//2, 'refinement_epochs': 0}
 
     model_params['batch_size'] = l//2
