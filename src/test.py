@@ -239,9 +239,10 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
 
 
 def run():
-    exp_label = 'L1_v_hybrid'
+    exp_label = 'Avg_v_Inclusion'
+    
     params_1 = {'coefficient_initialization': 'xavier',
-                'replacement': True, 'avg_crossval': True, 'c_loss': False,
+                'replacement': True, 'avg_crossval': True, 'c_loss': True,
                 'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
 
     params_2 = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1,
@@ -255,10 +256,10 @@ def run():
                 'replacement': True, 'avg_crossval': False, 'c_loss': True,
                 'hybrid_reg': True, 'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
 
-    model_1 = {'params_updates': params_1, 'run_function': pas_test, 'label': 'EA_L1'}
-    model_2 = {'params_updates': params_4, 'run_function': pas_test, 'label': 'EA_hybrid'}
+    model_1 = {'params_updates': params_1, 'run_function': pas_test, 'label': 'EA_avg'}
+    model_2 = {'params_updates': params_3, 'run_function': pas_test, 'label': 'EA_inclusion'}
 
-    models_dict = {'EA_L1': model_1, 'EA_hybrid': model_2}
+    models_dict = {'EA_avg': model_1, 'EA_inclusion': model_2}
 
     if torch.cuda.is_available():
         comparison_test(models_dict, exp_label, exp_size=(100, np.inf))
