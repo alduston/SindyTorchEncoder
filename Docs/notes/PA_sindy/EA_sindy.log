@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  2 APR 2023 15:36
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  2 APR 2023 16:46
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -562,16 +562,16 @@ LaTeX Font Info:    Trying to load font information for U+rsfs on input line 67
 
 (/usr/local/texlive/2020/texmf-dist/tex/latex/jknapltx/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
-)
-LaTeX Font Info:    Trying to load font information for U+bbm on input line 101
+) [1
+
+{/usr/local/texlive/2020/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+LaTeX Font Info:    Trying to load font information for U+bbm on input line 102
 .
 
 (/usr/local/texlive/2020/texmf-dist/tex/latex/bbm-macros/ubbm.fd
 File: ubbm.fd 1999/03/15 V 1.2 Font definition for bbm font - TH
-) [1
-
-{/usr/local/texlive/2020/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-Overfull \hbox (7.37161pt too wide) in paragraph at lines 118--119
+)
+Overfull \hbox (7.37161pt too wide) in paragraph at lines 123--124
 []$\OMS/cmsy/m/n/10.95 L\OT1/cmr/m/n/10.95 (\OML/cmm/m/it/10.95 '; '[]; \OT1/cm
 r/m/n/10.95 ^^D[]; \OML/cmm/m/it/10.95 x; []x\OT1/cmr/m/n/10.95 ) = \OMS/cmsy/m
 /n/10.95 L[]\OT1/cmr/m/n/10.95 (\OML/cmm/m/it/10.95 '; '[]\OT1/cmr/m/n/10.95 ; 
@@ -582,7 +582,7 @@ r/m/n/10.95 ^^D[]; \OML/cmm/m/it/10.95 x; []x\OT1/cmr/m/n/10.95 ) = \OMS/cmsy/m
  []
 
 
-Overfull \hbox (7.63339pt too wide) in paragraph at lines 128--130
+Overfull \hbox (7.63339pt too wide) in paragraph at lines 131--133
 []\OT1/cmr/m/n/10.95 Ie it pro-motes spar-sity in $[]^^D = [] [][] ^^D[]$. We u
 se $\OMS/cmsy/m/n/10.95 L[]\OT1/cmr/m/n/10.95 (^^D[]) = \OML/cmm/m/it/10.95 ^^U
 []\OMS/cmsy/m/n/10.95 k[] [][] \OT1/cmr/m/n/10.95 ^^D[]\OMS/cmsy/m/n/10.95 k[]$
@@ -593,7 +593,7 @@ se $\OMS/cmsy/m/n/10.95 L[]\OT1/cmr/m/n/10.95 (^^D[]) = \OML/cmm/m/it/10.95 ^^U
 Here is how much of TeX's memory you used:
  13968 strings out of 480608
  268891 string characters out of 5903631
- 504773 words of memory out of 5000000
+ 506773 words of memory out of 5000000
  29581 multiletter control sequences out of 15000+600000
  540193 words of font info for 57 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -611,7 +611,7 @@ pe1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1
 /public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/
 public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/pu
 blic/amsfonts/symbols/msbm10.pfb>
-Output written on EA_sindy.pdf (5 pages, 114870 bytes).
+Output written on EA_sindy.pdf (5 pages, 117579 bytes).
 PDF statistics:
  72 PDF objects out of 1000 (max. 8388607)
  52 compressed objects within 1 object stream

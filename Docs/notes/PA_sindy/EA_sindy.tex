@@ -57,7 +57,7 @@
 \newcommand{\Lim}[1]{\raisebox{0.5ex}{\scalebox{0.8}{$\displaystyle \lim_{#1}\;$}}}
 \newcommand{\Limn}{\Lim{n \in \N}}
 \newcommand{\Cross}{\mathbin{\tikz [x=1.4ex,y=1.4ex,line width=.2ex] \draw (0,0) -- (1,1) (0,1) -- (1,0);}}
-\title{ EA-sindy}
+\title{ EA-Sindy}
 \author{Alois D'uston,  ald6fd}
 \setlength{\parindent}{0pt}
 
@@ -73,23 +73,24 @@ Base Autoencoder Sindy begins with data matrixes $X,  \dot{X} \in \R^{m \times D
 
 Each column $X_i \sim \mathcal{X}$.  Derivatives $\dot{X}_i$ in  $\dot{X}$ are computed numerically.  
  
-We fit model $\varphi^{-1}(\Theta(\varphi(x))\Xi) \approx \dot{x}$  using training data $X,  \dot{X}$ , where:
+We assume that $x \sim \mathcal{X}$ admits some lower dimensional representation in latent space  $\mathcal{Z}$.  We further assume that the dynamical system $\dot{x} = f(x)$ can be represented in sparse fashion in $\mathcal{Z}$.  Concretely this means we fit model
+ I.  $x =  \varphi^{-1} \varphi(x) = \varphi^{-1}(z)$, 
+  II.  $(\dd{}{x}\varphi)  \dot{x} = \dd{}{t}\varphi(x) =   \dot{z} = \Theta(z)\Xi = \Theta(\varphi(x))\Xi$,  
+
+III. $\dot{x}= \dd{}{t} \varphi^{-1} \varphi(x)= (\dd{}{z} \varphi^{-1})(\dd{}{t}\varphi(x)) = (\dd{}{z} \varphi^{-1})(\Theta(\varphi(x))\Xi)$, where 
 
 
-i.  $\func{\varphi}{\R^D}{\R^d}$, $\func{\varphi^{-1}}{\R^d}{\R^D}$ are encoder decoder pair s.t  
-$\restrict{(\varphi^{-1} \circ \varphi)}{\mathcal{X}} \approx  I$
+i.  $\func{\varphi}{\R^D}{\R^d}$, $\func{\varphi^{-1}}{\R^d}{\R^D}$ are encoder decoder neural nets.
 
 ii.  $\func{\Theta}{\R^d}{\R^p}$ evaluates function library(consisting of $p$ funcs) on $\varphi(x)$.
 
-iii.  $\Xi \in \R^{d \times p}$ are linear coefficients associated to each term in ${\Theta}(\varphi(x))$.
+iii.  $\Xi \in \R^{d \times p}$ is a matrix of   coefficients associated to each term in ${\Theta}(\varphi(x))$,  which we take to be sparse.
 
 We fit this model using gradient descent with loss function:
 
 $\mathcal{L}(\varphi, \varphi^{-1},  \Xi ; x ,\dot{x}) = \mathcal{L}_\text{encode}(\varphi, \varphi^{-1}; x) + \mathcal{L}_\text{fit}(\varphi, \varphi^{-1},\Xi; x,\dot{x}) + \mathcal{L}_\text{reg}(\Xi)$
 
- $\mathcal{L}_\text{encode}$ enforces that $\restrict{(\varphi^{-1} \circ \varphi)}{\mathcal{X}} \approx  I$
- 
- $\mathcal{L}_\text{fit}$ enforces that $\varphi^{-1}(\Theta(\varphi(x))\Xi) \approx \dot{x}$
+ $\mathcal{L}_\text{encode}$ enforces that $\restrict{(\varphi^{-1} \circ \varphi)}{\mathcal{X}} \approx  I$,  $\mathcal{L}_\text{fit}$ enforces conditions II,III and
 
  $\mathcal{L}_\text{reg}$ promotes sparsity in  coefficients $\Xi$.
  Usually   use $\mathcal{L}_\text{reg}(\Xi) = \lambda_\text{reg}\norm{\Xi}{1}$
@@ -100,8 +101,7 @@ $\mathcal{L}(\varphi, \varphi^{-1},  \Xi ; x ,\dot{x}) = \mathcal{L}_\text{encod
  
  At epoch $k$ of training we set $\Lambda ^{(k)}_{ij} = \indi\{(\Lambda ^{(k-1)}\odot \Xi^{(k-1)})_{ij} \approx 0\}$.
  
- \pagebreak
- 
+ \bs
  
  In ensemble autoencoder sindy we split our training data $X,\dot{X}$ 	into $b$ bags $\{X^{(i)},  \dot{X}^{(i)}\}_{i=1}^b$ where $X^{(i)},\dot{X}^{(i)} \in \R^{q \times D}$ are sampled from the training 
  
@@ -109,21 +109,24 @@ $\mathcal{L}(\varphi, \varphi^{-1},  \Xi ; x ,\dot{x}) = \mathcal{L}_\text{encod
   We consider coefficient tensor 
   
   $\Xi^{[1:b]} \in \R^{b \times d \times p}$,  where $\Xi^{[1:b]}_{[i,:,:]} = \Xi^{(i)}$ 
- corresponds to bag $X^{(i)},\dot{X}^{(i)}$ of the data.  In training,  we fit model
-   $\varphi^{-1}(\Theta(\varphi(x))\sum_{i} \Xi^{(i)}\indi\{x \in X^{(i)}\}) \approx \dot{x}$.
+ corresponds to bag $X^{(i)},\dot{X}^{(i)}$ of the data.  In other words,  $\Xi^{(i)}$ is used to fit $\dd{}{t} \varphi(x)$ to $\dot{x}$ for $x,\dot{x} \in X^{(i)},\dot{X}^{(i)}$.
  
+ As with regular autoencoder sindy,  in training, we fit the model 
+ 
+  I.  $x =  \varphi^{-1} \varphi(x) = \varphi^{-1}(z)$, 
+ II.  $\dd{}{t} \varphi(x) =  \Theta(\varphi(x))\sum_{i} \Xi^{(i)}\indi\{x \in X^{(i)}\})$
+ 
+ III.  $\dot{x} = (\dd{}{z} \varphi^{-1})(\Theta(\varphi(x))\sum_{i} \Xi^{(i)}\indi\{x \in X^{(i)}\})$
  
  We do so via gradient descent using loss function:
  
  $\mathcal{L}(\varphi, \varphi^{-1}, \Xi^{[1:b]} ; x ,\dot{x}) = \mathcal{L}_\text{encode}(\varphi, \varphi^{-1}; x) + \mathcal{L}_\text{fit}(\varphi, \varphi^{-1},\Xi^{[1:b]}; x,\dot{x}) + \mathcal{L}_\text{reg}(\Xi^{[1:b]})$
  
-  $\mathcal{L}_\text{encode}$ is unchanged, enforces that $\restrict{(\varphi^{-1} \circ \varphi)}{\mathcal{X}} \approx  I$
- 
- 
-  $\mathcal{L}_\text{fit}$ enforces that    $\varphi^{-1}(\Theta(\varphi(x))\sum_{i} \Xi^{(i)}\indi\{x \in X^{(i)}\}) \approx \dot{x}$.
+  $\mathcal{L}_\text{encode}$ is unchanged, enforces that $\restrict{(\varphi^{-1} \circ \varphi)}{\mathcal{X}} \approx  I$,  
+ $\mathcal{L}_\text{fit}$ enforces II,III and
   
   
-   $\mathcal{L}_\text{reg}$ promotes sparsity in the average of coefficients  $\Xi^{(1)},...\Xi^{(n)}$
+   $\mathcal{L}_\text{reg}$ promotes sparsity in the average of coefficients  $\Xi^{(1)},...\Xi^{(b)}$
    
     Ie it promotes sparsity in   $\tilde{\Xi} = \frac{1}{b}\sum_{i} \Xi^{(i)}$.
      We use $\mathcal{L}_\text{reg}(\Xi^{[1:b]}) = \lambda_\text{reg}\norm{\frac{1}{b}\sum_{i} \Xi^{(i)}}{1}$
@@ -139,6 +142,28 @@ $\mathcal{L}(\varphi, \varphi^{-1},  \Xi ; x ,\dot{x}) = \mathcal{L}_\text{encod
  
  \tb{Results}:
  
+ Base test:
+ 
+ \bs
+ 
+ Low data test:
+ 
+ 
+  \bs
+ 
+ Noise test:
+ 
+ 
+  \bs
+ 
+ Avg v Inclusion test:
+ 
+ 
+  \bs
+ 
+ Total reg v Avg reg test:
+ 
+  \bs
  
  \pagebreak
  

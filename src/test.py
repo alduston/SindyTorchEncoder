@@ -26,7 +26,7 @@ def pas_test(model_params, training_data, validation_data, run  = 0):
     model_params['add_noise'] = False
     l = len(training_data['x'])
 
-    train_params = {'bag_epochs': 2000, 'nbags': model_params['nbags'],
+    train_params = {'bag_epochs': 5000, 'nbags': model_params['nbags'],
                     'bag_size': l//2, 'refinement_epochs': 0}
 
     model_params['batch_size'] = l//2
@@ -239,7 +239,7 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
 
 
 def run():
-    exp_label = 'Avg_v_Inclusion'
+    exp_label = 'AA_comparison_long'
     params_1 = {'coefficient_initialization': 'xavier',
                 'replacement': True, 'avg_crossval': False, 'c_loss': True,
                 'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
@@ -248,25 +248,29 @@ def run():
                 'expand_sample': False}
 
     params_3 = {'coefficient_initialization': 'xavier',
-                 'replacement': True, 'avg_crossval': True, 'c_loss': True,
+                 'replacement': True, 'avg_crossval': False, 'c_loss': False,
                  'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
 
-    model_1 = {'params_updates': params_1, 'run_function': pas_test, 'label': 'EA_avg_results'}
-    model_2 = {'params_updates': params_3, 'run_function': pas_test, 'label': 'EA_inclusion_results'}
+    model_1 = {'params_updates': params_1, 'run_function': pas_test, 'label': 'EA_results'}
+    model_2 = {'params_updates': params_3, 'run_function': pas_test, 'label': 'EAalt_results'}
 
     models_dict = {'EA_avg': model_1, 'EA_inclusion': model_2}
 
     if torch.cuda.is_available():
         comparison_test(models_dict, exp_label, exp_size=(100, np.inf))
     else:
+        exp = 'AA_comparison_test'
         try:
-            os.mkdir(f'../plots/{exp_label}')
+            os.mkdir(f'../plots/{exp}')
         except OSError:
             pass
-        Meta_df_1 = pd.read_csv(f'../data/{exp_label}/{model_1["label"]}.csv')
-        Meta_df_2 = pd.read_csv(f'../data/{exp_label}/{model_2["label"]}.csv')
+        exp = 'AA_comparison_test'
+        label1 = 'EA_results'
+        label2 = 'EAalt_results'
+        Meta_df_1 = pd.read_csv(f'../data/{exp}/{label1}.csv')
+        Meta_df_2 = pd.read_csv(f'../data/{exp}/{label2}.csv')
 
-        get_plots(Meta_df_1, Meta_df_2, exp_label,model_labels = ['EA', 'EAalt'])
+        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['EA', 'EAalt'])
 
 if __name__=='__main__':
     run()
