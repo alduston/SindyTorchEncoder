@@ -24,9 +24,10 @@ def pas_test(model_params, training_data, validation_data, run  = 0):
     model_params['sequential_thresholding'] = False
     model_params['use_activation_mask'] = False
     model_params['add_noise'] = False
+
     l = len(training_data['x'])
 
-    train_params = {'bag_epochs': 5000, 'nbags': model_params['nbags'],
+    train_params = {'bag_epochs': model_params['max_epochs'], 'nbags': model_params['nbags'],
                     'bag_size': l//2, 'refinement_epochs': 0}
 
     model_params['batch_size'] = l//2
@@ -34,6 +35,19 @@ def pas_test(model_params, training_data, validation_data, run  = 0):
     model_params['run'] = run
     model_params['pretrain_epochs'] = 51
     net, Loss_dict = scramble_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
+    return net, Loss_dict
+
+
+def pas_recursive(model_params, training_data, validation_data, run  = 0, k = 5):
+    Loss_dict = {}
+    for i in range(k):
+        net,loss_dict = pas_test(model_params, training_data, validation_data)
+        model_params['coefficient_mask'] = net.coefficient_mask.detach().numpy()
+        loss_dict['epoch'] = [val +  model_params['max_epochs'] for val in loss_dict['epoch']]
+        if len(Loss_dict.keys()):
+            Loss_dict = {key: val.append(loss_dict[key]) for key,val in Loss_dict.items()}
+        else:
+            Loss_dict = loss_dict
     return net, Loss_dict
 
 
@@ -239,11 +253,11 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
 
 
 def run():
-    exp_label = 'Avg_v_Inclusion'
-    
+    exp_label = 'L1_v_Recursive'
+
     params_1 = {'coefficient_initialization': 'xavier',
-                'replacement': True, 'avg_crossval': True, 'c_loss': True,
-                'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
+                'replacement': True, 'avg_crossval': False, 'c_loss': False,
+                'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1, 'max_epochs': 1200}
 
     params_2 = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1,
                 'expand_sample': False}
@@ -253,13 +267,15 @@ def run():
                  'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
 
     params_4 = {'coefficient_initialization': 'xavier',
-                'replacement': True, 'avg_crossval': False, 'c_loss': True,
-                'hybrid_reg': True, 'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
+                'replacement': True, 'avg_crossval': False, 'c_loss': False,
+                'hybrid_reg': True, 'loss_weight_decoder': .1, 'nbags': 30,
+                'bagn_factor': 1,'max_epochs': 6000}
 
-    model_1 = {'params_updates': params_1, 'run_function': pas_test, 'label': 'EA_avg'}
-    model_2 = {'params_updates': params_3, 'run_function': pas_test, 'label': 'EA_inclusion'}
+    model_2 = {'params_updates': params_1, 'run_function': pas_test, 'label': 'EA_L1'}
+    model_1 = {'params_updates': params_4, 'run_function': pas_recursive, 'label': 'EA_recursive'}
 
-    models_dict = {'EA_avg': model_1, 'EA_inclusion': model_2}
+    models_dict = {'EA_L1': model_2, 'EA_recursive': model_1}
+
 
     if torch.cuda.is_available():
         comparison_test(models_dict, exp_label, exp_size=(100, np.inf))
