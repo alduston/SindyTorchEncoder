@@ -319,6 +319,10 @@ class SindyNet(nn.Module):
             if alt:
                 sub_coeffs = torch.sum(sub_coeffs, dim = 0)
         reg_loss = self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sub_coeffs))
+        if self.params['hybrid_reg']:
+            sub_coeffs = torch.sum(sub_coeffs, dim=0)
+            reg_loss +=  self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sub_coeffs))
+            reg_loss *= .5
         if avg:
             reg_loss *= (1 / self.params['nbags'])
         return reg_loss

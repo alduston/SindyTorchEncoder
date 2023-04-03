@@ -165,6 +165,7 @@ def get_test_params(train_size = 100, max_data = 100000, noise = 1e-6):
     params['scramble'] = False
     params['eval'] = False
     params['expand_sample'] = True
+    params['hybrid_reg'] = False
     params['bagn_factor'] = 1
     params['true_coeffs'] = training_data['sindy_coefficients']
 

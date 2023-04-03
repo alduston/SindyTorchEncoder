@@ -239,36 +239,44 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
 
 
 def run():
-    exp_label = 'AA_comparison_long'
+    exp_label = 'L1_v_hybrid'
     params_1 = {'coefficient_initialization': 'xavier',
-                'replacement': True, 'avg_crossval': False, 'c_loss': True,
+                'replacement': True, 'avg_crossval': True, 'c_loss': False,
                 'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
 
     params_2 = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1,
                 'expand_sample': False}
 
     params_3 = {'coefficient_initialization': 'xavier',
-                 'replacement': True, 'avg_crossval': False, 'c_loss': False,
+                 'replacement': True, 'avg_crossval': False, 'c_loss': True,
                  'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
 
-    model_1 = {'params_updates': params_1, 'run_function': pas_test, 'label': 'EA_results'}
-    model_2 = {'params_updates': params_3, 'run_function': pas_test, 'label': 'EAalt_results'}
+    params_4 = {'coefficient_initialization': 'xavier',
+                'replacement': True, 'avg_crossval': False, 'c_loss': True,
+                'hybrid_reg': True, 'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1}
 
-    models_dict = {'EA_avg': model_1, 'EA_inclusion': model_2}
+    model_1 = {'params_updates': params_1, 'run_function': pas_test, 'label': 'EA_L1'}
+    model_2 = {'params_updates': params_4, 'run_function': pas_test, 'label': 'EA_hybrid'}
+
+    models_dict = {'EA_L1': model_1, 'EA_hybrid': model_2}
 
     if torch.cuda.is_available():
         comparison_test(models_dict, exp_label, exp_size=(100, np.inf))
     else:
-        exp = 'AA_comparison_test'
+        exp = 'AA_comparison_long'
         try:
             os.mkdir(f'../plots/{exp}')
         except OSError:
             pass
-        exp = 'AA_comparison_test'
         label1 = 'EA_results'
         label2 = 'EAalt_results'
-        Meta_df_1 = pd.read_csv(f'../data/{exp}/{label1}.csv')
-        Meta_df_2 = pd.read_csv(f'../data/{exp}/{label2}.csv')
+
+        os.rename(f'../data/{exp}/{label1}.csv', f'../data/{exp}/{label1}_local.csv')
+        os.rename(f'../data/{exp}/{label2}.csv', f'../data/{exp}/{label2}_local.csv')
+
+        Meta_df_1 = pd.read_csv(f'../data/{exp}/{label1}_local.csv')
+        Meta_df_2 = pd.read_csv(f'../data/{exp}/{label2}_local.csv')
+
 
         get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['EA', 'EAalt'])
 
