@@ -73,8 +73,10 @@ Base Autoencoder Sindy begins with data matrixes $X,  \dot{X} \in \R^{m \times D
 
 Each column $X_i$ of the data matrix is taken to come from some
 
- distribution  with support on $\mathcal{X}\subset \R^D$.  Derivatives $\dot{X}_i$ in  data matrix $\dot{X}$ come are computed numerically beforehand.  
- We assume that data vectors $x \in \mathcal{X}$ admit lower dimensional representations in some latent space  $\mathcal{Z}$.  We further assume that the dynamical system $\dot{x} = f(x)$,  mapped into  $\mathcal{Z}$, can be represented as $\dot{z} = \Theta(z)\Xi$,   where $\Theta$ is a function library evaluated on the coordinates of $z$ and $\Xi$ is sparse matrix of coefficients. 
+ distribution  with support on $\mathcal{X}\subset \R^D$.  Derivatives $\dot{X}_i$ in  data matrix $\dot{X}$  are computed numerically beforehand.  
+ We assume that data vectors 
+ 
+ $x \in \mathcal{X}$ admit lower dimensional representations in some latent space  $\mathcal{Z}$.  We further assume that the dynamical system $\dot{x} = f(x)$,  mapped into  $\mathcal{Z}$, can be represented as $\dot{z} = \Theta(z)\Xi$,   where $\Theta$ is a function library evaluated on the coordinates of $z$ and $\Xi$ is sparse matrix of coefficients. 
  
   We further assume that the mappings $x \mapsto z$ and $z \mapsto x$ are differentiable. 
 
@@ -157,7 +159,7 @@ Firstly,  at epoch $k$ of training we may set $\Lambda ^{(k)}_{ij} = \indi\{\fra
   
   decouples the regularization of each sub model.  
   
-We sub-model regularization is coupled,  and thus depedent,  as with the $ \mathcal{L}_\text{reg1}$ regularizer we may consider 
+When sub-model regularization is coupled,  and thus depedent,  as with the $ \mathcal{L}_\text{reg1}$ regularizer we may consider 
 mask
 $\Lambda ^{(k)}_{ij} = \indi\{\Lambda ^{(k-1)} \odot \frac{1}{b}\sum_{h} 
 \Xi^{(h),(k)}_{ij} \approx 0\}$.
@@ -171,7 +173,7 @@ Per the model setup we have
 $\dot{z} \approx \alpha_a f(z) + c_1^Tg(z)$ and 
 $\dot{z} \approx + \alpha_b f(z) +  c_2^Tg(z)$.  
 
-Adding the two expressions we obtain $\dot{z}   \approx \frac{1}{2}(c_1+c_2)^Tg(z)$,  hence $f$ is not essential to fitting $\tilde{z}$.    Even if the fit quality is the same,  it might still be that representations $[\alpha_a \: c_1]$ or $[\alpha_b \: c_2]$ are 'better' than $[0 \: c_1 + c_2]$ in the sense that they have  greater sparsity, but in that case the $\mathcal{L}_\text{reg1}$ regularizer would push the model in the direction of adopting the representation with the greatest sparsity.   Hence in all cases it is reasonable for us to not worry about destructive interference among relevant coefficients in this masking scheme. We refer to this procedure as cooperative selection.
+Adding the two expressions we obtain $\dot{z}   \approx \frac{1}{2}(c_1+c_2)^Tg(z)$,  hence $f$ is not essential to fitting $\dot{z}$.    Even if the fit quality is the same,  it might still be that representations $[\alpha_a \: c_1]$ or $[\alpha_b \: c_2]$ are 'better' than $[0 \: c_1 + c_2]$ in the sense that they have  greater sparsity, but in that case the $\mathcal{L}_\text{reg1}$ regularizer would push the model in the direction of adopting the representation with the greatest sparsity.   Hence in all cases it is reasonable for us to not worry about destructive interference among relevant coefficients in this masking scheme. We refer to this procedure as cooperative selection.
   
   \pagebreak
   

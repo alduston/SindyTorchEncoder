@@ -43,7 +43,7 @@ def pas_recursive(model_params, training_data, validation_data, run  = 0, k = 5)
     Loss_dict = {}
     for i in range(k):
         net, loss_dict = pas_test(model_params, training_data, validation_data)
-        model_params['coefficient_mask'] = net.coefficient_mask.detach().numpy()
+        model_params['coefficient_mask'] = net.coefficient_mask.detach().cpu().numpy()
         loss_dict['epoch'] = [val +  i * (model_params['max_epochs']+1) for val in loss_dict['epoch']]
         if len(Loss_dict.keys()):
             Loss_dict = {key: val + loss_dict[key] for (key,val) in Loss_dict.items()}
@@ -276,7 +276,6 @@ def run():
     model_2 = {'params_updates': params_4, 'run_function': pas_recursive, 'label': 'EA_recursive'}
 
     models_dict = {'EA_L1': model_1, 'EA_recursive': model_2}
-    #comparison_test(models_dict, exp_label, exp_size=(10, np.inf))
 
     if torch.cuda.is_available():
         comparison_test(models_dict, exp_label, exp_size=(100, np.inf))

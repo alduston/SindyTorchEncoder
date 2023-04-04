@@ -398,6 +398,7 @@ def get_masks(net):
         mask = torch.zeros(mask_shape, device = device)
         mask[i*l:(i+1)*l, :] += 1.0
         masks.append(mask)
+        print(mask.shape)
     return torch.stack(masks)
 
 
