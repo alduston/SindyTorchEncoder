@@ -33,8 +33,8 @@ def pas_test(model_params, training_data, validation_data, run  = 0):
     model_params['batch_size'] = l//2
     model_params['crossval_freq'] = 40
     model_params['run'] = run
-    model_params['pretrain_epochs'] = 1
-    model_params['test_freq'] = 5
+    model_params['pretrain_epochs'] = 50
+    model_params['test_freq'] = 50
     net, Loss_dict = scramble_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
@@ -222,7 +222,7 @@ def get_plots(model1_df, model2_df, exp_label,
 
         avg_1 *= (1/n_runs)
         avg_2 *= (1/n_runs)
-        avg_trajectory_plot(model1_df, model1_df, avg_1, avg_2, exp_label, key, model_labels = model_labels)
+        avg_trajectory_plot(model1_df, model2_df, avg_1, avg_2, exp_label, key, model_labels = model_labels)
     return True
 
 
@@ -269,33 +269,36 @@ def run():
 
     params_4 = {'coefficient_initialization': 'xavier',
                 'replacement': True, 'avg_crossval': False, 'c_loss': False,
-                'hybrid_reg': True, 'loss_weight_decoder': .1, 'nbags': 30,
+                'hybrid_reg': False, 'loss_weight_decoder': .1, 'nbags': 30,
                 'bagn_factor': 1,'max_epochs': 1200}
 
     model_1 = {'params_updates': params_1, 'run_function': pas_test, 'label': 'EA_L1'}
     model_2 = {'params_updates': params_4, 'run_function': pas_recursive, 'label': 'EA_recursive'}
 
     models_dict = {'EA_L1': model_1, 'EA_recursive': model_2}
+    #comparison_test(models_dict, exp_label, exp_size=(10, np.inf))
 
     if torch.cuda.is_available():
         comparison_test(models_dict, exp_label, exp_size=(100, np.inf))
     else:
-        exp = 'AA_comparison_long'
+        exp = 'L1_v_Recursive'
         try:
             os.mkdir(f'../plots/{exp}')
         except OSError:
             pass
-        label1 = 'EA_results'
-        label2 = 'EAalt_results'
-
-        os.rename(f'../data/{exp}/{label1}.csv', f'../data/{exp}/{label1}_local.csv')
-        os.rename(f'../data/{exp}/{label2}.csv', f'../data/{exp}/{label2}_local.csv')
+        label1 = 'EA_L1'
+        label2 = 'EA_recursive'
+        try:
+            os.rename(f'../data/{exp}/{label1}.csv', f'../data/{exp}/{label1}_local.csv')
+            os.rename(f'../data/{exp}/{label2}.csv', f'../data/{exp}/{label2}_local.csv')
+        except OSError:
+            pass
 
         Meta_df_1 = pd.read_csv(f'../data/{exp}/{label1}_local.csv')
         Meta_df_2 = pd.read_csv(f'../data/{exp}/{label2}_local.csv')
 
 
-        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['EA', 'EAalt'])
+        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['EA_L1', 'EA_recursive'])
 
 if __name__=='__main__':
     run()

@@ -1,0 +1,221 @@
+\documentclass[11pt]{article}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{mathrsfs}
+\usepackage{bbm}
+\usepackage{tikz}
+\usepackage{accents}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{centernot}
+\newcommand{\bs}{{\bigskip}}
+\newcommand{\floor}[1]{\lfloor #1 \rfloor}
+\newcommand{\ceiling}[1]{\lceil #1 \rceil}
+\newcommand{\ms}{{\medskip}}
+\newcommand{\sms}{{\smallskip}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\indi}{\mathbbm{1}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\sigF}{\mathcal{F}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\B}{\mathbb{B}}
+\newcommand{\dd}[2]{\frac{d{#1}}{d{#2}}}
+\newcommand{\fancyF}{\mathscr{F}}
+\newcommand{\borelB}{\mathcal{B}}
+\newcommand{\Var}{\text{Var}}
+\newcommand{\inner}[2]{\langle{#1},{#2}\rangle}
+\newcommand{\sinner}[1]{\langle{#1},{#1} \rangle}
+\renewcommand{\epsilon}{\varepsilon}
+\renewcommand{\overrightarrow}{\vec}
+\newcommand{\tb}{\textbf}
+\newcommand{\bfrac}[2]{\displaystyle{\frac{#1}{#2}}}
+\newcommand{\bcup}{\bigcup\limits}
+\newcommand{\bcap}{\bigcap\limits}
+\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+\newcommand{\nimply}{\centernot\Rightarrow}
+\newcommand{\ar}{\Rightarrow}
+\newcommand{\norm}[2]{\| #1 \|_{#2}}
+\newcommand{\bnorm}[1]{\norm{#1}{}}
+\newcommand{\probp}{\mathbb{P}}
+\newcommand{\restrict}[2]{#1\big{|}_{#2}}
+
+\newcommand{\enorm}[1]{\| #1 \|}
+\newcommand{\goto}{\rightarrow}
+\newcommand{\bint}[2]{\displaystyle{\int_{#1}^{#2}}}
+\newcommand{\nogoto}{\centernot\rightarrow}
+\renewcommand{\baselinestretch}{1.5}
+\newcommand{\bsum}[2]{\displaystyle{\sum_{#1}^{#2}}}
+\newcommand{\bprod}[2]{\displaystyle{\prod_{#1}^{#2}}}
+\newcommand{\func}[3]{#1: #2\rightarrow#3}
+\newcommand{\sfunc}[2]{#1: #2\rightarrow#2}
+\newcommand{\cexp}[2]{\E[#1 \mid #2]}
+\usepackage{venndiagram}
+\newcommand{\Lim}[1]{\raisebox{0.5ex}{\scalebox{0.8}{$\displaystyle \lim_{#1}\;$}}}
+\newcommand{\Limn}{\Lim{n \in \N}}
+\newcommand{\Cross}{\mathbin{\tikz [x=1.4ex,y=1.4ex,line width=.2ex] \draw (0,0) -- (1,1) (0,1) -- (1,0);}}
+\title{ EA-Sindy}
+\author{Alois D'uston,  ald6fd}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+
+\maketitle
+
+
+\tb{Autoencoder Sindy}:
+
+Base Autoencoder Sindy begins with data matrixes $X,  \dot{X} \in \R^{m \times D}$. 
+
+Each column $X_i$ of the data matrix is taken to come from some
+
+ distribution  with support on $\mathcal{X}\subset \R^D$.  Derivatives $\dot{X}_i$ in  data matrix $\dot{X}$ come are computed numerically beforehand.  
+ We assume that data vectors $x \in \mathcal{X}$ admit lower dimensional representations in some latent space  $\mathcal{Z}$.  We further assume that the dynamical system $\dot{x} = f(x)$,  mapped into  $\mathcal{Z}$, can be represented as $\dot{z} = \Theta(z)\Xi$,   where $\Theta$ is a function library evaluated on the coordinates of $z$ and $\Xi$ is sparse matrix of coefficients. 
+ 
+  We further assume that the mappings $x \mapsto z$ and $z \mapsto x$ are differentiable. 
+
+ Concretely,  the above assumptions can be encoded  as 
+ 
+ 
+ 
+ I.  $x =  \varphi^{-1} \varphi(x)$, 
+  II.  $(\dd{}{x}\varphi)  \dot{x} =   \Theta(\varphi(x))\Xi$,  
+III. $\dot{x} = (\dd{}{z} \varphi^{-1})(\Theta(\varphi(x))\Xi)$, where 
+
+
+i.  $\func{\varphi}{\R^D}{\R^d}$, $\func{\varphi^{-1}}{\R^d}{\R^D}$ are encoder decoder neural nets,  $d < < D$.
+
+ii.  $\func{\Theta}{\R^d}{\R^p}$ evaluates function library(containing $p$ functions) on $\varphi(x)$.
+
+iii.  $\Xi \in \R^{d \times p}$ is a matrix of   coefficients associated to each term in ${\Theta}(\varphi(x))$,  which we take to be sparse in the $\norm{\cdot}{0}$ sense.
+
+We fit this model using gradient descent with loss function:
+
+$\mathcal{L}(\varphi, \varphi^{-1},  \Xi ; x ,\dot{x}) = \mathcal{L}_\text{encode}(\varphi, \varphi^{-1}; x) + \mathcal{L}_\text{fit}(\varphi, \varphi^{-1},\Xi; x,\dot{x}) + \mathcal{L}_\text{reg}(\Xi)$
+
+ $\mathcal{L}_\text{encode}$ enforces that $\varphi^{-1} \varphi(x) \approx  x$,  $\mathcal{L}_\text{fit}$ enforces conditions II,III and
+
+ $\mathcal{L}_\text{reg}$ promotes sparsity in  coefficients $\Xi$, typically using $\mathcal{L}_\text{reg}(\Xi) = \lambda_\text{reg}\norm{\Xi}{1}$.
+ 
+ $L_1$ regularization results in $\Xi$ matrix where lots of coefficients are close to zero.  Our prior assumption is that only a few coefficients are nonzero. 
+ 
+  We use coefficient mask $\Lambda$ to enforce exact coherence to this assumption.  
+ 
+ At epoch $k$,of training we set $\Lambda ^{(k)}_{ij} = \indi\{(\Lambda ^{(k-1)}\odot \Xi^{(k)})_{ij} \approx 0\}$
+ for all indexes $i=1 ... d$,  $j = 1 ...p$ of the  to coefficient matrix. This mask  has the effect of setting all coefficients in $\Xi$ close to zero to exactly zero.
+
+ \tb{Ensemble Autoencoder Sindy}:
+ 
+ In Ensemble Autoencoder Sindy we split our training data $X,\dot{X}$ 	into $b$ bags $\{X^{(i)},  \dot{X}^{(i)}\}_{i=1}^b$ where $X^{(i)},\dot{X}^{(i)} \in \R^{q \times D}$ are sampled uniformly from the training 
+ samples $X,\dot{X}$ with replacement.  The idea will be to fit a sindy to each data bag,  then in testing,  to average over the outputs of all the models.  This procedure should in principle produce a sindy predictor with less variance than the original. To do this we  consider coefficient tensor 
+  
+  $\Xi^{[1:b]} \in \R^{b \times d \times p}$,  where $\Xi^{[1:b]}[i,:,:] = \Xi^{(i)}$ 
+ corresponds to bag $X^{(i)},\dot{X}^{(i)}$ of the data.  In other words,  $\Xi^{(i)}$ is used to fit $\dd{}{t} \varphi(x)$ to $\dot{x}$ for $x,\dot{x} \in X^{(i)},\dot{X}^{(i)}$ per conditions II, III.
+ In this framework our sindy predictor of the derivative $\dot{z}$ changes from
+ $ \Theta(\varphi(x))\Xi$ to $\Theta(\varphi(x))\sum_{i} \Xi^{(i)}\indi\{x \in X^{(i)}\})$.
+ 
+ 
+ Hence,  in training we fit the model 
+ 
+  IV.  $x =  \varphi^{-1} \varphi(x)$, 
+ V.  $\dd{}{x} \varphi(x)\dot{x} =  \Theta(\varphi(x))\sum_{i} \Xi^{(i)}\indi\{x \in X^{(i)}\})$
+ 
+ VI.  $\dot{x} = (\dd{}{z} \varphi^{-1})(\Theta(\varphi(x))\sum_{i} \Xi^{(i)}\indi\{x \in X^{(i)}\})$
+ 
+ where coefficient tensor $\Xi^{[1:b]}$ is taken to be sparse some appropriate way.
+ 
+ We do so via gradient descent using loss function:
+ 
+ $\mathcal{L}(\varphi, \varphi^{-1}, \Xi^{[1:b]} ; x ,\dot{x}) = \mathcal{L}_\text{encode}(\varphi, \varphi^{-1}; x) + \mathcal{L}_\text{fit}(\varphi, \varphi^{-1},\Xi^{[1:b]}; x,\dot{x}) + \mathcal{L}_\text{reg}(\Xi^{[1:b]})$
+ 
+  $\mathcal{L}_\text{encode}$ is unchanged,  it still enforces that $\varphi^{-1} \varphi(x) \approx  x$. 
+  
+ $\mathcal{L}_\text{fit}$ enforces  V,VI, ie it enforces that for each $i$,   $\Xi^{(i)}$ can be used to fit bag $X^{(i)}$ to its corresponding numerically computed derivatives $\dot{X}^{(i)}$ per II, III.
+  
+  
+   As mentioned $\mathcal{L}_\text{reg}$ promotes sparsity in $\Xi^{[1:b]}$. We may take this a number of ways.  One approach  is to promote sparsity in the   average of the coefficients  given $\tilde{\Xi} = \frac{1}{b}\sum_{i} \Xi^{(i)}$ .  To do this we use $\mathcal{L}_\text{reg1}(\Xi^{[1:b]}) = \lambda_\text{reg}\norm{\frac{1}{b}\sum_{i} \Xi^{(i)}}{1}$.  
+   
+   The rationale here is that our final outputed predictor will be the bag average 
+   $\tilde{\Xi} = \frac{1} {b}\sum_{i} \Xi^{(i)}$,  hence this is the object whose sparsity we should promote with regularization .  
+   Note, this procedure couples the the training of predictors $\Xi^{(i)},  \Xi^{(j)}$ for $i \neq j$ via the regularization term.  $\Xi^{(i)}$ is incentivized to destructively interfere with  terms in $\Xi^{(j)}$.  
+   
+   Generally speaking it is desirable to make models in an 
+   ensemble independent of one another.   This observation motivates an alternative regularization scheme were we try to ensure that each of $\Xi^{(i)}$ are sparse in the $\norm{\cdot}{0}$ sense.( instead of the average being sparse).  To do this we may use 
+ $\mathcal{L}_\text{reg2}(\Xi^{[1:b]}) = \lambda_\text{reg} 
+\frac{1}{b} \sum_{i}\norm{\Xi^{(i)}}{1}$. 
+Each of these regularizations  has its pro and cons,  which we discuss later in greater detail.
+ 
+ We again use a coefficient mask $\Lambda$ to enforce our  assumption that only a few coefficients of the bag average predictor $\tilde{\Xi}  = \frac{1}{b}\sum_{i} \Xi^{(i)}$ are nonzero.  We may achieve this in two ways.
+Firstly,  at epoch $k$ of training we may set $\Lambda ^{(k)}_{ij} = \indi\{\frac{1}{b}
+  | \{h : (\Lambda ^{(k-1)}\odot \Xi^{(h),(k)})_{ij} \approx 0\}| > p_\text{tol} \}$.
+  
+  This procedure is known is stability selection.  It works by finding  all those coefficients $\Xi_{ij}$ which aren't consistently activated(well seperated from 0) across data bags $\{X^{(i)},  \dot{X}^{(i)}\}_{i=1}^b$,   and setting these coefficients to $0$.   The reasoning here is that if a large proportion of the sub predictors $\{\Xi^{(i)}\}_{i=1}^{b}$ 'decide' that a coefficient is not important,  then it is reasonable to set that coefficient to zero.  This procedure implicitly assumes that these decisions  are being made independently by the different sub-predictors.  Hence this masking scheme is in theory more suited to the $\mathcal{L}_\text{reg2}$ regularizer  which 
+  
+  decouples the regularization of each sub model.  
+  
+We sub-model regularization is coupled,  and thus depedent,  as with the $ \mathcal{L}_\text{reg1}$ regularizer we may consider 
+mask
+$\Lambda ^{(k)}_{ij} = \indi\{\Lambda ^{(k-1)} \odot \frac{1}{b}\sum_{h} 
+\Xi^{(h),(k)}_{ij} \approx 0\}$.
+
+This is the same masking scheme as in regular autoencoder sindy,  with 
+$\frac{1}{b}\sum_{h} \Xi^{(h),(k)}_{ij} = \tilde{\Xi}^{(h)}$ substituted for $\Xi^{(h)}$.  One way to interpret this scheme is that sub predictors
+$\{\Xi^{(i)}\}_{i=1}^{b}$ cooperate to produce sparsity in $\tilde{\Xi}$ while preserving their own ability to fit their respective data bags 
+$\{X^{(i)}, \dot{X}^{(i)}\}_{i=1}^{b}$.  There is less freedom to manipulate the value of relevant/important coefficients than their is irrelevant ones.  Hence the ensemble will preferentially destructively interfere to produce sparsity in $\tilde{\Xi}$ at those indexes $i,j$ which are less important to the overall quality of the fit.  This will result in the average $\frac{1}{b}\sum_{h} \Xi^{(h),(k)}_{ij}$ being well seperated from zero for relevant coefficients and close to zero for irrelevant coefficients, as to promote sparsity in $\tilde{\Xi}$.    Note,  we don't expect destructive interference for relevant coefficients.  To see why,  suppose $f(z) \in \Theta(z) $ is important coefficient for fitting $\dot{z}$.   Further suppose for sub predictors,  $\Xi^{(a)}, \Xi^{(b)}$,  the coefficients $\alpha_a,  \alpha_b$ associated to $f$ interfere destructively,  ie $\alpha_a +  \alpha_b \approx 0$.  
+
+Per the model setup we have
+$\dot{z} \approx \alpha_a f(z) + c_1^Tg(z)$ and 
+$\dot{z} \approx + \alpha_b f(z) +  c_2^Tg(z)$.  
+
+Adding the two expressions we obtain $\dot{z}   \approx \frac{1}{2}(c_1+c_2)^Tg(z)$,  hence $f$ is not essential to fitting $\tilde{z}$.    Even if the fit quality is the same,  it might still be that representations $[\alpha_a \: c_1]$ or $[\alpha_b \: c_2]$ are 'better' than $[0 \: c_1 + c_2]$ in the sense that they have  greater sparsity, but in that case the $\mathcal{L}_\text{reg1}$ regularizer would push the model in the direction of adopting the representation with the greatest sparsity.   Hence in all cases it is reasonable for us to not worry about destructive interference among relevant coefficients in this masking scheme. We refer to this procedure as cooperative selection.
+  
+  \pagebreak
+  
+  \tb{Implementation details}:
+
+  
+ \pagebreak
+ 
+  
+ \tb{Results}:
+ 
+ Base test:
+ 
+ \bs
+ 
+ Low data test:
+ 
+ 
+  \bs
+ 
+ Noise test:
+ 
+ 
+  \bs
+ 
+ Avg v Inclusion test:
+ 
+ 
+  \bs
+ 
+ Total reg v Avg reg test:
+ 
+  \bs
+ 
+ \pagebreak
+ 
+ 
+ \tb{Research directions}:
+  
+  
+  
+  \pagebreak
+  
+
+
+
+\end{document}
