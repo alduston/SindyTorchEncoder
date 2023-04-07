@@ -272,7 +272,7 @@ def run():
                 'hybrid_reg': False, 'loss_weight_decoder': .1, 'nbags': 30,
                 'bagn_factor': 1,'max_epochs': 1200}
 
-    model_1 = {'params_updates': params_1, 'run_function': pas_test, 'label': 'Meta_A'}
+    model_1 = {'params_updates': params_1, 'run_function': pas_test, 'label': 'Meta_PA'}
     model_2 = {'params_updates': params_2, 'run_function': a_test, 'label': 'Meta_A'}
 
     models_dict = {'EA': model_1, 'A': model_2}
