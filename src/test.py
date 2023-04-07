@@ -257,8 +257,8 @@ def run():
     exp_label = 'L1_v_Recursive'
 
     params_1 = {'coefficient_initialization': 'xavier',
-                'replacement': True, 'avg_crossval': False, 'c_loss': False,
-                'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1, 'max_epochs': 6000}
+                'replacement': True, 'avg_crossval': False, 'c_loss': True,
+                'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1, 'max_epochs': 8000}
 
     params_2 = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1,
                 'expand_sample': False}
@@ -272,15 +272,15 @@ def run():
                 'hybrid_reg': False, 'loss_weight_decoder': .1, 'nbags': 30,
                 'bagn_factor': 1,'max_epochs': 1200}
 
-    model_1 = {'params_updates': params_1, 'run_function': pas_test, 'label': 'EA_L1'}
-    model_2 = {'params_updates': params_4, 'run_function': pas_recursive, 'label': 'EA_recursive'}
+    model_1 = {'params_updates': params_1, 'run_function': pas_test, 'label': 'Meta_A'}
+    model_2 = {'params_updates': params_2, 'run_function': a_test, 'label': 'Meta_A'}
 
-    models_dict = {'EA_L1': model_1, 'EA_recursive': model_2}
+    models_dict = {'EA': model_1, 'A': model_2}
 
     if torch.cuda.is_available():
-        comparison_test(models_dict, exp_label, exp_size=(100, np.inf))
+        comparison_test(models_dict, exp_label, exp_size=(128, np.inf))
     else:
-        exp = 'L1_v_Recursive'
+        exp = 'Ensemble_Results'
         try:
             os.mkdir(f'../plots/{exp}')
         except OSError:
