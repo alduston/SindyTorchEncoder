@@ -71,9 +71,9 @@ def pas_sub_test(model_params, training_data, validation_data, run  = 0):
 def a_test(model_params, training_data, validation_data, run = 0):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 1800, 'nbags': 1, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 7000, 'nbags': 1, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                    'refinement_epochs': 200}
+                    'refinement_epochs': 1000}
     model_params['batch_size'] = l//8
     model_params['threshold_frequency'] = 50
     model_params['run'] = run
