@@ -200,28 +200,41 @@ def avg_sub_trajectory_plot(Meta_A_df, Meta_PA_df, A_avg, PA_avg, exp_label, sub
     return True
 
 
+def get_key_med(df,key, nruns):
+    l = len(df[f'epoch'])
+    key_df = df[[f'{key}{i}' for i in range(nruns)]]
+    med = key_df.min(axis = 1)
+    return np.asarray(med)
+
+
+
 def get_plots(model1_df, model2_df, exp_label,
-              plot_keys = ["sindy_x_","decoder_", "active_coeffs_", "coeff_"], model_labels = ['A', 'EA']):
+              plot_keys = ["sindy_x_","decoder_", "active_coeffs_", "coeff_"],
+              model_labels = ['A', 'EA'], nruns = None):
     try:
         os.mkdir(f'../plots/{exp_label}/')
     except OSError:
         pass
 
-    runs_1 = max([int(key[-1]) for key in model1_df.columns if key.startswith('coeff')])
-    runs_2 = max([int(key[-1]) for key in model2_df.columns if key.startswith('coeff')])
-    n_runs = min(runs_1, runs_2) + 1
+    if not nruns:
+        runs_1 = max([int(key[-1]) for key in model1_df.columns if key.startswith('coeff')])
+        runs_2 = max([int(key[-1]) for key in model2_df.columns if key.startswith('coeff')])
+        nruns = min(runs_1, runs_2) + 1
 
     for key in plot_keys:
         avg_1 = np.zeros(len(model1_df[f'epoch']))
         avg_2 = np.zeros(len(model2_df[f'epoch']))
 
-        for i in range(n_runs):
+        for i in range(nruns):
             avg_1 += model1_df[f'{key}{i}']
             avg_2 += model2_df[f'{key}{i}']
             trajectory_plot(model1_df, model2_df, exp_label, key, i, model_labels = model_labels)
 
-        avg_1 *= (1/n_runs)
-        avg_2 *= (1/n_runs)
+        avg_1 *= (1/nruns)
+        avg_2 *= (1/nruns)
+        if key in ['sindy_x_','decoder_']:
+            avg_1 = get_key_med(model1_df, key, nruns)
+            avg_2 = get_key_med(model2_df, key, nruns)
         avg_trajectory_plot(model1_df, model2_df, avg_1, avg_2, exp_label, key, model_labels = model_labels)
     return True
 
@@ -253,11 +266,29 @@ def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
     return True
 
 
+def update_df_cols(df, update_num):
+    rename_dict = {}
+    for col in df.columns:
+        try:
+            try:
+                col_num = int(col[-2:])
+                col_num += update_num
+                rename_dict[col] = f'{col[:-2]}{col_num}'
+            except BaseException:
+                col_num = int(col[-1:])
+                col_num += update_num
+                rename_dict[col] = f'{col[:-1]}{col_num}'
+        except BaseException:
+            pass
+    return df.rename(columns=rename_dict)
+
+
+
 def run():
-    exp_label = 'L1_v_Recursive'
+    exp_label = 'Ensemble_Results_2'
 
     params_1 = {'coefficient_initialization': 'xavier',
-                'replacement': True, 'avg_crossval': False, 'c_loss': True,
+                'replacement': True, 'avg_crossval': False, 'c_loss': False,
                 'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1, 'max_epochs': 8000}
 
     params_2 = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1,
@@ -275,18 +306,18 @@ def run():
     model_1 = {'params_updates': params_1, 'run_function': pas_test, 'label': 'Meta_PA'}
     model_2 = {'params_updates': params_2, 'run_function': a_test, 'label': 'Meta_A'}
 
-    models_dict = {'EA': model_1, 'A': model_2}
+    models_dict = {'Meta_PA': model_1, 'Meta_A': model_2}
 
     if torch.cuda.is_available():
         comparison_test(models_dict, exp_label, exp_size=(128, np.inf))
     else:
-        exp = 'Ensemble_Results'
+        exp = 'Ensemble_Results_2'
         try:
             os.mkdir(f'../plots/{exp}')
         except OSError:
             pass
-        label1 = 'EA_L1'
-        label2 = 'EA_recursive'
+        label1 = 'Meta_PA2'
+        label2 = 'Meta_A2'
         try:
             os.rename(f'../data/{exp}/{label1}.csv', f'../data/{exp}/{label1}_local.csv')
             os.rename(f'../data/{exp}/{label2}.csv', f'../data/{exp}/{label2}_local.csv')
@@ -296,8 +327,19 @@ def run():
         Meta_df_1 = pd.read_csv(f'../data/{exp}/{label1}_local.csv')
         Meta_df_2 = pd.read_csv(f'../data/{exp}/{label2}_local.csv')
 
+        #Meta_df_1 = update_df_cols(Meta_df_1,20)
+        #Meta_df_2 = update_df_cols(Meta_df_2,20)
 
-        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['EA_L1', 'EA_recursive'])
+        #Meta_df_old1 = pd.read_csv(f'../data/{exp}/{label1[:-1]}.csv')
+        #Meta_df_old2 = pd.read_csv(f'../data/{exp}/{label2[:-1]}.csv')
+
+        #for col in Meta_df_old1.columns:
+            #Meta_df_1[col] = Meta_df_old1[col]
+
+        #for col in Meta_df_old2.columns:
+            #Meta_df_2[col] = Meta_df_old2[col]
+
+        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['Meta_EA_alt', 'Meta_A'], nruns = 30)
 
 if __name__=='__main__':
     run()
