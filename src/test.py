@@ -285,7 +285,7 @@ def update_df_cols(df, update_num):
 
 
 def run():
-    exp_label = 'Ensemble_Results_2'
+    exp_label = 'Ensemble_Results_3'
 
     params_1 = {'coefficient_initialization': 'xavier', 'loss_weight_sindy_regularization': 5e-5,
                 'replacement': True, 'avg_crossval': False, 'c_loss': False,
