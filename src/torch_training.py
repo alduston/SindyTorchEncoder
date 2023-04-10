@@ -63,7 +63,7 @@ def process_bag_coeffs(Bag_coeffs, model, avg = False):
     n_samples = bag_coeffs.shape[0]
     avg_coeffs = (1/n_samples) * torch.sum(bag_coeffs, dim = 0)
 
-    ip_thresh = .6
+    ip_thresh = .5
     for ix in range(x):
         for iy in range(y):
             coeffs_vec = bag_coeffs[:,ix,iy]
@@ -77,14 +77,6 @@ def process_bag_coeffs(Bag_coeffs, model, avg = False):
 
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = model.params['device'])
     return new_mask, avg_coeffs
-
-
-def get_choice_tensor(shape, prob, device):
-    num_vals = torch.exp(torch.sum(torch.log(torch.tensor(shape)))).detach().cpu()
-    num_vals = int(num_vals.detach().cpu().numpy())
-    vals = torch.tensor(random.choices([1.0, 0], weights=[prob, 1 - prob], k=num_vals),
-                        dtype=torch.float32, device = device).reshape(shape)
-    return vals
 
 #24 by 8000
 
@@ -344,7 +336,7 @@ def validate_paralell_epoch(model, data_loader, Loss_dict, true_coeffs = None):
         val_model.sindy_coeffs = torch.nn.Parameter(med_coeffs, requires_grad=True)
 
     else:
-        avg_coeffs = (1 / n_bags) * torch.sum(Bag_coeffs, dim=0)
+        avg_coeffs = (1 / n_bags-1) * torch.sum(Bag_coeffs, dim=0)
         val_model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
 
     for batch_index, data in enumerate(data_loader):

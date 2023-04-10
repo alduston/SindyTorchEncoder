@@ -32,7 +32,6 @@ def augment_sample(sample):
 def make_samples(tensors, n_samples, sample_size, device, replacement = True, augment = False):
     samples = [[] for tensor in tensors]
     indexes = list(range(0,tensors[0].shape[0]))
-    #sample_size = tensors[0].shape[0]
     for i in range(n_samples):
         if replacement:
             sub_indexes = random.choices(indexes, k = sample_size)
@@ -110,7 +109,7 @@ class model_data(Dataset):
 def get_test_params(train_size = 100, max_data = 100000, noise = 1e-6):
     noise_strength = 1e-4
     training_data = get_lorenz_data(train_size, noise_strength=noise)
-    validation_data = get_lorenz_data(20, noise_strength=noise)
+    validation_data = get_lorenz_data(train_size, noise_strength=noise)
 
     training_data = {key: vec[:min(max_data, len(training_data['x']))] for key,vec in training_data.items()}
     validation_data = {key: vec[:min(max_data, len(validation_data['x']))] for key, vec in validation_data.items()}

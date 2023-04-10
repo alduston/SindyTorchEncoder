@@ -75,7 +75,7 @@ def a_test(model_params, training_data, validation_data, run = 0):
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
                     'refinement_epochs': 1000}
     model_params['batch_size'] = l//8
-    model_params['threshold_frequency'] = 50
+    model_params['threshold_frequency'] = 250
     model_params['run'] = run
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
@@ -316,8 +316,8 @@ def run():
             os.mkdir(f'../plots/{exp}')
         except OSError:
             pass
-        label1 = 'Meta_PA2'
-        label2 = 'Meta_A2'
+        label1 = 'Meta_PA'
+        label2 = 'Meta_A'
         try:
             os.rename(f'../data/{exp}/{label1}.csv', f'../data/{exp}/{label1}_local.csv')
             os.rename(f'../data/{exp}/{label2}.csv', f'../data/{exp}/{label2}_local.csv')
@@ -339,7 +339,7 @@ def run():
         #for col in Meta_df_old2.columns:
             #Meta_df_2[col] = Meta_df_old2[col]
 
-        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['Meta_EA_alt', 'Meta_A'], nruns = 30)
+        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['Meta_EA_alt', 'Meta_A'], nruns = 2)
 
 if __name__=='__main__':
     run()
