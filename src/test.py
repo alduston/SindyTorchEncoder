@@ -287,7 +287,7 @@ def update_df_cols(df, update_num):
 def run():
     exp_label = 'Ensemble_Results_2'
 
-    params_1 = {'coefficient_initialization': 'xavier',
+    params_1 = {'coefficient_initialization': 'xavier', 'loss_weight_sindy_regularization': 5e-5,
                 'replacement': True, 'avg_crossval': False, 'c_loss': False,
                 'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1, 'max_epochs': 8000}
 
@@ -339,7 +339,7 @@ def run():
         #for col in Meta_df_old2.columns:
             #Meta_df_2[col] = Meta_df_old2[col]
 
-        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['Meta_EA_alt', 'Meta_A'], nruns = 2)
+        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['Meta_EA_alt', 'Meta_A'], nruns = 12)
 
 if __name__=='__main__':
     run()
