@@ -32,7 +32,7 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
     model_params['batch_size'] = l//2
     model_params['crossval_freq'] = 40
     model_params['run'] = run
-    model_params['pretrain_epochs'] = 150
+    model_params['pretrain_epochs'] = 200
     model_params['test_freq'] = 50
     net, Loss_dict = train_ea_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
@@ -41,9 +41,9 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
 def a_test(model_params, training_data, validation_data, run = 0):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 200, 'nbags': 1, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 2200, 'nbags': 1, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                    'refinement_epochs': 50}
+                    'refinement_epochs': 300}
     model_params['batch_size'] = l//8
     model_params['threshold_frequency'] = 50
     model_params['run'] = run
@@ -258,7 +258,7 @@ def run():
     exp_label = 'True_Ensemble'
 
     params_1 = {'replacement': True, 'avg_crossval': False, 'c_loss': False, 'coefficient_initialization': 'xavier',
-                'loss_weight_decoder': .1, 'nbags': 5, 'bagn_factor': 1, 'max_epochs': 250}
+                'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1, 'max_epochs': 2500}
 
     params_2 = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1,
                 'expand_sample': False}
