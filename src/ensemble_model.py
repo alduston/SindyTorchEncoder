@@ -20,6 +20,11 @@ def clear_plt():
     return True
 
 
+def binarize(tensor):
+    return (tensor != 0).float() * 1
+
+
+
 class SindyNetEnsemble(nn.Module):
     def __init__(self, params, device = None):
         super().__init__()
@@ -33,8 +38,7 @@ class SindyNetEnsemble(nn.Module):
         params['device'] = self.device
         self.params = params
         self.activation_f = self.get_activation_f(params)
-
-        self.submodels = [self.SubModel() for i in range(self.params['nbags'])]
+        self.submodels = self.init_submodels()
 
         decoder, decoder_layers = self.Decoder(self.params)
         self.decoder = decoder
@@ -43,21 +47,36 @@ class SindyNetEnsemble(nn.Module):
         self.iter_count = torch.tensor(0, device = device)
         self.epoch = torch.tensor(0, device = device)
 
-        self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad = True)
+        self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients())
         self.coefficient_mask = torch.tensor(params['coefficient_mask'], dtype = torch.float32, device = self.device)
 
         self.num_active_coeffs = torch.sum(copy(self.coefficient_mask)).cpu().detach().numpy()
         self.exp_label = params['exp_label']
         self.true_coeffs = torch.tensor(params['true_coeffs'], dtype=torch.float32, device=self.device)
+        self.torch_params =  self.get_params()
 
 
-    def SubModel(self):
+    def get_params(self):
+        torch_params = list(self.parameters())
+        for model in self.submodels:
+            torch_params += model['encoder'].parameters()
+        return torch_params
+
+
+    def init_submodel(self, idx):
         encoder, encoder_layers = self.Encoder(self.params)
-        sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad = True)
-        losses_dict = {}
+        encoder.sindy_coeffs =  nn.Parameter(self.init_sindy_coefficients(), requires_grad = True)
         submodel = {'encoder' : encoder, 'encoder_layers': encoder_layers,
-                    'sindy_coeffs': sindy_coeffs, 'losses_dict': losses_dict}
+                    'sindy_coeffs': encoder.sindy_coeffs}
         return submodel
+
+
+    def init_submodels(self):
+        submodels = []
+        for bag_idx in range(self.params['nbags']):
+            submodel = self.init_submodel(bag_idx)
+            submodels.append(submodel)
+        return submodels
 
 
     def Encoder(self, params):
@@ -152,7 +171,7 @@ class SindyNetEnsemble(nn.Module):
 
         for bag_idx, sub_model in enumerate(sub_models):
             encoder_weights, encoder_biases = self.encoder_weights(bag_idx)
-            mask = sub_model['output_mask'].T
+            mask = copy(sub_model['output_mask'].T)
             if self.params['eval']:
                 mask = torch.ones(mask.shape, device = self.device)
                 rescale = (1/len(sub_models))
@@ -210,7 +229,7 @@ class SindyNetEnsemble(nn.Module):
 
 
     def masked_predict(self, Theta):
-        masks = [submodel['output_mask'] for submodel in self.submodels]
+        masks = [copy(submodel['output_mask']) for submodel in self.submodels]
         coeffs = [submodel['sindy_coeffs'] for submodel in self.submodels]
         coeff_mask = self.coefficient_mask
         for idx,coeff_m in enumerate(coeffs):
@@ -265,7 +284,8 @@ class SindyNetEnsemble(nn.Module):
         rescale = 1
 
         for bag_idx, sub_model in enumerate(sub_models):
-            mask = sub_model['output_mask'].T
+            mask = copy(sub_model['output_mask']).T
+
             if self.params['eval']:
                 mask = torch.ones(mask.shape, device=self.device)
                 rescale = (1 / len(sub_models))
@@ -273,10 +293,11 @@ class SindyNetEnsemble(nn.Module):
                 dx_decode = z_derivative(z, sindy_predict, decoder_weights,
                                                 decoder_biases, activation=activation)
                 output_shape = dx_decode.shape
-                dx_decode *= self.reshape_mask(mask, output_shape)
+                mask = self.reshape_mask(mask, output_shape)
+                dx_decode *= mask
             else:
-                dx_decode += self.reshape_mask(mask, output_shape) * z_derivative(z, sindy_predict,
-                                                decoder_weights, decoder_biases, activation=activation)
+                mask = self.reshape_mask(mask, output_shape)
+                dx_decode += mask * z_derivative(z, sindy_predict, decoder_weights, decoder_biases, activation=activation)
         return dx_decode * rescale
 
 
@@ -308,7 +329,7 @@ class SindyNetEnsemble(nn.Module):
         submodels = self.submodels
         for i, submodel in enumerate(submodels):
             encoder = submodel['encoder']
-            mask = submodel['output_mask']
+            mask = copy(submodel['output_mask'])
             if not i:
                 z_p = encoder(x)
                 output_shape = z_p.shape

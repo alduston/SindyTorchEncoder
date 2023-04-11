@@ -257,26 +257,21 @@ def update_df_cols(df, update_num):
 def run():
     exp_label = 'True_Ensemble'
 
-    params_1 = {'coefficient_initialization': 'xavier',
-                'replacement': True, 'avg_crossval': False, 'c_loss': False,
-                'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1, 'max_epochs': 1000}
+    params_1 = {'replacement': True, 'avg_crossval': False, 'c_loss': False, 'coefficient_initialization': 'xavier',
+                'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1, 'max_epochs': 1500}
 
     params_2 = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1,
                 'expand_sample': False}
 
-    model_1 = {'params_updates': params_1, 'run_function': ea_test, 'label': 'Meta_PA'}
+    model_1 = {'params_updates': params_1, 'run_function': ea_test, 'label': 'Meta_EA'}
     model_2 = {'params_updates': params_2, 'run_function': a_test, 'label': 'Meta_A'}
 
-    models_dict = {'Meta_PA': model_1, 'Meta_A': model_2}
-    comparison_test(models_dict, exp_label, exp_size=(12, np.inf))
+    models_dict = {'Meta_EA': model_1, 'Meta_A': model_2}
 
-
-
-    '''
     if torch.cuda.is_available():
-        comparison_test(models_dict, exp_label, exp_size=(12, np.inf))
+        comparison_test(models_dict, exp_label, exp_size=(128, np.inf))
     else:
-        exp = 'Ensemble_Results_2'
+        exp = 'True_Ensemble'
         try:
             os.mkdir(f'../plots/{exp}')
         except OSError:
