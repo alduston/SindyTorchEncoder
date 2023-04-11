@@ -109,7 +109,7 @@ class model_data(Dataset):
 def get_test_params(train_size = 100, max_data = 100000, noise = 1e-6):
     noise_strength = 1e-4
     training_data = get_lorenz_data(train_size, noise_strength=noise)
-    validation_data = get_lorenz_data(train_size, noise_strength=noise)
+    validation_data = get_lorenz_data(30, noise_strength=noise)
 
     training_data = {key: vec[:min(max_data, len(training_data['x']))] for key,vec in training_data.items()}
     validation_data = {key: vec[:min(max_data, len(validation_data['x']))] for key, vec in validation_data.items()}

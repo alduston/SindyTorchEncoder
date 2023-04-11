@@ -41,9 +41,9 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
 def a_test(model_params, training_data, validation_data, run = 0):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 1300, 'nbags': 1, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 200, 'nbags': 1, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                    'refinement_epochs': 200}
+                    'refinement_epochs': 50}
     model_params['batch_size'] = l//8
     model_params['threshold_frequency'] = 50
     model_params['run'] = run
@@ -258,7 +258,7 @@ def run():
     exp_label = 'True_Ensemble'
 
     params_1 = {'replacement': True, 'avg_crossval': False, 'c_loss': False, 'coefficient_initialization': 'xavier',
-                'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1, 'max_epochs': 1500}
+                'loss_weight_decoder': .1, 'nbags': 5, 'bagn_factor': 1, 'max_epochs': 250}
 
     params_2 = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1,
                 'expand_sample': False}
@@ -267,7 +267,6 @@ def run():
     model_2 = {'params_updates': params_2, 'run_function': a_test, 'label': 'Meta_A'}
 
     models_dict = {'Meta_EA': model_1, 'Meta_A': model_2}
-
     if torch.cuda.is_available():
         comparison_test(models_dict, exp_label, exp_size=(128, np.inf))
     else:
@@ -276,8 +275,8 @@ def run():
             os.mkdir(f'../plots/{exp}')
         except OSError:
             pass
-        label1 = 'Meta_PA2'
-        label2 = 'Meta_A2'
+        label1 = 'Meta_A'
+        label2 = 'Meta_EA'
         try:
             os.rename(f'../data/{exp}/{label1}.csv', f'../data/{exp}/{label1}_local.csv')
             os.rename(f'../data/{exp}/{label2}.csv', f'../data/{exp}/{label2}_local.csv')
@@ -299,7 +298,7 @@ def run():
         #for col in Meta_df_old2.columns:
             #Meta_df_2[col] = Meta_df_old2[col]
 
-        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['Meta_EA_alt', 'Meta_A'], nruns = 30)
-    '''
+        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['Meta_EA_alt', 'Meta_A'], nruns = 2)
+
 if __name__=='__main__':
     run()
