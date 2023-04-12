@@ -266,6 +266,7 @@ def run():
     model_2 = {'params_updates': params_2, 'run_function': a_test, 'label': 'Meta_A'}
 
     models_dict = {'Meta_EA': model_1, 'Meta_A': model_2}
+    comparison_test(models_dict, exp_label, exp_size=(12, np.inf))
     if torch.cuda.is_available():
         comparison_test(models_dict, exp_label, exp_size=(128, np.inf))
     else:

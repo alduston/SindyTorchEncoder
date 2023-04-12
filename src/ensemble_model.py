@@ -54,18 +54,20 @@ class SindyNetEnsemble(nn.Module):
         self.exp_label = params['exp_label']
         self.true_coeffs = torch.tensor(params['true_coeffs'], dtype=torch.float32, device=self.device)
         self.torch_params =  self.get_params()
-        print([tensor.device for tensor in self.torch_params])
 
 
     def get_params(self):
         params = list(self.parameters())
+        print(f'Bases params have: {[param.device for param in params]}')
         torch_params = []
-        for model in self.submodels:
+        for i,model in enumerate(self.submodels):
+            if not i:
+                print(f'Submodel params have: {[param.device for param in model["encoder"].parameters()]}')
             params += model['encoder'].parameters()
-        for tensor in params:
-            tensor = tensor.to(self.device)
-            torch_params.append(tensor)
-        return torch_params
+        #for tensor in params:
+            #tensor = tensor.to(self.device)
+            #torch_params.append(tensor)
+        return params
 
 
     def init_submodel(self, idx):
