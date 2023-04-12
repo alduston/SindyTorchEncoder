@@ -264,13 +264,11 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
     for i,submodel in enumerate(net.submodels):
         submodel['output_mask'] = output_masks[i]
 
-    sub_model_test_losses_dict = deepcopy(sub_model_losses_dict)
 
     crossval_freq = net.params['crossval_freq']
     test_freq = net.params['test_freq']
-    optimizer = torch.optim.Adam(net.torch_params, lr=net.params['learning_rate'],
+    optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'],
                                  capturable = torch.cuda.is_available())
-
     true_coeffs = net.true_coeffs
 
     for epoch in range(train_params['bag_epochs']):

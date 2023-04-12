@@ -58,17 +58,11 @@ class SindyNetEnsemble(nn.Module):
 
     def get_params(self):
         params = list(self.parameters())
-        print(f'Bases params have devices: {[param.device for param in params]}')
-        print(f'Bases params have  shapes: {[param.shape for param in params]}')
         torch_params = []
         for i,model in enumerate(self.submodels):
-            if not i:
-                print(f'Submodel params have: {[param.device for param in model["encoder"].parameters()]}')
-                print(f'Submodel params have shape: {[param.shape for param in model["encoder"].parameters()]}')
             params += model['encoder'].parameters()
-        #for tensor in params:
-            #tensor = tensor.to(self.device)
-            #torch_params.append(tensor)
+        for i,tensor in enumerate(params):
+            self.register_parameter(name=f'param{i}', param = tensor)
         return params
 
 
