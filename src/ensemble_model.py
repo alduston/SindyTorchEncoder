@@ -181,7 +181,7 @@ class SindyNetEnsemble(nn.Module):
             if not bag_idx:
                 dz  = z_derivative(x, dx , encoder_weights, encoder_biases, activation)
                 output_shape = dz.shape
-                dz *= self.reshape_mask(mask, output_shape)
+                dz *= self.reshape_mask(mask, output_shape, first = False)
             else:
                 dz += self.reshape_mask(mask, output_shape) * z_derivative(x , dx , encoder_weights,
                                                                        encoder_biases, activation)
@@ -268,9 +268,9 @@ class SindyNetEnsemble(nn.Module):
 
     def reshape_mask(self, mask, output_shape, first = True):
         if first:
-            return mask[:output_shape[0], :]
+            return mask[:output_shape[0], :output_shape[-1]]
         else:
-            return mask[:, :output_shape[-1]]
+            return mask[:output_shape[0], :output_shape[-1]]
 
 
     def active_coeffs(self):
