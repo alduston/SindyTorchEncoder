@@ -54,6 +54,7 @@ class SindyNetEnsemble(nn.Module):
         self.exp_label = params['exp_label']
         self.true_coeffs = torch.tensor(params['true_coeffs'], dtype=torch.float32, device=self.device)
         self.torch_params =  self.get_params()
+        print([tensor.device for tensor in self.torch_params])
 
 
     def get_params(self):
