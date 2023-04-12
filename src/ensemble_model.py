@@ -62,7 +62,7 @@ class SindyNetEnsemble(nn.Module):
         torch_params = []
         for model in self.submodels:
             params += model['encoder'].parameters()
-        for param in params:
+        for tensor in params:
             tensor = tensor.to(self.device)
             torch_params.append(tensor)
         return torch_params
