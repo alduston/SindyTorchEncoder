@@ -382,7 +382,6 @@ def print_keyval(key,val_list):
 def get_masks(net):
     batch_len = net.params['bag_size']
     mask_shape = (batch_len, net.params['library_dim'])
-    #mask_shape = (batch_len, net.params['latent_dim'])
     l = batch_len // net.params['nbags']
     masks = []
     device = net.device
@@ -390,7 +389,6 @@ def get_masks(net):
         mask = torch.zeros(mask_shape, device = device)
         mask[i*l:(i+1)*l, :] += 1.0
         masks.append(mask)
-        print(mask.shape)
     return torch.stack(masks)
 
 

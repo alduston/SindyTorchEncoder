@@ -8,8 +8,35 @@ import warnings
 from copy import copy, deepcopy
 import numpy as np
 import matplotlib.pyplot as plt
+import random
 #import tensorflow as tf
 warnings.filterwarnings("ignore")
+
+
+def expand_tensor(tensor, r):
+    l,L = tensor.shape
+    expanded_tensor = torch.zeros(l*r, L)
+    for i in range(l):
+        for k in range(r):
+            row_idx = i*r +k
+            expanded_tensor[row_idx, :] += tensor[i,:]
+    return expanded_tensor
+
+def plot_mask(mask, savedir = 'mask.png'):
+    transpose = False
+    if mask.shape[0] > mask.shape[1]:
+        transpose = True
+        mask = mask.T
+    L = max(mask.shape)
+    l = min(mask.shape)
+    r = int(L / l)
+    print_mask = expand_tensor(mask,r)
+    if transpose:
+        print_mask = print_mask.T
+    plt.imshow(binarize(print_mask))
+    plt.savefig(savedir)
+    clear_plt()
+    return True
 
 
 def clear_plt():
@@ -21,7 +48,9 @@ def clear_plt():
 
 
 def binarize(tensor):
-    return (tensor != 0).float() * 1
+    binary_tensor = (tensor != 0).float() * 1
+    binary_tensor[-1,-1]=0
+    return binary_tensor
 
 
 
@@ -61,6 +90,7 @@ class SindyNetEnsemble(nn.Module):
         torch_params = []
         for i,model in enumerate(self.submodels):
             params += model['encoder'].parameters()
+            #params += model['decoder'].parameters()
         for i,tensor in enumerate(params):
             self.register_parameter(name=f'param{i}', param = tensor)
         return params
@@ -68,9 +98,12 @@ class SindyNetEnsemble(nn.Module):
 
     def init_submodel(self, idx):
         encoder, encoder_layers = self.Encoder(self.params)
+        #decoder, decoder_layers = self.Decoder(self.params)
+
         encoder.sindy_coeffs =  nn.Parameter(self.init_sindy_coefficients(), requires_grad = True)
         submodel = {'encoder' : encoder, 'encoder_layers': encoder_layers,
                     'sindy_coeffs': encoder.sindy_coeffs}
+                    #'decoder': decoder, 'decoder_layers': decoder_layers,
         return submodel
 
 
@@ -87,6 +120,7 @@ class SindyNetEnsemble(nn.Module):
         input_dim = params['input_dim']
         latent_dim = params['latent_dim']
         widths = params['widths']
+        #widths = [int(width * np.random.uniform(.7,1.5,1)) for width in widths]
 
         layers = []
         for output_dim in widths:
@@ -182,9 +216,10 @@ class SindyNetEnsemble(nn.Module):
                 dz  = z_derivative(x, dx , encoder_weights, encoder_biases, activation)
                 output_shape = dz.shape
                 dz *= self.reshape_mask(mask, output_shape, first = False)
+
             else:
                 dz += self.reshape_mask(mask, output_shape) * z_derivative(x , dx , encoder_weights,
-                                                                       encoder_biases, activation)
+                                                                      encoder_biases, activation)
         return dz * rescale
 
 
@@ -301,6 +336,12 @@ class SindyNetEnsemble(nn.Module):
             else:
                 mask = self.reshape_mask(mask, output_shape)
                 dx_decode += mask * z_derivative(z, sindy_predict, decoder_weights, decoder_biases, activation=activation)
+            if not self.params['eval']:
+                if bag_idx in range(3):
+                    x_mask = self.reshape_mask(mask, x.shape, first = False)
+                    dx_p = z_derivative(z, sindy_predict, decoder_weights, decoder_biases, activation=activation)
+                    error = copy(torch.sum(((mask.T * (dx_p.T - dx)**2))))
+                    self.params['dx_errors'][bag_idx] += float(error.detach())
         return dx_decode * rescale
 
 
@@ -319,6 +360,7 @@ class SindyNetEnsemble(nn.Module):
 
     def avg_forward(self, x):
         submodels = self.submodels
+        decoder = self.decoder
         for i,submodel in enumerate(submodels):
             encoder = submodel['encoder']
             if not i:
@@ -328,20 +370,53 @@ class SindyNetEnsemble(nn.Module):
         return z * (1/len(submodels))
 
 
+    def avg_decode(self, z):
+        submodels = self.submodels
+        for i,submodel in enumerate(submodels):
+            decoder = submodel['decoder']
+            if not i:
+                x = decoder(z)
+            else:
+                x += decoder(z)
+        return x * (1/len(submodels))
+
+
     def masked_forward(self, x):
         submodels = self.submodels
+        decoder = self.decoder
         for i, submodel in enumerate(submodels):
             encoder = submodel['encoder']
+            #decoder = submodel['decoder']
             mask = copy(submodel['output_mask'])
             if not i:
                 z_p = encoder(x)
                 output_shape = z_p.shape
-                mask = self.reshape_mask(mask, output_shape, first = False)
-                z = mask * z_p
+                z_mask = self.reshape_mask(mask, output_shape, first = False)
+                z = z_mask * z_p
             else:
-                mask = self.reshape_mask(mask, output_shape, first = False)
-                z += mask * encoder(x)
+                z_mask = self.reshape_mask(mask, output_shape, first = False)
+                z += z_mask * encoder(x)
+            if i in range(3):
+                #x_mask = self.reshape_mask(mask, x.shape, first = False)
+                error = copy(torch.sum((decoder(encoder(x)) - x)**2))
+                #self.params['errors'][i] += float(error.detach())
         return z
+
+
+    def masked_decode(self, z):
+        submodels = self.submodels
+        for i, submodel in enumerate(submodels):
+            decoder = submodel['decoder']
+            mask = copy(submodel['output_mask'])
+            if not i:
+                x_p = decoder(z)
+                output_shape = x_p.shape
+                x_mask = self.reshape_mask(mask, output_shape, first = False)
+                x = x_mask * x_p
+            else:
+                x_mask = self.reshape_mask(mask, output_shape, first = False)
+                x += x_mask * decoder(z)
+        return x
 
 
     def forward(self, x):

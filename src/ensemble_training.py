@@ -2,7 +2,7 @@ import numpy as np
 #import tensorflow as tf
 import pickle
 import torch
-from ensemble_model import SindyNetEnsemble
+from ensemble_model import SindyNetEnsemble, binarize
 from data_utils import get_test_params,get_loader, get_bag_loader
 from sindy_utils import get_initialized_weights
 from math import inf, isinf
@@ -44,6 +44,7 @@ def process_bag_coeffs(Bag_coeffs, model, avg = False):
 
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = model.params['device'])
     return new_mask, avg_coeffs
+
 
 def train_one_step(model, data, optimizer, mode = None):
     optimizer.zero_grad()
@@ -105,7 +106,6 @@ def validate_one_epoch(model, data_loader, true_coeffs = None):
         coeff_loss_val = coeff_pattern_loss(pred_coeffs, true_coeffs)
         total_loss_dict['coeff'] = coeff_loss_val
     return  total_loss, total_loss_dict
-
 
 
 def train_ensemble_step(model, data, optimizer):
@@ -222,16 +222,47 @@ def print_keyval(key,val_list):
     return ''
 
 
+def expand_tensor(tensor, r):
+    l,L = tensor.shape
+    expanded_tensor = torch.zeros(l*r, L)
+    for i in range(l):
+        for k in range(r):
+            row_idx = i*r +k
+            expanded_tensor[row_idx, :] += tensor[i,:]
+    return expanded_tensor
+
+def plot_mask(mask, savedir = 'mask.png'):
+    transpose = False
+    if mask.shape[0] > mask.shape[1]:
+        transpose = True
+        mask = mask.T
+    L = max(mask.shape)
+    l = min(mask.shape)
+    r = int(L / l)
+    print_mask = expand_tensor(mask,r)
+    if transpose:
+        print_mask = print_mask.T
+
+    plt.imshow(binarize(print_mask))
+    plt.savefig(savedir)
+    clear_plt()
+    return True
+
+
 def get_output_masks(net):
     batch_len = net.params['bag_size']
     mask_shape = (batch_len, net.params['input_dim'])
     l = batch_len // net.params['nbags']
     masks = []
     device = net.device
-    for i in range(net.params['nbags'] + 1):
+    for i in range(net.params['nbags']-1):
         mask = torch.zeros(mask_shape, device=device)
         mask[i * l:(i + 1) * l, :] += 1.0
         masks.append(mask)
+    i = net.params['nbags']-1
+    final_mask = torch.zeros(mask_shape, device=device)
+    final_mask[i * l:, :] += 1.0
+    masks.append(final_mask)
     return torch.stack(masks)
 
 
@@ -251,6 +282,7 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
     net = SindyNetEnsemble(model_params).to(device)
     net.params['nbags'] = len(train_bag_loader)
     net.params['scramble'] = True
+    net.params['dx_error_lists'] = [[], [], []]
     sub_model_coeffs = []
     sub_model_losses_dict = {}
 
@@ -263,7 +295,6 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
     output_masks = get_output_masks(net)
     for i,submodel in enumerate(net.submodels):
         submodel['output_mask'] = output_masks[i]
-
 
     crossval_freq = net.params['crossval_freq']
     test_freq = net.params['test_freq']
@@ -278,8 +309,15 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
                 print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in Loss_dict.items()])}')
         if not epoch % crossval_freq and epoch >= net.params['pretrain_epochs']:
             net = crossval(net)
+        net.params['dx_errors'] = [0,0,0]
         train_ensemble_epoch(net, train_bag_loader, optimizer)
+        for i in range(3):
+            net.params['dx_error_lists'][i].append(net.params['dx_errors'][i])
 
     net, Loss_dict = validate_ensemble_epoch(net, test_loader, Loss_dict)
+    for i in range(3):
+        errors = np.log(np.asarray(net.params['dx_error_lists'][i]))
+        plt.plot(errors)
+        plt.savefig('../data/dx_errors.png')
     return net, Loss_dict
 
