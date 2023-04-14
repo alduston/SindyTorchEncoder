@@ -27,8 +27,7 @@ def process_bag_coeffs(Bag_coeffs, model, avg = False):
     new_mask =  np.zeros(bag_coeffs.shape[1:])
     x,y = new_mask.shape
 
-    n_samples = bag_coeffs.shape[0]
-    avg_coeffs = (1/n_samples) * torch.sum(bag_coeffs, dim = 0)
+    med_coeffs =  torch.median(bag_coeffs, 0)[0]
 
     ip_thresh = .6
     for ix in range(x):
@@ -43,7 +42,7 @@ def process_bag_coeffs(Bag_coeffs, model, avg = False):
                     new_mask[ix, iy] = 1
 
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = model.params['device'])
-    return new_mask, avg_coeffs
+    return new_mask, med_coeffs
 
 
 def train_one_step(model, data, optimizer, mode = None):
@@ -110,8 +109,6 @@ def validate_one_epoch(model, data_loader, true_coeffs = None):
 
 def train_ensemble_step(model, data, optimizer):
     optimizer.zero_grad()
-    c_loss = model.params['c_loss']
-    scramble =  model.params['scramble']
     loss, loss_refinement, losses = model.Loss(x=data['x_bag'], dx=data['dx_bag'])
     loss.backward()
     optimizer.step()
@@ -119,7 +116,6 @@ def train_ensemble_step(model, data, optimizer):
 
 
 def train_ensemble_epoch(model, bag_loader, optimizer):
-    printfreq = model.params['train_print_freq']
     model.train()
     epoch_loss = 0
     model.epoch += 1
@@ -133,10 +129,10 @@ def train_ensemble_epoch(model, bag_loader, optimizer):
 
 def crossval(model):
     Bag_coeffs = model.sub_model_coeffs()
-    new_mask, avg_coeffs = process_bag_coeffs(Bag_coeffs, model, avg = model.params['avg_crossval'])
+    new_mask, med_coeffs = process_bag_coeffs(Bag_coeffs, model, avg = model.params['avg_crossval'])
     model.coefficient_mask = model.coefficient_mask * new_mask
     model.num_active_coeffs = int(torch.sum(copy(model.coefficient_mask)).cpu().detach())
-    model.sindy_coeffs = torch.nn.Parameter(model.coefficient_mask * avg_coeffs, requires_grad=True)
+    model.sindy_coeffs = torch.nn.Parameter(model.coefficient_mask * med_coeffs, requires_grad=True)
     return model
 
 
@@ -179,8 +175,8 @@ def validate_ensemble_epoch(model, data_loader, Loss_dict, true_coeffs = None):
     n_bags = Bag_coeffs.shape[0]
     val_model = copy(model)
 
-    avg_coeffs = (1 / n_bags) * torch.sum(Bag_coeffs, dim=0)
-    val_model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
+    med_coeffs =  torch.median(Bag_coeffs, 0)[0]
+    val_model.sindy_coeffs = torch.nn.Parameter(med_coeffs, requires_grad=True)
 
     for batch_index, data in enumerate(data_loader):
         with torch.no_grad():
@@ -265,6 +261,7 @@ def get_output_masks(net):
     masks.append(final_mask)
     return torch.stack(masks)
 
+
 def error_plot(net):
     for i in range(3):
         errors = np.log(np.asarray(net.params['dx_error_lists'][i]))
@@ -295,14 +292,11 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
     net.params['nbags'] = len(train_bag_loader)
     net.params['scramble'] = True
     net.params['dx_error_lists'] = [[], [], [], []]
-    #sub_model_coeffs = []
-    #sub_model_losses_dict = {}
+    net.params['dx_errors'] = [0, 0, 0, 0]
 
     for idx, bag in enumerate(train_bag_loader):
         if idx == 0:
             net.params['bag_size'] = len(bag['x_bag'])
-        else:
-            pass
 
     output_masks = get_output_masks(net)
     for i,submodel in enumerate(net.submodels):
@@ -319,6 +313,8 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
             val_model, Loss_dict = validate_ensemble_epoch(net, test_loader, Loss_dict, true_coeffs)
             if printout:
                 print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in Loss_dict.items()])}')
+                #print(net.params['dx_errors'])
+
         if not epoch % crossval_freq and epoch >= net.params['pretrain_epochs']:
             net = crossval(net)
         net.params['dx_errors'] = [0,0,0,0]
