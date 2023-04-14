@@ -26,10 +26,9 @@ def process_bag_coeffs(Bag_coeffs, model, avg = False):
     bag_coeffs = Bag_coeffs
     new_mask =  np.zeros(bag_coeffs.shape[1:])
     x,y = new_mask.shape
+    agr_coeffs =  model.aggregate(bag_coeffs)
 
-    med_coeffs =  torch.median(bag_coeffs, 0)[0]
-
-    ip_thresh = .6
+    ip_thresh = 2/3
     for ix in range(x):
         for iy in range(y):
             coeffs_vec = bag_coeffs[:,ix,iy]
@@ -42,7 +41,7 @@ def process_bag_coeffs(Bag_coeffs, model, avg = False):
                     new_mask[ix, iy] = 1
 
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = model.params['device'])
-    return new_mask, med_coeffs
+    return new_mask, agr_coeffs
 
 
 def train_one_step(model, data, optimizer, mode = None):
@@ -175,8 +174,8 @@ def validate_ensemble_epoch(model, data_loader, Loss_dict, true_coeffs = None):
     n_bags = Bag_coeffs.shape[0]
     val_model = copy(model)
 
-    med_coeffs =  torch.median(Bag_coeffs, 0)[0]
-    val_model.sindy_coeffs = torch.nn.Parameter(med_coeffs, requires_grad=True)
+    agr_coeffs =  model.aggregate(Bag_coeffs)
+    val_model.sindy_coeffs = torch.nn.Parameter(agr_coeffs, requires_grad=True)
 
     for batch_index, data in enumerate(data_loader):
         with torch.no_grad():
@@ -263,13 +262,13 @@ def get_output_masks(net):
 
 
 def error_plot(net):
-    for i in range(3):
+    for i in range(net.params['nbags']):
         errors = np.log(np.asarray(net.params['dx_error_lists'][i]))
-        plt.plot(errors, label=f'bag {i}')
+        plt.plot(errors)
     avg_errors = np.log(np.asarray(net.params['dx_error_lists'][-1]))
     plt.plot(avg_errors, label=f'avg')
     plt.legend()
-    l = len(os.listdir('../data/misc/dx_plots/'))
+    l = len(os.listdir('../data/misc/dx_plots/')) + 1
     plt.savefig(f'../data/misc/dx_plots/dx_errors_{l}.png')
     clear_plt()
     return True
@@ -291,8 +290,8 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
     net = SindyNetEnsemble(model_params).to(device)
     net.params['nbags'] = len(train_bag_loader)
     net.params['scramble'] = True
-    net.params['dx_error_lists'] = [[], [], [], []]
-    net.params['dx_errors'] = [0, 0, 0, 0]
+    net.params['dx_error_lists'] = [[] for i in range(net.params['nbags']+1)]
+    net.params['dx_errors'] = [0 for i in range(net.params['nbags']+1)]
 
     for idx, bag in enumerate(train_bag_loader):
         if idx == 0:
@@ -317,9 +316,9 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
 
         if not epoch % crossval_freq and epoch >= net.params['pretrain_epochs']:
             net = crossval(net)
-        net.params['dx_errors'] = [0,0,0,0]
+        net.params['dx_errors'] = [0 for i in range(net.params['nbags']+1)]
         train_ensemble_epoch(net, train_bag_loader, optimizer)
-        for i in range(4):
+        for i in range(net.params['nbags']+1):
             net.params['dx_error_lists'][i].append(net.params['dx_errors'][i])
 
     net, Loss_dict = validate_ensemble_epoch(net, test_loader, Loss_dict)

@@ -1,7 +1,7 @@
 import os
 import time
 
-n_runs = 10
+n_runs = 20
 job = 'job1.slurm'
 
 for i in range(n_runs):

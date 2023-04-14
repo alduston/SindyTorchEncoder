@@ -32,7 +32,7 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
     model_params['batch_size'] = l//2
     model_params['crossval_freq'] = 50
     model_params['run'] = run
-    model_params['pretrain_epochs'] = 101
+    model_params['pretrain_epochs'] = 100
     model_params['test_freq'] = 50
     net, Loss_dict = train_ea_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
@@ -41,9 +41,9 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
 def a_test(model_params, training_data, validation_data, run = 0):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 2700, 'nbags': 1, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 600, 'nbags': 1, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                    'refinement_epochs': 300}
+                    'refinement_epochs': 0}
     model_params['batch_size'] = l//8
     model_params['threshold_frequency'] = 50
     model_params['run'] = run
@@ -255,9 +255,9 @@ def update_df_cols(df, update_num):
 
 
 def run():
-    exp_label = 'Error_plot_test'
+    exp_label = 'median_test'
     params_1 = {'replacement': True, 'avg_crossval': False, 'c_loss': False, 'coefficient_initialization': 'xavier',
-                'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1, 'max_epochs': 3000}
+                'loss_weight_decoder': .1, 'nbags': 10, 'bagn_factor': 1, 'max_epochs': 600}
 
     params_2 = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1,
                 'expand_sample': False}
@@ -266,17 +266,18 @@ def run():
     model_2 = {'params_updates': params_2, 'run_function': a_test, 'label': 'Meta_A'}
 
     models_dict = {'Meta_EA': model_1, 'Meta_A': model_2}
-
     if torch.cuda.is_available():
-        comparison_test(models_dict, exp_label, exp_size=(100, np.inf))
+        comparison_test(models_dict, exp_label, exp_size=(30, np.inf))
     else:
-        exp = 'Median_test'
+        return True
+        exp = 'Error_plot_test'
         try:
             os.mkdir(f'../plots/{exp}')
         except OSError:
             pass
         label1 = 'Meta_EA'
         label2 = 'Meta_A'
+
         try:
             os.rename(f'../data/{exp}/{label1}.csv', f'../data/{exp}/{label1}_local.csv')
             os.rename(f'../data/{exp}/{label2}.csv', f'../data/{exp}/{label2}_local.csv')
@@ -286,7 +287,7 @@ def run():
         Meta_df_1 = pd.read_csv(f'../data/{exp}/{label1}_local.csv')
         Meta_df_2 = pd.read_csv(f'../data/{exp}/{label2}_local.csv')
 
-        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['Meta_EA', 'Meta_A'], nruns = 5)
+        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['Meta_EA', 'Meta_A'], nruns = 3)
 
 if __name__=='__main__':
     run()

@@ -216,21 +216,19 @@ class SindyNetEnsemble(nn.Module):
         return float(sub_loss.detach())
 
 
-    def avg_dz_loss(self, x, dx):
+    def agr_dz_loss(self, x, dx):
         activation = self.params['activation']
         M = x.shape[0] * x.shape[1]
+        dzs = []
         for sub_idx in range(self.params['nbags']):
             encoder_weights, encoder_biases = self.encoder_weights(sub_idx)
             dz_sub = z_derivative(x, dx, encoder_weights, encoder_biases, activation)
-            if not sub_idx:
-                dz = dz_sub
-            else:
-                dz +=  dz_sub
-        dz *= (1/self.params['nbags'])
-        z = self.med_forward(x)
+            dzs.append(dz_sub)
+        dz = self.aggregate(torch.stack(dzs))
+        z = self.agr_forward(x)
         Theta = self.Theta(z, x, dx)
-        avg_coeff =  torch.sum(self.sub_model_coeffs(), axis = 0)/self.params['nbags']
-        sindy_predict = torch.matmul(Theta, self.coefficient_mask * avg_coeff)
+        agr_coeff =  self.aggregate(self.sub_model_coeffs())
+        sindy_predict = torch.matmul(Theta, self.coefficient_mask * agr_coeff)
         sub_loss = torch.mean((dz - sindy_predict.T)**2)/M
         return float(sub_loss.detach())
 
@@ -258,7 +256,7 @@ class SindyNetEnsemble(nn.Module):
 
         dzs = torch.stack(dzs)
         if self.params['eval']:
-            return torch.median(dzs, 0)[0]
+            return self.aggregate(dzs)
         return torch.sum(dzs, 0)
 
 
@@ -365,15 +363,15 @@ class SindyNetEnsemble(nn.Module):
         return sub_dx
 
 
-    def avg_dx(self, x, dx):
-        z_avg = self.med_forward(x)
-        Theta = self.Theta(z_avg, x, dx)
-        avg_coeff =  torch.median(self.sub_model_coeffs(),  0)[0]
-        sindy_predict = torch.matmul(Theta, self.coefficient_mask * avg_coeff)
+    def agr_dx(self, x, dx):
+        z_aggregate = self.agr_forward(x)
+        Theta = self.Theta(z_aggregate, x, dx)
+        agr_coeff =  self.aggregate(self.sub_model_coeffs())
+        sindy_predict = torch.matmul(Theta, self.coefficient_mask * agr_coeff)
         decoder_weights, decoder_biases = self.decoder_weights()
         activation = self.params['activation']
-        avg_dx = z_derivative(z_avg, sindy_predict, decoder_weights, decoder_biases, activation=activation)
-        return avg_dx
+        agr_dx = z_derivative(z_aggregate, sindy_predict, decoder_weights, decoder_biases, activation=activation)
+        return agr_dx
 
 
     def dx_decode(self,z, x, dx = None):
@@ -402,20 +400,18 @@ class SindyNetEnsemble(nn.Module):
                 dx_decodes.append(mask * z_derivative(z, sindy_predict, decoder_weights, decoder_biases, activation=activation))
         dx_decodes = torch.stack(dx_decodes)
         if self.params['eval']:
-            dx_decode = torch.median(dx_decodes,0)[0]
+            dx_decode = self.aggregate(dx_decodes)
         else:
             dx_decode = torch.sum(dx_decodes,0)
+            M = dx.shape[0] * dx.shape[1]
 
-            if not self.params['eval']:
-                M = dx.shape[0] * dx.shape[1]
-                if bag_idx in range(3):
-                    dx_p = self.sub_dx(bag_idx, x, dx)
-                    error = copy(torch.sum((((dx_p.T - dx)**2))))/M
-                    self.params['dx_errors'][bag_idx] += float(error.detach())
-                if bag_idx == 0:
-                    dx_avg = self.avg_dx(x, dx)
-                    error =  copy(torch.sum((((dx_avg.T - dx)**2))))/M
-                    self.params['dx_errors'][-1] += float(error.detach())
+            dx_p = self.sub_dx(bag_idx, x, dx)
+            error = copy(torch.sum((((dx_p.T - dx)**2))))/M
+            self.params['dx_errors'][bag_idx] += float(error.detach())
+            if bag_idx == 0:
+                dx_agr = self.agr_dx(x, dx)
+                error =  copy(torch.sum((((dx_agr.T - dx)**2))))/M
+                self.params['dx_errors'][-1] += float(error.detach())
         return dx_decode
 
 
@@ -432,7 +428,14 @@ class SindyNetEnsemble(nn.Module):
         return torch.stack([submodel['sindy_coeffs'] for submodel in self.submodels])
 
 
-    def med_forward(self, x):
+    def aggregate(self, tensors, agr_key = 'mean'):
+        if agr_key == 'median':
+            return torch.median(tensors,0)[0]
+        if agr_key == 'mean':
+            return torch.mean(tensors,0)
+
+
+    def agr_forward(self, x):
         submodels = self.submodels
         zs = []
         for i,submodel in enumerate(submodels):
@@ -444,18 +447,17 @@ class SindyNetEnsemble(nn.Module):
                 z = encoder(x)
                 zs.append(z)
         zs = torch.stack(zs)
-        return torch.median(zs,0)[0]
+        return self.aggregate(zs)
 
 
-    def avg_decode(self, z):
+    def agr_decode(self, z):
         submodels = self.submodels
+        xs = []
         for i,submodel in enumerate(submodels):
             decoder = submodel['decoder']
-            if not i:
-                x = decoder(z)
-            else:
-                x += decoder(z)
-        return x * (1/len(submodels))
+            x = decoder(z)
+            xs.append(x)
+        return self.aggregate(torch.stack(xs))
 
 
     def masked_forward(self, x):
@@ -492,7 +494,7 @@ class SindyNetEnsemble(nn.Module):
 
     def forward(self, x):
         if self.params['eval']:
-            z = self.med_forward(x)
+            z = self.agr_forward(x)
         else:
             z = self.masked_forward(x)
         x_decode = self.decoder(z)
