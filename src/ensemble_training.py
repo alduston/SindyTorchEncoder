@@ -265,6 +265,18 @@ def get_output_masks(net):
     masks.append(final_mask)
     return torch.stack(masks)
 
+def error_plot(net):
+    for i in range(3):
+        errors = np.log(np.asarray(net.params['dx_error_lists'][i]))
+        plt.plot(errors, label=f'bag {i}')
+    avg_errors = np.log(np.asarray(net.params['dx_error_lists'][-1]))
+    plt.plot(avg_errors, label=f'avg')
+    plt.legend()
+    l = len(os.listdir('../data/misc/dx_plots/'))
+    plt.savefig(f'../data/misc/dx_plots/dx_errors_{l}.png')
+    clear_plt()
+    return True
+
 
 def train_ea_sindy(model_params, train_params, training_data, validation_data, printout = False):
     Loss_dict = {'epoch': [], 'total': [], 'decoder': [], 'sindy_x': [],
@@ -282,9 +294,9 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
     net = SindyNetEnsemble(model_params).to(device)
     net.params['nbags'] = len(train_bag_loader)
     net.params['scramble'] = True
-    net.params['dx_error_lists'] = [[], [], []]
-    sub_model_coeffs = []
-    sub_model_losses_dict = {}
+    net.params['dx_error_lists'] = [[], [], [], []]
+    #sub_model_coeffs = []
+    #sub_model_losses_dict = {}
 
     for idx, bag in enumerate(train_bag_loader):
         if idx == 0:
@@ -309,15 +321,12 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
                 print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in Loss_dict.items()])}')
         if not epoch % crossval_freq and epoch >= net.params['pretrain_epochs']:
             net = crossval(net)
-        net.params['dx_errors'] = [0,0,0]
+        net.params['dx_errors'] = [0,0,0,0]
         train_ensemble_epoch(net, train_bag_loader, optimizer)
-        for i in range(3):
+        for i in range(4):
             net.params['dx_error_lists'][i].append(net.params['dx_errors'][i])
 
     net, Loss_dict = validate_ensemble_epoch(net, test_loader, Loss_dict)
-    for i in range(3):
-        errors = np.log(np.asarray(net.params['dx_error_lists'][i]))
-        plt.plot(errors)
-        plt.savefig('../data/dx_errors.png')
+    error_plot(net)
     return net, Loss_dict
 

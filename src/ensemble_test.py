@@ -270,7 +270,7 @@ def run():
     if torch.cuda.is_available():
         comparison_test(models_dict, exp_label, exp_size=(100, np.inf))
     else:
-        exp = 'True_Ensemble'
+        exp = 'Error_plot_test'
         try:
             os.mkdir(f'../plots/{exp}')
         except OSError:

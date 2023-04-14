@@ -314,6 +314,29 @@ class SindyNetEnsemble(nn.Module):
         return sindy_coefficients * coefficient_mask
 
 
+    def sub_dx(self, bag_idx, x, dx):
+        sub_model = self.submodels[bag_idx]
+        z_p = sub_model['encoder'](x)
+        Theta = self.Theta(z_p, x, dx)
+        coeff_m_p = sub_model['sindy_coeffs']
+        sindy_predict = torch.matmul(Theta, self.coefficient_mask * coeff_m_p)
+        decoder_weights, decoder_biases = self.decoder_weights()
+        activation = self.params['activation']
+        sub_dx = z_derivative(z_p, sindy_predict, decoder_weights, decoder_biases, activation=activation)
+        return sub_dx
+
+
+    def avg_dx(self, x, dx):
+        z_avg = self.avg_forward(x)
+        Theta = self.Theta(z_avg, x, dx)
+        avg_coeff =  torch.sum(self.sub_model_coeffs(), axis = 0)/self.params['nbags']
+        sindy_predict = torch.matmul(Theta, self.coefficient_mask * avg_coeff)
+        decoder_weights, decoder_biases = self.decoder_weights()
+        activation = self.params['activation']
+        avg_dx = z_derivative(z_avg, sindy_predict, decoder_weights, decoder_biases, activation=activation)
+        return avg_dx
+
+
     def dx_decode(self,z, x, dx = None):
         sindy_predict = self.sindy_predict(z, x, dx)
         decoder_weights, decoder_biases = self.decoder_weights()
@@ -337,11 +360,15 @@ class SindyNetEnsemble(nn.Module):
                 mask = self.reshape_mask(mask, output_shape)
                 dx_decode += mask * z_derivative(z, sindy_predict, decoder_weights, decoder_biases, activation=activation)
             if not self.params['eval']:
+                M = dx.shape[0] * dx.shape[1]
                 if bag_idx in range(3):
-                    x_mask = self.reshape_mask(mask, x.shape, first = False)
-                    dx_p = z_derivative(z, sindy_predict, decoder_weights, decoder_biases, activation=activation)
-                    error = copy(torch.sum(((mask.T * (dx_p.T - dx)**2))))
+                    dx_p = self.sub_dx(bag_idx, x, dx)
+                    error = copy(torch.sum((((dx_p.T - dx)**2))))/M
                     self.params['dx_errors'][bag_idx] += float(error.detach())
+                if bag_idx == 0:
+                    dx_avg = self.avg_dx(x, dx)
+                    error =  copy(torch.sum((((dx_avg.T - dx)**2))))/M
+                    self.params['dx_errors'][-1] += float(error.detach())
         return dx_decode * rescale
 
 
@@ -360,7 +387,6 @@ class SindyNetEnsemble(nn.Module):
 
     def avg_forward(self, x):
         submodels = self.submodels
-        decoder = self.decoder
         for i,submodel in enumerate(submodels):
             encoder = submodel['encoder']
             if not i:
