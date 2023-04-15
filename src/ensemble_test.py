@@ -33,7 +33,7 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
     model_params['crossval_freq'] = 50
     model_params['run'] = run
     model_params['pretrain_epochs'] = 100
-    model_params['test_freq'] = 50
+    model_params['test_freq'] = 5
     net, Loss_dict = train_ea_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
@@ -255,7 +255,7 @@ def update_df_cols(df, update_num):
 
 
 def run():
-    exp_label = 'idk'
+    exp_label = 'Latent_test'
     params_1 = {'replacement': True, 'avg_crossval': False, 'c_loss': False, 'coefficient_initialization': 'xavier',
                 'loss_weight_decoder': .1, 'nbags': 25, 'bagn_factor': 1, 'max_epochs': 4000}
 

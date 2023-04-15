@@ -34,7 +34,7 @@ def pas_test(model_params, training_data, validation_data, run  = 0):
     model_params['crossval_freq'] = 40
     model_params['run'] = run
     model_params['pretrain_epochs'] = 50
-    model_params['test_freq'] = 50
+    model_params['test_freq'] = 5
     net, Loss_dict = scramble_train_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
@@ -287,7 +287,7 @@ def update_df_cols(df, update_num):
 def run():
     exp_label = 'Ensemble_Results_3'
 
-    params_1 = {'coefficient_initialization': 'xavier', 'loss_weight_sindy_regularization': 5e-5,
+    params_1 = {'coefficient_initialization': 'xavier', 'loss_weight_sindy_regularization': 1e-5,
                 'replacement': True, 'avg_crossval': False, 'c_loss': False,
                 'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1, 'max_epochs': 8000}
 
@@ -308,10 +308,11 @@ def run():
 
     models_dict = {'Meta_PA': model_1, 'Meta_A': model_2}
 
+    comparison_test(models_dict, exp_label, exp_size=(12, np.inf))
     if torch.cuda.is_available():
         comparison_test(models_dict, exp_label, exp_size=(128, np.inf))
     else:
-        exp = 'Ensemble_Results_2'
+        exp = 'Ensemble_Results_3'
         try:
             os.mkdir(f'../plots/{exp}')
         except OSError:
@@ -339,7 +340,7 @@ def run():
         #for col in Meta_df_old2.columns:
             #Meta_df_2[col] = Meta_df_old2[col]
 
-        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['Meta_EA_alt', 'Meta_A'], nruns = 12)
+        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['Meta_EA_alt', 'Meta_A'], nruns = 4)
 
 if __name__=='__main__':
     run()

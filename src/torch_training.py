@@ -336,7 +336,7 @@ def validate_paralell_epoch(model, data_loader, Loss_dict, true_coeffs = None):
         val_model.sindy_coeffs = torch.nn.Parameter(med_coeffs, requires_grad=True)
 
     else:
-        avg_coeffs = (1 / n_bags-1) * torch.sum(Bag_coeffs, dim=0)
+        avg_coeffs = (1 / n_bags) * torch.sum(Bag_coeffs, dim=0)
         val_model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
 
     for batch_index, data in enumerate(data_loader):

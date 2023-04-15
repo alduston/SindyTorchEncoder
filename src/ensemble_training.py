@@ -275,7 +275,7 @@ def error_plot(net):
 
 
 def train_ea_sindy(model_params, train_params, training_data, validation_data, printout = False):
-    Loss_dict = {'epoch': [], 'total': [], 'decoder': [], 'sindy_x': [],
+    Loss_dict = {'epoch': [], 'total': [], 'decoder': [], 'sindy_x': [], 'latent': [],
                  'reg': [], 'sindy_z': [], 'active_coeffs': [], 'coeff': [0.0]}
     if torch.cuda.is_available():
         device = 'cuda:0'
@@ -289,7 +289,6 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
 
     net = SindyNetEnsemble(model_params).to(device)
     net.params['nbags'] = len(train_bag_loader)
-    net.params['scramble'] = True
     net.params['dx_error_lists'] = [[] for i in range(net.params['nbags']+1)]
     net.params['dx_errors'] = [0 for i in range(net.params['nbags']+1)]
 
