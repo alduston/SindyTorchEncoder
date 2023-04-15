@@ -28,10 +28,12 @@ def process_bag_coeffs(Bag_coeffs, model, avg = False):
     x,y = new_mask.shape
     agr_coeffs =  model.aggregate(bag_coeffs)
 
-    ip_thresh = 3/4
+    ip_thresh = .6
+    #ip_matrix = torch.zeros((x,y))
     for ix in range(x):
         for iy in range(y):
             coeffs_vec = bag_coeffs[:,ix,iy]
+            #ip_matrix[ix,iy] += sum([abs(val) > .1 for val in coeffs_vec])/len(coeffs_vec)
             if avg:
                 if torch.abs(torch.mean(coeffs_vec)) > .1:
                     new_mask[ix, iy] = 1
@@ -44,7 +46,7 @@ def process_bag_coeffs(Bag_coeffs, model, avg = False):
     return new_mask, agr_coeffs
 
 
-def train_one_step(model, data, optimizer, mode = None):
+def train_one_step(model, data, optimizer):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
         loss, loss_refinement, losses = model.auto_Loss(x = data['x'], dx = data['dx'])
@@ -169,9 +171,9 @@ def validate_ensemble_epoch(model, data_loader, Loss_dict, true_coeffs = None):
     model.eval()
     model.params['eval'] = True
     total_loss = 0
+
     total_loss_dict = {}
     Bag_coeffs = copy(model.sub_model_coeffs())
-    n_bags = Bag_coeffs.shape[0]
     val_model = copy(model)
 
     agr_coeffs =  model.aggregate(Bag_coeffs)
@@ -309,6 +311,7 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
     for epoch in range(train_params['bag_epochs']):
         if not epoch % test_freq:
             val_model, Loss_dict = validate_ensemble_epoch(net, test_loader, Loss_dict, true_coeffs)
+            process_bag_coeffs(net.sub_model_coeffs(), net)
             if printout:
                 print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in Loss_dict.items()])}')
                 #print(net.params['dx_errors'])

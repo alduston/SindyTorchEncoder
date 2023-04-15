@@ -331,7 +331,7 @@ class SindyNetEnsemble(nn.Module):
         coeffs = [submodel['sindy_coeffs'] for submodel in self.submodels]
         coeff_mask = self.coefficient_mask
         pred_stack = torch.stack([torch.matmul(Theta, coeff_mask * coeff_m) for coeff_m in coeffs])
-        pred_masks = torch.stack([self.reshape_mask(mask, z.shape, first=False) for mask, z in zip(masks, pred_stack)])
+        pred_masks = torch.stack([self.reshape_mask(mask, pred.shape, first=False) for mask, pred in zip(masks, pred_stack)])
         sindy_predict = torch.sum(pred_stack*pred_masks, 0)
         return sindy_predict
 
@@ -493,7 +493,8 @@ class SindyNetEnsemble(nn.Module):
             if alt:
                 sub_coeffs = torch.sum(sub_coeffs, dim = 0)
                 rescale = (1 / self.params['nbags'])
-        reg_loss = self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sub_coeffs))
+        #reg_loss = self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sub_coeffs))
+        reg_loss = self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sub_coeffs * self.coefficient_mask))
         return reg_loss * rescale
 
 
