@@ -402,16 +402,17 @@ class SindyNetEnsemble(nn.Module):
         if self.params['eval']:
             dx_decode = self.aggregate(dx_decodes)
         else:
-            dx_decode = torch.sum(dx_decodes,0)
-            M = dx.shape[0] * dx.shape[1]
+            for bag_idx, sub_model in enumerate(sub_models):
+                dx_decode = torch.sum(dx_decodes,0)
+                M = dx.shape[0] * dx.shape[1]
 
-            dx_p = self.sub_dx(bag_idx, x, dx)
-            error = copy(torch.sum((((dx_p.T - dx)**2))))/M
-            self.params['dx_errors'][bag_idx] += float(error.detach())
-            if bag_idx == 0:
-                dx_agr = self.agr_dx(x, dx)
-                error =  copy(torch.sum((((dx_agr.T - dx)**2))))/M
-                self.params['dx_errors'][-1] += float(error.detach())
+                dx_p = self.sub_dx(bag_idx, x, dx)
+                error = copy(torch.sum((((dx_p.T - dx)**2))))/M
+                self.params['dx_errors'][bag_idx] += float(error.detach())
+                if bag_idx == 0:
+                    dx_agr = self.agr_dx(x, dx)
+                    error =  copy(torch.sum((((dx_agr.T - dx)**2))))/M
+                    self.params['dx_errors'][-1] += float(error.detach())
         return dx_decode
 
 

@@ -255,7 +255,7 @@ def update_df_cols(df, update_num):
 
 
 def run():
-    exp_label = 'median_test'
+    exp_label = 'idk'
     params_1 = {'replacement': True, 'avg_crossval': False, 'c_loss': False, 'coefficient_initialization': 'xavier',
                 'loss_weight_decoder': .1, 'nbags': 10, 'bagn_factor': 1, 'max_epochs': 600}
 
