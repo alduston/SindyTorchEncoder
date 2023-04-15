@@ -87,10 +87,9 @@ class SindyNetEnsemble(nn.Module):
 
     def get_params(self):
         params = list(self.parameters())
-        torch_params = []
         for i,model in enumerate(self.submodels):
             params += model['encoder'].parameters()
-            #params += model['decoder'].parameters()
+            params += model['translator'].parameters()
         for i,tensor in enumerate(params):
             self.register_parameter(name=f'param{i}', param = tensor)
         return params
@@ -98,9 +97,11 @@ class SindyNetEnsemble(nn.Module):
 
     def init_submodel(self, idx):
         encoder, encoder_layers = self.Encoder(self.params)
+        translator, translator_layers = self.Translator(self.params)
         encoder.sindy_coeffs =  nn.Parameter(self.init_sindy_coefficients(), requires_grad = True)
         submodel = {'encoder' : encoder, 'encoder_layers': encoder_layers,
-                    'sindy_coeffs': encoder.sindy_coeffs}
+                    'translator': translator, 'translator_layers': translator_layers,
+                    'sindy_coeffs': encoder.sindy_coeffs }
         return submodel
 
 
@@ -112,6 +113,23 @@ class SindyNetEnsemble(nn.Module):
         return submodels
 
 
+    def get_network(self, input_dim, widths, final_dim, activation):
+        layers = []
+        for output_dim in widths:
+            layer = nn.Linear(input_dim, output_dim)
+            nn.init.xavier_uniform(layer.weight)
+            nn.init.constant_(layer.bias.data, 0)
+
+            input_dim = output_dim
+            layers.append(layer)
+            layers.append(activation)
+
+        layer = nn.Linear(input_dim,  final_dim)
+        nn.init.xavier_uniform(layer.weight)
+        nn.init.constant_(layer.bias.data, 0)
+        layers.append(layer)
+        net = nn.Sequential(*layers)
+        return net, layers
 
 
     def Encoder(self, params):
@@ -119,7 +137,7 @@ class SindyNetEnsemble(nn.Module):
         input_dim = params['input_dim']
         latent_dim = params['latent_dim']
         widths = params['widths']
-
+        #return self.get_network(input_dim, widths, latent_dim, activation_function)
         layers = []
         for output_dim in widths:
             encoder = nn.Linear(input_dim, output_dim)
@@ -139,12 +157,19 @@ class SindyNetEnsemble(nn.Module):
         return Encoder, layers
 
 
+    def Translator(self, params):
+        activation_function = self.get_activation_f(params)
+        input_dim = params['latent_dim']
+        widths = [2 * input_dim]
+        final_dim = params['input_dim']
+        return self.get_network(input_dim, widths, final_dim, activation_function)
+
+
     def Decoder(self, params):
         activation_function = self.get_activation_f(params)
         final_dim = params['input_dim']
         input_dim = params['latent_dim']
         widths = params['widths']
-
         layers = []
         for output_dim in widths[::-1]:
             decoder = nn.Linear(input_dim, output_dim)
@@ -305,16 +330,9 @@ class SindyNetEnsemble(nn.Module):
         masks = [copy(submodel['output_mask']) for submodel in self.submodels]
         coeffs = [submodel['sindy_coeffs'] for submodel in self.submodels]
         coeff_mask = self.coefficient_mask
-        for idx,coeff_m in enumerate(coeffs):
-            mask = masks[idx]
-            sub_predict = torch.matmul(Theta, coeff_mask * coeff_m)
-            if not idx:
-                output_shape = sub_predict.shape
-                mask = self.reshape_mask(mask, output_shape, first = False)
-                sindy_predict = mask * sub_predict
-            else:
-                mask = self.reshape_mask(mask, output_shape, first = False)
-                sindy_predict += mask * sub_predict
+        pred_stack = torch.stack([torch.matmul(Theta, coeff_mask * coeff_m) for coeff_m in coeffs])
+        pred_masks = torch.stack([self.reshape_mask(mask, z.shape, first=False) for mask, z in zip(masks, pred_stack)])
+        sindy_predict = torch.sum(pred_stack*pred_masks, 0)
         return sindy_predict
 
 
@@ -362,53 +380,37 @@ class SindyNetEnsemble(nn.Module):
 
 
     def agr_dx(self, x, dx):
-        z_aggregate = self.agr_forward(x)[0]
-        Theta = self.Theta(z_aggregate, x, dx)
-        agr_coeff =  self.aggregate(self.sub_model_coeffs())
-        sindy_predict = torch.matmul(Theta, self.coefficient_mask * agr_coeff)
-        decoder_weights, decoder_biases = self.decoder_weights()
-        activation = self.params['activation']
-        agr_dx = z_derivative(z_aggregate, sindy_predict, decoder_weights, decoder_biases, activation=activation)
+        dx_decodes = torch.stack([self.sub_dx(bag_idx, x, dx) for bag_idx in range(self.params['nbags'])])
+        agr_dx = self.aggregate(dx_decodes)
         return agr_dx
+
+
+    def get_dx_errors(self, x, dx):
+        sub_models = self.submodels
+        for bag_idx, sub_model in enumerate(sub_models):
+            M = dx.shape[0] * dx.shape[1]
+
+            dx_p = self.sub_dx(bag_idx, x, dx)
+            error = copy(torch.sum((((dx_p.T - dx) ** 2)))) / M
+            self.params['dx_errors'][bag_idx] += float(error.detach())
+            if bag_idx == 0:
+                dx_agr = self.agr_dx(x, dx)
+                error = copy(torch.sum((((dx_agr.T - dx) ** 2)))) / M
+                self.params['dx_errors'][-1] += float(error.detach())
+        return True
 
 
     def dx_decode(self,z, x, dx = None):
         sindy_predict = self.sindy_predict(z, x, dx)
         decoder_weights, decoder_biases = self.decoder_weights()
         activation = self.params['activation']
-        sub_models = self.submodels
+        dx_decode = z_derivative(z, sindy_predict, decoder_weights,
+                                 decoder_biases, activation=activation)
 
-        dx_decodes = []
-        for bag_idx, sub_model in enumerate(sub_models):
-            mask = copy(sub_model['output_mask']).T
-
-            if self.params['eval']:
-                mask = torch.ones(mask.shape, device=self.device)
-            if not bag_idx:
-                dx_decode = z_derivative(z, sindy_predict, decoder_weights,
-                                                decoder_biases, activation=activation)
-                output_shape = dx_decode.shape
-                mask = self.reshape_mask(mask, output_shape)
-                dx_decode *= mask
-                dx_decodes.append(dx_decode)
-            else:
-                mask = self.reshape_mask(mask, output_shape)
-                dx_decodes.append(mask * z_derivative(z, sindy_predict, decoder_weights, decoder_biases, activation=activation))
-        dx_decodes = torch.stack(dx_decodes)
         if self.params['eval']:
-            dx_decode = self.aggregate(dx_decodes)
+            dx_decode = self.agr_dx(x, dx)
         else:
-            for bag_idx, sub_model in enumerate(sub_models):
-                dx_decode = torch.sum(dx_decodes,0)
-                M = dx.shape[0] * dx.shape[1]
-
-                dx_p = self.sub_dx(bag_idx, x, dx)
-                error = copy(torch.sum((((dx_p.T - dx)**2))))/M
-                self.params['dx_errors'][bag_idx] += float(error.detach())
-                if bag_idx == 0:
-                    dx_agr = self.agr_dx(x, dx)
-                    error =  copy(torch.sum((((dx_agr.T - dx)**2))))/M
-                    self.params['dx_errors'][-1] += float(error.detach())
+            self.get_dx_errors(x, dx)
         return dx_decode
 
 
@@ -445,37 +447,27 @@ class SindyNetEnsemble(nn.Module):
 
     def agr_decode(self, z):
         submodels = self.submodels
-        xs = []
-        for i,submodel in enumerate(submodels):
-            decoder = submodel['decoder']
-            x = decoder(z)
-            xs.append(x)
-        return self.aggregate(torch.stack(xs))
+        x_stack = torch.stack([submodel['decoder'](z) for submodel in submodels])
+        x_pred = self.aggregate(x_stack)
+        return x_pred, x_stack
 
 
-    def masked_forward(self, x, get_stack = False):
+    def masked_forward(self, x):
         submodels = self.submodels
         masks = self.sub_model_masks()
         z_stack = torch.stack([submodel['encoder'](x) for submodel in submodels])
-        z_masks = torch.stack([self.reshape_mask(mask, z.shape, first = False) for mask,z in zip(masks, z_stack)])
+        z_masks = torch.stack([self.reshape_mask(mask, z.shape, first = False) for mask, z in zip(masks, z_stack)])
         z = torch.sum(z_masks * z_stack, 0)
         return z, z_stack
 
 
     def masked_decode(self, z):
         submodels = self.submodels
-        for i, submodel in enumerate(submodels):
-            decoder = submodel['decoder']
-            mask = copy(submodel['output_mask'])
-            if not i:
-                x_p = decoder(z)
-                output_shape = x_p.shape
-                x_mask = self.reshape_mask(mask, output_shape, first = False)
-                x = x_mask * x_p
-            else:
-                x_mask = self.reshape_mask(mask, output_shape, first = False)
-                x += x_mask * decoder(z)
-        return x
+        masks = self.sub_model_masks()
+        x_stack = torch.stack([submodel['decoder'](z) for submodel in submodels])
+        x_masks = torch.stack([self.reshape_mask(mask, x.shape, first=False) for mask,x in zip(masks, x_stack)])
+        x_pred = torch.sum(x_masks * x_stack, 0)
+        return x_pred, x_stack
 
 
     def forward(self, x):

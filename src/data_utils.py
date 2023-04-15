@@ -140,6 +140,7 @@ def get_test_params(train_size = 100, max_data = 100000, noise = 1e-6):
 
     params['activation'] = 'sigmoid'
     params['widths'] = [64,32]
+    params['widths'] = [64, 32]
 
     # training parameters
     params['epoch_size'] = training_data['x'].shape[0]

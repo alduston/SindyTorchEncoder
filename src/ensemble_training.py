@@ -28,7 +28,7 @@ def process_bag_coeffs(Bag_coeffs, model, avg = False):
     x,y = new_mask.shape
     agr_coeffs =  model.aggregate(bag_coeffs)
 
-    ip_thresh = 2/3
+    ip_thresh = 3/4
     for ix in range(x):
         for iy in range(y):
             coeffs_vec = bag_coeffs[:,ix,iy]
