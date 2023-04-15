@@ -320,8 +320,10 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
             net = crossval(net)
         net.params['dx_errors'] = [0 for i in range(net.params['nbags']+1)]
         train_ensemble_epoch(net, train_bag_loader, optimizer)
-        for i in range(net.params['nbags']+1):
-            net.params['dx_error_lists'][i].append(net.params['dx_errors'][i])
+        
+        if net.params['dx_errors'][0] != 0:
+            for i in range(net.params['nbags']+1):
+                net.params['dx_error_lists'][i].append(net.params['dx_errors'][i])
 
     net, Loss_dict = validate_ensemble_epoch(net, test_loader, Loss_dict)
     error_plot(net)
