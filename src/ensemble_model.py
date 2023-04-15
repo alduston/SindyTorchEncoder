@@ -409,8 +409,10 @@ class SindyNetEnsemble(nn.Module):
 
         if self.params['eval']:
             dx_decode = self.agr_dx(x, dx)
-        else:
             self.get_dx_errors(x, dx)
+        else:
+            if not self.epoch % 20:
+                self.get_dx_errors(x, dx)
         return dx_decode
 
 
