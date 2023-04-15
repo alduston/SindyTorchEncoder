@@ -266,7 +266,7 @@ def error_plot(net):
         errors = np.log(np.asarray(net.params['dx_error_lists'][i]))
         plt.plot(errors)
     avg_errors = np.log(np.asarray(net.params['dx_error_lists'][-1]))
-    plt.plot(avg_errors, label=f'avg')
+    plt.plot(avg_errors, label=f'avg', marker='x')
     plt.legend()
     l = len(os.listdir('../data/misc/dx_plots/')) + 1
     plt.savefig(f'../data/misc/dx_plots/dx_errors_{l}.png')
