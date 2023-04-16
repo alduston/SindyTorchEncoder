@@ -388,14 +388,26 @@ class SindyNetEnsemble(nn.Module):
     def get_dx_errors(self, x, dx):
         sub_models = self.submodels
         for bag_idx, sub_model in enumerate(sub_models):
-            M = dx.shape[0] * dx.shape[1]
-
             dx_p = self.sub_dx(bag_idx, x, dx)
-            error = copy(torch.sum((((dx_p.T - dx) ** 2)))) / M
+            error = copy(torch.mean((((dx_p.T - dx) ** 2))))
             self.params['dx_errors'][bag_idx] += float(error.detach())
             if bag_idx == 0:
                 dx_agr = self.agr_dx(x, dx)
-                error = copy(torch.sum((((dx_agr.T - dx) ** 2)))) / M
+                error = copy(torch.mean((((dx_agr.T - dx) ** 2))))
+                self.params['dx_errors'][-1] += float(error.detach())
+        return True
+
+
+    def get_decode_errors(self, x, dx):
+        sub_models = self.submodels
+        for bag_idx, sub_model in enumerate(sub_models):
+            z_p = sub_model['encoder'](x)
+            x_p = self.decoder(z_p)
+            error = copy(torch.mean((((x_p - x) ** 2))))
+            self.params['dx_errors'][bag_idx] += float(error.detach())
+            if bag_idx == 0:
+                x_agr = self.decoder(self.agr_forward(x)[0])
+                error = copy(torch.mean((((x_agr - x) ** 2))))
                 self.params['dx_errors'][-1] += float(error.detach())
         return True
 
@@ -430,7 +442,7 @@ class SindyNetEnsemble(nn.Module):
         return torch.stack([submodel['output_mask'] for submodel in self.submodels])
 
 
-    def aggregate(self, tensors, agr_key = 'mean'):
+    def aggregate(self, tensors, agr_key = 'median'):
         if agr_key == 'median':
             return torch.median(tensors,0)[0]
         if agr_key == 'mean':
@@ -521,7 +533,6 @@ class SindyNetEnsemble(nn.Module):
 
 
     def latent_loss(self, z_stack):
-        z_stack[0]  *= 0
         z_avg = torch.sum(z_stack, 0)
         stack_var = torch.mean((z_stack - z_avg)**2)
         return self.params['loss_weight_latent'] * stack_var

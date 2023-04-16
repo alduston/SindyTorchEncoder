@@ -266,10 +266,7 @@ def get_output_masks(net):
 def error_plot(net):
     for i in range(net.params['nbags']):
         errors = np.log(np.asarray(net.params['dx_error_lists'][i]))
-        if i == 0:
-            plt.plot(errors,  marker='o')
-        else:
-            plt.plot(errors)
+        plt.plot(errors)
     avg_errors = np.log(np.asarray(net.params['dx_error_lists'][-1]))
     plt.plot(avg_errors, label=f'avg', marker='x')
     plt.legend()

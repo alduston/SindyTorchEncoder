@@ -32,8 +32,8 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
     model_params['batch_size'] = l//2
     model_params['crossval_freq'] = 50
     model_params['run'] = run
-    model_params['pretrain_epochs'] = 100
-    model_params['test_freq'] = 50
+    model_params['pretrain_epochs'] = 50
+    model_params['test_freq'] = 5
     net, Loss_dict = train_ea_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
@@ -41,9 +41,9 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
 def a_test(model_params, training_data, validation_data, run = 0):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs':2250, 'nbags': 1, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs':2700, 'nbags': 1, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                    'refinement_epochs': 250}
+                    'refinement_epochs':300}
     model_params['batch_size'] = l//2
     model_params['threshold_frequency'] = 50
     model_params['run'] = run
@@ -255,9 +255,10 @@ def update_df_cols(df, update_num):
 
 
 def run():
-    exp_label = 'Latent_Test'
-    params_1 = {'replacement': True, 'avg_crossval': False, 'c_loss': False, 'coefficient_initialization': 'xavier',
-                'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1, 'max_epochs': 2500}
+    exp_label = 'Median_test'
+    params_1 = {'replacement': True, 'c_loss': False, 'coefficient_initialization': 'xavier',
+                'loss_weight_decoder': .1, 'loss_weight_sindy_regularization': 1e-5,
+                'nbags': 30, 'bagn_factor': 1, 'max_epochs': 3000,  'avg_crossval': False}
 
     params_2 = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1,
                 'expand_sample': False}
