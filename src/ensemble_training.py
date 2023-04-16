@@ -266,7 +266,10 @@ def get_output_masks(net):
 def error_plot(net):
     for i in range(net.params['nbags']):
         errors = np.log(np.asarray(net.params['dx_error_lists'][i]))
-        plt.plot(errors)
+        if i == 0:
+            plt.plot(errors,  marker='o')
+        else:
+            plt.plot(errors)
     avg_errors = np.log(np.asarray(net.params['dx_error_lists'][-1]))
     plt.plot(avg_errors, label=f'avg', marker='x')
     plt.legend()
@@ -312,6 +315,10 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
         if not epoch % test_freq:
             val_model, Loss_dict = validate_ensemble_epoch(net, test_loader, Loss_dict, true_coeffs)
             process_bag_coeffs(net.sub_model_coeffs(), net)
+
+            for i in range(net.params['nbags'] + 1):
+                net.params['dx_error_lists'][i].append(net.params['dx_errors'][i])
+            net.params['dx_errors'] = [0 for i in range(net.params['nbags'] + 1)]
             if printout:
                 print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in Loss_dict.items()])}')
                 #print(net.params['dx_errors'])
@@ -320,10 +327,7 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
             net = crossval(net)
         net.params['dx_errors'] = [0 for i in range(net.params['nbags']+1)]
         train_ensemble_epoch(net, train_bag_loader, optimizer)
-        
-        if net.params['dx_errors'][0] != 0:
-            for i in range(net.params['nbags']+1):
-                net.params['dx_error_lists'][i].append(net.params['dx_errors'][i])
+
 
     net, Loss_dict = validate_ensemble_epoch(net, test_loader, Loss_dict)
     error_plot(net)

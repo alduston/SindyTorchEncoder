@@ -410,9 +410,6 @@ class SindyNetEnsemble(nn.Module):
         if self.params['eval']:
             dx_decode = self.agr_dx(x, dx)
             self.get_dx_errors(x, dx)
-        else:
-            if not self.epoch % 20:
-                self.get_dx_errors(x, dx)
         return dx_decode
 
 
@@ -524,6 +521,7 @@ class SindyNetEnsemble(nn.Module):
 
 
     def latent_loss(self, z_stack):
+        z_stack[0]  *= 0
         z_avg = torch.sum(z_stack, 0)
         stack_var = torch.mean((z_stack - z_avg)**2)
         return self.params['loss_weight_latent'] * stack_var
