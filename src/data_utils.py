@@ -79,7 +79,6 @@ class model_data(Dataset):
             x_bags,dx_bags = make_samples([self.x,self.dx], n_samples = bag_params['nbags'],
                                           augment = bag_params['augment'], sample_size = bag_params['bag_size'],
                                           replacement = bag_params['replacement'], device = self.device)
-
             self.x_bags = x_bags
             self.dx_bags = dx_bags
 
@@ -152,6 +151,7 @@ def get_test_params(train_size = 100, max_data = 100000, noise = 1e-6):
     params['epoch_size'] = training_data['x'].shape[0]
     params['batch_size'] = min([params['epoch_size']//8, train_size])
     params['nbags'] = 1
+    params['bag_size'] = None
     params['threshold_frequency'] = 5
     params['learning_rate'] = 1e-3
 
@@ -178,6 +178,7 @@ def get_test_params(train_size = 100, max_data = 100000, noise = 1e-6):
     params['hybrid_reg'] = False
     params['bagn_factor'] = 1
     params['true_coeffs'] = training_data['sindy_coefficients']
+    params['print_factor'] = 1000
 
     return params,training_data, validation_data
 
@@ -192,7 +193,6 @@ def get_bag_loader(data, train_params, model_params,  workers = 0,
     train_params['augment'] = augment
     train_params['replacement'] = replacement
     data_class = model_data(data, model_params, device, bag_params = train_params)
-
     return DataLoader(data_class, batch_size=train_params['bag_size'], num_workers=workers, shuffle=False)
 
 

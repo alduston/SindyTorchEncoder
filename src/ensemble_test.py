@@ -23,30 +23,31 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
     model_params['sequential_thresholding'] = False
     model_params['use_activation_mask'] = False
     model_params['add_noise'] = False
-    l = len(training_data['x'])
 
+    l = len(training_data['x'])
     train_params = {'bag_epochs': model_params['max_epochs'], 'nbags': model_params['nbags'],
                     'bag_size': l, 'refinement_epochs': 0}
 
-    model_params['batch_size'] = l//2
+    model_params['batch_size'] = l
     model_params['crossval_freq'] = 50
+    #model_params['crossval_freq'] = 2000
     model_params['run'] = run
     model_params['pretrain_epochs'] = 50
-    model_params['test_freq'] = 10
-    with torch.autograd.set_detect_anomaly(True):
-        net, Loss_dict = train_ea_sindy(model_params, train_params, training_data, validation_data,  printout = True)
+    model_params['test_freq'] = 50
+    net, Loss_dict = train_ea_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
 
 def a_test(model_params, training_data, validation_data, run = 0):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
+
     train_params = {'bag_epochs': 0, 'pretrain_epochs': 4500, 'nbags': 1, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                    'refinement_epochs':500}
-    model_params['batch_size'] = l//2
+                    'refinement_epochs': 500}
+    model_params['batch_size'] = l
     model_params['threshold_frequency'] = 50
-    model_params['print_freq'] = 10
+    model_params['print_freq'] = 50
     model_params['run'] = run
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
@@ -178,9 +179,7 @@ def get_key_med(df,key, nruns):
     return np.asarray(med)
 
 
-
-def get_plots(model1_df, model2_df, exp_label,
-              plot_keys = ["sindy_x_","decoder_", "active_coeffs_", "coeff_"],
+def get_plots(model1_df, model2_df, exp_label, plot_keys = ["sindy_x_","decoder_", "active_coeffs_", "coeff_"],
               model_labels = ['A', 'EA'], nruns = None):
     try:
         os.mkdir(f'../plots/{exp_label}/')
@@ -255,10 +254,10 @@ def update_df_cols(df, update_num):
 
 
 def run():
-    exp_label = 'One_bag'
-    params_1 = {'replacement': False, 'c_loss': False,
+    exp_label = 'celebration'
+    params_1 = {'replacement': True, 'c_loss': False,'coefficient_initialization': 'xavier',
                 'loss_weight_decoder': .1,  'loss_weight_sindy_regularization': 1e-5,
-                'nbags': 1, 'bagn_factor': 1, 'max_epochs': 5000,  'avg_crossval': False}
+                'nbags': 30, 'bagn_factor': 1, 'max_epochs': 5000,  'avg_crossval': False}
 
     params_2 = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1,
                 'expand_sample': False, 'nbags': 1}
@@ -269,8 +268,9 @@ def run():
 
     if torch.cuda.is_available():
         comparison_test(models_dict, exp_label, exp_size=(100, np.inf))
+
     else:
-        exp = 'one_bag'
+        exp = 'celebration'
         try:
             os.mkdir(f'../plots/{exp}')
         except OSError:
@@ -287,7 +287,8 @@ def run():
         Meta_df_1 = pd.read_csv(f'../data/{exp}/{label1}_local.csv')
         Meta_df_2 = pd.read_csv(f'../data/{exp}/{label2}_local.csv')
 
-        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['Meta_EA', 'Meta_A'], nruns = 6)
+        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['Meta_EA', 'Meta_A'], nruns = 10)
+
 
 if __name__=='__main__':
     run()

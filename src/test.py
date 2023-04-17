@@ -20,6 +20,22 @@ from copy import deepcopy, copy
 warnings.filterwarnings("ignore")
 
 
+def gmean(tensor, dim = 0):
+    log_x = torch.log(tensor)
+    return torch.exp(torch.mean(log_x, dim=dim))
+
+def gmean(tensor, dim = 0):
+    p_mask = tensor >= 0
+    n_mask = tensor  < 0
+    p_tensor = tensor * p_mask
+    n_tensor = tensor * n_mask
+
+
+    log_x = torch.log(p_tensor)
+    return torch.exp(torch.mean(log_x, dim=dim)) - abs_min
+
+
+
 def pas_test(model_params, training_data, validation_data, run  = 0):
     model_params['sequential_thresholding'] = False
     model_params['use_activation_mask'] = False
@@ -28,10 +44,11 @@ def pas_test(model_params, training_data, validation_data, run  = 0):
     l = len(training_data['x'])
 
     train_params = {'bag_epochs': model_params['max_epochs'], 'nbags': model_params['nbags'],
-                    'bag_size': l//2, 'refinement_epochs': 0}
+                     'bag_size': l, 'refinement_epochs': 0}
+                    #'bag_size': l//2, 'refinement_epochs': 0}
 
     model_params['batch_size'] = l//2
-    model_params['crossval_freq'] = 40
+    model_params['crossval_freq'] = 100
     model_params['run'] = run
     model_params['pretrain_epochs'] = 50
     model_params['test_freq'] = 5
@@ -71,11 +88,11 @@ def pas_sub_test(model_params, training_data, validation_data, run  = 0):
 def a_test(model_params, training_data, validation_data, run = 0):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 7000, 'nbags': 1, 'bag_size': 100,
+    train_params = {'bag_epochs': 0, 'pretrain_epochs': 1000, 'nbags': 1, 'bag_size': 100,
                     'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                    'refinement_epochs': 1000}
-    model_params['batch_size'] = l//8
-    model_params['threshold_frequency'] = 250
+                    'refinement_epochs': 0}
+    model_params['batch_size'] = l//2
+    model_params['threshold_frequency'] = 100
     model_params['run'] = run
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
@@ -287,9 +304,12 @@ def update_df_cols(df, update_num):
 def run():
     exp_label = 'Ensemble_Results_3'
 
-    params_1 = {'coefficient_initialization': 'xavier', 'loss_weight_sindy_regularization': 1e-5,
-                'replacement': True, 'avg_crossval': False, 'c_loss': False,
-                'loss_weight_decoder': .1, 'nbags': 30, 'bagn_factor': 1, 'max_epochs': 8000}
+    #params_1 = {'coefficient_initialization': 'xavier', 'loss_weight_sindy_regularization': 1e-5,
+                #'replacement': True, 'avg_crossval': False, 'c_loss': False,
+                #'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1, 'max_epochs': 8000}
+    params_1 = { 'loss_weight_sindy_regularization': 1e-5,
+                 'replacement': False, 'avg_crossval': False, 'c_loss': False,
+                'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1, 'max_epochs': 1000}
 
     params_2 = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1,
                 'expand_sample': False}
@@ -308,10 +328,12 @@ def run():
 
     models_dict = {'Meta_PA': model_1, 'Meta_A': model_2}
 
-    comparison_test(models_dict, exp_label, exp_size=(12, np.inf))
+    #comparison_test(models_dict, exp_label, exp_size=(20, np.inf))
     if torch.cuda.is_available():
+
         comparison_test(models_dict, exp_label, exp_size=(128, np.inf))
     else:
+        return True
         exp = 'Ensemble_Results_3'
         try:
             os.mkdir(f'../plots/{exp}')

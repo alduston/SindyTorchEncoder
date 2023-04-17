@@ -114,16 +114,17 @@ def validate_one_epoch(model, data_loader, true_coeffs = None):
     model.params['eval'] = True
     total_loss = 0
     total_loss_dict = {}
+    l = len(data_loader)
     for batch_index, data in enumerate(data_loader):
         with torch.no_grad():
             loss, loss_refinement, losses = validate_one_step(model, data)
-            total_loss += loss
+            total_loss += loss/l
             if len(total_loss_dict.keys()):
                 for key in total_loss_dict.keys():
-                    total_loss_dict[key] += losses[key]
+                    total_loss_dict[key] += losses[key]/l
             else:
                 for key, val in losses.items():
-                    total_loss_dict[key] = val
+                    total_loss_dict[key] = val/l
     if true_coeffs!= None:
         pred_coeffs = copy(model.coefficient_mask)
         coeff_loss_val = coeff_pattern_loss(pred_coeffs, true_coeffs)
@@ -138,6 +139,7 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
     train_epochs = train_params[f'{mode}_epochs']
     optimizer = torch.optim.Adam(net.parameters(), lr= model_params['learning_rate'])
     true_coeffs = net.true_coeffs
+
     for epoch in range(train_epochs):
         if not epoch % print_freq:
             test_loss, test_loss_dict = validate_one_epoch(net, test_loader, true_coeffs)
@@ -185,9 +187,6 @@ def train_sindy(model_params, train_params, training_data, validation_data, prin
         net, loss_dict,Loss_dict = subtrain_sindy(net, train_loader, model_params, train_params,
                                     mode='refinement', print_freq=model_params['print_freq'], test_loader=test_loader,
                                     printout=printout, Loss_dict = Loss_dict)
-    plt.plot(net.params['plot_vals'])
-    plt.savefig('Aplot.png')
-    clear_plt()
     return net, Loss_dict
 
 
@@ -436,6 +435,8 @@ def scramble_train_sindy(model_params, train_params, training_data, validation_d
     test_freq = net.params['test_freq']
     optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'],
                                  capturable = torch.cuda.is_available())
+
+    print([param.shape for param in net.parameters()])
     true_coeffs = net.true_coeffs
 
     for epoch in range(train_params['bag_epochs']):

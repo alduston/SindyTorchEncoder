@@ -256,7 +256,7 @@ class SindyNet(nn.Module):
         Theta = self.Theta(z, x, dx)
         epoch = self.epoch
         if idx == None:
-            sindy_coefficients = self.sindy_coeffs
+             sindy_coefficients = self.sindy_coeffs
         else:
             sindy_coefficients = self.sub_model_coeffs[idx]
         if self.params['sequential_thresholding']:
@@ -310,6 +310,7 @@ class SindyNet(nn.Module):
 
     def decoder_loss(self, x, x_pred):
         criterion = nn.MSELoss()
+        loss = self.params['loss_weight_decoder'] * self.params['bagn_factor'] * criterion(x, x_pred)
         return self.params['loss_weight_decoder'] *  self.params['bagn_factor'] * criterion(x, x_pred)
 
 
@@ -338,12 +339,6 @@ class SindyNet(nn.Module):
             return  self.params['loss_weight_sindy_z'] * criterion(ddz , ddz_predict)
 
 
-    def consistency_loss(self):
-        n_bags = self.sub_model_coeffs.shape[0]
-        avg_coeffs = torch.sum(self.sub_model_coeffs) * (1/n_bags)
-        return self.params['loss_weight_consistency'] * torch.linalg.norm(self.anti_mask * avg_coeffs, float('inf'))
-
-
     def sindy_x_loss(self, z, x, dx, ddx = None, idx = None):
         criterion = nn.MSELoss()
         if self.params['model_order'] == 1:
@@ -365,6 +360,7 @@ class SindyNet(nn.Module):
         loss = loss_refinement + reg_loss
         losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss,
                   'sindy_x': sindy_x_loss, 'reg': reg_loss}
+        losses = {key: self.params['print_factor'] * val for (key, val) in losses.items()}
         return loss, loss_refinement, losses
 
 
