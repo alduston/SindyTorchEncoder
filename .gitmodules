@@ -1,3 +1,3 @@
-[submodule "misc/Geom_median"]
-	path = misc/Geom_median
+[submodule "misc/geom_median"]
+	path = misc/geom_median
 	url = https://github.com/krishnap25/geom_median
