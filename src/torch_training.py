@@ -80,15 +80,13 @@ def process_bag_coeffs(Bag_coeffs, model, avg = False):
 
 #24 by 8000
 
-def train_one_epoch(model, data_loader, optimizer, scheduler = None):
+def train_one_epoch(model, data_loader, optimizer):
     model.train()
     total_loss = 0
     total_loss_dict = {}
 
     for batch_index, data in enumerate(data_loader):
         loss, loss_refinement, losses = train_one_step(model, data, optimizer)
-        if scheduler:
-            scheduler.step()
         total_loss += loss
         if len(total_loss_dict.keys()):
             for key in total_loss_dict.keys():
@@ -110,7 +108,10 @@ def validate_one_step(model, data):
 
 
 def validate_one_epoch(model, data_loader, true_coeffs = None):
+    model.params['plot_vals'].append(float(model.sindy_coeffs[0,0].detach()))
+
     model.eval()
+    model.params['eval'] = True
     total_loss = 0
     total_loss_dict = {}
     for batch_index, data in enumerate(data_loader):
@@ -127,6 +128,7 @@ def validate_one_epoch(model, data_loader, true_coeffs = None):
         pred_coeffs = copy(model.coefficient_mask)
         coeff_loss_val = coeff_pattern_loss(pred_coeffs, true_coeffs)
         total_loss_dict['coeff'] = coeff_loss_val
+    model.params['eval'] = False
     return  total_loss, total_loss_dict
 
 
@@ -150,8 +152,6 @@ def subtrain_sindy(net, train_loader, model_params, train_params, mode, print_fr
                 print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in loss_dict.items()])}')
 
         total_loss, total_loss_dict = train_one_epoch(net, train_loader, optimizer)
-        if not (net.epoch % 1000)-1:
-            pass
 
     if len(Loss_dict.keys()):
         for key, val in loss_dict.items():
@@ -169,6 +169,7 @@ def train_sindy(model_params, train_params, training_data, validation_data, prin
         device = 'cpu'
 
     expansion_factor = None
+
     if model_params['expand_sample']:
         expansion_factor = model_params['nbags']//2
     train_loader = get_loader(training_data, model_params, device=device, expand_factor = expansion_factor)
@@ -182,8 +183,11 @@ def train_sindy(model_params, train_params, training_data, validation_data, prin
     if train_params['refinement_epochs']:
         net.params['sequential_thresholding'] = False
         net, loss_dict,Loss_dict = subtrain_sindy(net, train_loader, model_params, train_params,
-                                    mode='refinement', print_freq=50, test_loader=test_loader,
+                                    mode='refinement', print_freq=model_params['print_freq'], test_loader=test_loader,
                                     printout=printout, Loss_dict = Loss_dict)
+    plt.plot(net.params['plot_vals'])
+    plt.savefig('Aplot.png')
+    clear_plt()
     return net, Loss_dict
 
 

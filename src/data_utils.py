@@ -82,11 +82,16 @@ class model_data(Dataset):
 
             self.x_bags = x_bags
             self.dx_bags = dx_bags
+
+            #self.x_bags = self.x
+            #self.dx_bags = self.dx
+
             self.n_samples = self.x_bags.shape[0]
         if expand_factor:
             self.x = expand_tensor(self.x, expand_factor)
             self.dx = expand_tensor(self.dx, expand_factor)
             self.n_samples = self.x.shape[0]
+
         self.params = params
         self.bag_params = bag_params
         if self.params['model_order'] == 2:
@@ -95,6 +100,7 @@ class model_data(Dataset):
     def __getitem__(self, index):
         if self.bag_params:
             return {'x_bag': self.x_bags[index], 'dx_bag': self.dx_bags[index]}
+            #return {'x': self.x_bags[index], 'dx': self.dx_bags[index]}
         else:
             if self.params['model_order'] == 2:
                 return {'x': self.x[index], 'dx': self.dx[index], 'dxx': self.dxx[index]}
@@ -167,6 +173,7 @@ def get_test_params(train_size = 100, max_data = 100000, noise = 1e-6):
     params['c_loss'] = False
     params['scramble'] = False
     params['eval'] = False
+    params['plot_vals'] = []
     params['expand_sample'] = True
     params['hybrid_reg'] = False
     params['bagn_factor'] = 1

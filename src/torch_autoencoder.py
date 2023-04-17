@@ -101,6 +101,7 @@ class SindyNet(nn.Module):
         nn.init.constant_(encoder.bias.data, 0)
         layers.append(encoder)
         Encoder = nn.Sequential(*layers)
+
         return Encoder, layers
 
 
@@ -125,6 +126,7 @@ class SindyNet(nn.Module):
         nn.init.constant_(decoder.bias.data, 0)
         layers.append(decoder)
         Decoder = nn.Sequential(*layers)
+
         return Decoder, layers
 
 
