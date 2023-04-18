@@ -28,12 +28,11 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
     train_params = {'bag_epochs': model_params['max_epochs'], 'nbags': model_params['nbags'],
                     'bag_size': l, 'refinement_epochs': 0}
 
-    model_params['batch_size'] = l
+    model_params['batch_size'] = l//2
     model_params['crossval_freq'] = 50
-    #model_params['crossval_freq'] = 2000
     model_params['run'] = run
     model_params['pretrain_epochs'] = 50
-    model_params['test_freq'] = 50
+    model_params['test_freq'] = model_params['test_freq']
     net, Loss_dict = train_ea_sindy(model_params, train_params, training_data, validation_data,  printout = True)
     return net, Loss_dict
 
@@ -41,13 +40,11 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
 def a_test(model_params, training_data, validation_data, run = 0):
     model_params['sequential_thresholding'] = True
     l = len(training_data['x'])
+    train_params = {'bag_epochs': 0, 'pretrain_epochs':  model_params['max_epochs'], 'nbags': 1,
+                    'refinement_epochs': model_params['refinement_epochs']}
 
-    train_params = {'bag_epochs': 0, 'pretrain_epochs': 4500, 'nbags': 1, 'bag_size': 100,
-                    'subtrain_epochs': 60, 'bag_sub_epochs': 40, 'bag_learning_rate': .01, 'shuffle_threshold': 3,
-                    'refinement_epochs': 500}
-    model_params['batch_size'] = l
-    model_params['threshold_frequency'] = 50
-    model_params['print_freq'] = 50
+    model_params['batch_size'] = l//2
+    model_params['print_freq'] = model_params['test_freq']
     model_params['run'] = run
     net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
@@ -178,13 +175,30 @@ def get_key_med(df,key, nruns):
     med = key_df.median(axis = 1)
     return np.asarray(med)
 
+def list_in(str, str_list):
+    for sub_str in str_list:
+        if sub_str in str:
+            return True
+    return False
+
 
 def get_plots(model1_df, model2_df, exp_label, plot_keys = ["sindy_x_","decoder_", "active_coeffs_", "coeff_"],
-              model_labels = ['A', 'EA'], nruns = None):
+              model_labels = ['A', 'EA'], nruns = None, factor = 1):
     try:
         os.mkdir(f'../plots/{exp_label}/')
     except OSError:
         pass
+
+    str_list = ['decoder', 'sindy_x', 'sindy_z']
+    for col in model1_df.columns:
+        if list_in(col, str_list):
+
+            model1_df[col] = model1_df[col] / factor
+
+    for col in model2_df.columns:
+        if list_in(col, str_list):
+            model2_df[col] = model2_df[col] / factor
+
 
     if not nruns:
         runs_1 = max([int(key[-1]) for key in model1_df.columns if key.startswith('coeff')])
@@ -254,23 +268,24 @@ def update_df_cols(df, update_num):
 
 
 def run():
-    exp_label = 'celebration'
-    params_1 = {'replacement': True, 'c_loss': False,'coefficient_initialization': 'xavier',
-                'loss_weight_decoder': .1,  'loss_weight_sindy_regularization': 1e-5,
-                'nbags': 30, 'bagn_factor': 1, 'max_epochs': 5000,  'avg_crossval': False}
+    exp_label = 'anderson'
+    epochs = 2000
 
-    params_2 = {'loss_weight_decoder': .1, 'nbags': 1, 'bagn_factor': 1,
-                'expand_sample': False, 'nbags': 1}
+    params_1 = {'nbags': 30, 'replacement': True, 'criterion': 'anderson',
+                 'coefficient_initialization': 'binary_xavier', 'max_epochs': epochs, 'test_freq': 20}
+
+    params_2 = {'nbags': 1, 'expand_sample': False, 'refinement_epochs': 0,
+                'coefficient_initialization': 'constant', 'max_epochs': epochs, 'test_freq': 20}
 
     model_1 = {'params_updates': params_1, 'run_function': ea_test, 'label': 'Meta_EA'}
     model_2 = {'params_updates': params_2, 'run_function': a_test, 'label': 'Meta_A'}
     models_dict = {'Meta_EA': model_1, 'Meta_A': model_2}
 
     if torch.cuda.is_available():
-        comparison_test(models_dict, exp_label, exp_size=(100, np.inf))
+        comparison_test(models_dict, exp_label, exp_size=(50, np.inf))
 
     else:
-        exp = 'celebration'
+        exp = 'anderson'
         try:
             os.mkdir(f'../plots/{exp}')
         except OSError:
@@ -287,8 +302,8 @@ def run():
         Meta_df_1 = pd.read_csv(f'../data/{exp}/{label1}_local.csv')
         Meta_df_2 = pd.read_csv(f'../data/{exp}/{label2}_local.csv')
 
-        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['Meta_EA', 'Meta_A'], nruns = 10)
-
+        get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['Meta_EA', 'Meta_A'],
+                  nruns = 4, factor = 1000)
 
 if __name__=='__main__':
     run()

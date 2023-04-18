@@ -108,8 +108,6 @@ def validate_one_step(model, data):
 
 
 def validate_one_epoch(model, data_loader, true_coeffs = None):
-    model.params['plot_vals'].append(float(model.sindy_coeffs[0,0].detach()))
-
     model.eval()
     model.params['eval'] = True
     total_loss = 0

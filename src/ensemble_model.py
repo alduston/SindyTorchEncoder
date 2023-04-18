@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import warnings
+from scipy.stats import anderson
 from sindy_utils import z_derivative, z_derivative_order2,\
     get_initialized_weights, sindy_library_torch, sindy_library_torch_order2
 import warnings
@@ -9,10 +10,10 @@ from copy import copy, deepcopy
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+import os
 from geom_median.torch import compute_geometric_median
 #import tensorflow as tf
 warnings.filterwarnings("ignore")
-
 
 def expand_tensor(tensor, r):
     l,L = tensor.shape
@@ -51,8 +52,32 @@ def clear_plt():
 
 def binarize(tensor):
     binary_tensor = (tensor != 0).float() * 1
-    binary_tensor[-1,-1]=0
     return binary_tensor
+
+
+def avg_criterion(vec, zero_threshold = .1):
+    return torch.abs(torch.mean(vec)) >  zero_threshold
+
+
+def stability_criterion(vec, zero_threshold = .1, accept_threshold = .6):
+    return (sum([abs(val) > zero_threshold for val in vec])/len(vec)) > accept_threshold
+
+
+def anderson_criterion(vec, zero_threshold = .1):
+    alpha = avg_criterion(vec,zero_threshold)
+    res = anderson(vec.numpy())
+    beta = res.statistic > res.critical_values[2]
+    bool = not (not alpha and beta)
+    if not bool:
+        plt.hist(vec)
+        i = len(os.lisdir('../data/misc/coeff_plots/')) + 1
+        plt.savefig(f'../data/misc/coeff_plots/histogram{i}.png')
+    return bool
+
+
+def binarize_xavier(tensor):
+    binary_tensor = (tensor >= 0).float() * 2
+    return binary_tensor - 1.0
 
 
 def gmean(tensor, dim = 0):
@@ -75,14 +100,11 @@ class SindyNetEnsemble(nn.Module):
         params['device'] = self.device
         self.params = params
         self.activation_f = self.get_activation_f(params)
+        self.criterion_f = self.get_criterion_f(params)
 
         submodels = self.init_submodels()
         self.submodels = submodels
         self.coefficient_mask = torch.tensor(params['coefficient_mask'], dtype=torch.float32, device=self.device)
-
-        #self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad=True)
-        #self.sub_model_coeffs = torch.stack([self.sindy_coeffs])
-
         self.sub_model_coeffs = torch.nn.Parameter(torch.stack([submodel['sindy_coeffs'] for submodel in self.submodels]),
                                                    requires_grad= True)
         self.sindy_coeffs = self.get_sindy_coefficients()
@@ -102,11 +124,11 @@ class SindyNetEnsemble(nn.Module):
         self.torch_params =  self.get_params()
 
 
+
     def get_params(self):
         params = list(self.parameters())
         for i,model in enumerate(self.submodels):
             params += model['encoder'].parameters()
-            #params += model['sindy_coeffs']
             #params += model['translator'].parameters()
         for i,tensor in enumerate(params):
             self.register_parameter(name=f'param{i}', param = tensor)
@@ -155,7 +177,6 @@ class SindyNetEnsemble(nn.Module):
         input_dim = params['input_dim']
         latent_dim = params['latent_dim']
         widths = params['widths']
-        #return self.get_network(input_dim, widths, latent_dim, activation_function)
         layers = []
         for output_dim in widths:
             encoder = nn.Linear(input_dim, output_dim)
@@ -215,6 +236,24 @@ class SindyNetEnsemble(nn.Module):
         elif activation == 'sigmoid':
             activation_function = torch.nn.Sigmoid()
         return activation_function
+
+
+    def get_criterion_f(self, params):
+        criterion = params['criterion']
+        if criterion == 'stability':
+            zero_threshold = params['zero_threshold']
+            accept_threshold = params['accept_threshold']
+            criterion_function = lambda vec: stability_criterion(vec, zero_threshold, accept_threshold)
+        elif criterion == 'avg':
+            zero_threshold = params['zero_threshold']
+            criterion_function = lambda vec: avg_criterion(vec, zero_threshold)
+        elif criterion == 'anderson':
+            zero_threshold = params['zero_threshold']
+            criterion_function = lambda vec: anderson_criterion(vec, zero_threshold)
+        return criterion_function
+
+
+
 
 
     def decoder_weights(self):
@@ -282,9 +321,6 @@ class SindyNetEnsemble(nn.Module):
 
 
     def dz(self, x, dx):
-        #encoder_weights, encoder_biases = self.encoder_weights(0)
-        #activation = self.params['activation']
-        #return z_derivative(x, dx, encoder_weights, encoder_biases, activation)
         if self.params['eval']:
             dz = self.agr_dz(x,dx)
         else:
@@ -304,7 +340,7 @@ class SindyNetEnsemble(nn.Module):
         init = self.params['coefficient_initialization']
         if init == 'xavier':
             intializer = torch.nn.init.xavier_uniform
-        elif init == 'specified':
+        elif init == 'binary_xavier':
             intializer = torch.nn.init.xavier_uniform
         elif init == 'constant':
             intializer = torch.nn.init.constant_
@@ -318,8 +354,11 @@ class SindyNetEnsemble(nn.Module):
         library_dim = self.params['library_dim']
         latent_dim = self.params['latent_dim']
         initializer, init_param = self.initializer()
-        return get_initialized_weights([library_dim, latent_dim], initializer,
+        weights =  get_initialized_weights([library_dim, latent_dim], initializer,
                                        init_param = init_param, device = self.device)
+        if self.params['coefficient_initialization']=='binary_xavier':
+            weights = binarize_xavier(weights)
+        return weights
 
 
     def get_sindy_coefficients(self):
@@ -352,10 +391,7 @@ class SindyNetEnsemble(nn.Module):
 
     def sindy_predict(self, z, x = None, dx = None):
         Theta = self.Theta(z, x, dx)
-        #sindy_coefficients = self.sindy_coeffs
-        #return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
         if self.params['eval']:
-            #sindy_coefficients = self.sindy_coeffs
             sindy_coefficients = self.get_sindy_coefficients()
             return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
         else:
@@ -363,7 +399,6 @@ class SindyNetEnsemble(nn.Module):
 
 
     def calc_coefficient_mask(self):
-        #sindy_coefficients = self.sindy_coeffs
         sindy_coefficients = self.get_sindy_coefficients()
         coefficient_mask = self.coefficient_mask * torch.tensor(
             torch.abs(sindy_coefficients) >= self.params['coefficient_threshold'],
@@ -380,7 +415,6 @@ class SindyNetEnsemble(nn.Module):
 
 
     def active_coeffs(self):
-        #sindy_coefficients = self.sindy_coeffs
         sindy_coefficients = self.get_sindy_coefficients()
         coefficient_mask = self.coefficient_mask
         return sindy_coefficients * coefficient_mask
@@ -391,7 +425,6 @@ class SindyNetEnsemble(nn.Module):
         z_p = sub_model['encoder'](x)
         Theta = self.Theta(z_p, x, dx)
         coeff_m_p = self.sub_model_coeffs[bag_idx]
-        #coeff_m_p = self.sindy_coeffs
         sindy_predict = torch.matmul(Theta, self.coefficient_mask * coeff_m_p)
         decoder_weights, decoder_biases = self.decoder_weights()
         activation = self.params['activation']
@@ -525,7 +558,6 @@ class SindyNetEnsemble(nn.Module):
     def sindy_reg_loss(self, alt = False):
         rescale = 1
         if self.params['eval']:
-            #reg_loss = self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(self.sindy_coeffs))
             reg_loss = self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(self.sindy_coeffs))
         else:
             sub_coeffs = self.sub_model_coeffs
@@ -533,7 +565,6 @@ class SindyNetEnsemble(nn.Module):
                 sub_coeffs = torch.sum(sub_coeffs, dim = 0)
                 rescale = (1 / self.params['nbags'])
             reg_loss = self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(sub_coeffs))
-        #return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(self.sindy_coeffs))
         return reg_loss * rescale
 
 
@@ -561,10 +592,8 @@ class SindyNetEnsemble(nn.Module):
 
 
     def latent_loss(self, z_stack):
-        z_avg = torch.mean(z_stack, 0)
-        stack_var = torch.mean((z_stack - z_avg) ** 2)
-        #z_med = compute_geometric_median([z for z in z_stack], weights=None, per_component=True).median
-        #stack_var = torch.mean((z_stack - z_med)**2)
+        z_med = compute_geometric_median([z for z in z_stack], weights=None, per_component=True).median
+        stack_var = torch.mean((z_stack - z_med)**2)
         return self.params['loss_weight_latent'] * stack_var
 
 
@@ -581,7 +610,6 @@ class SindyNetEnsemble(nn.Module):
         losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss, 'sindy_x': sindy_x_loss,
                   'latent': latent_loss, 'reg': reg_loss}
         losses = {key: self.params['print_factor'] * val for (key,val) in losses.items()}
-        #losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss, 'sindy_x': sindy_x_loss, 'reg': reg_loss}
         return loss, loss_refinement, losses
 
 

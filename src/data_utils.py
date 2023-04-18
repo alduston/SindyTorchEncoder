@@ -134,7 +134,7 @@ def get_test_params(train_size = 100, max_data = 100000, noise = 1e-6):
     params['coefficient_initialization'] = 'constant'
 
     # loss function weighting
-    params['loss_weight_decoder'] = 1.0
+    params['loss_weight_decoder'] = .1
     params['loss_weight_sindy_z'] =  0
     params['loss_weight_sindy_x'] = 1e-4
     #params['loss_weight_sindy_regularization'] = 0
@@ -152,7 +152,7 @@ def get_test_params(train_size = 100, max_data = 100000, noise = 1e-6):
     params['batch_size'] = min([params['epoch_size']//8, train_size])
     params['nbags'] = 1
     params['bag_size'] = None
-    params['threshold_frequency'] = 5
+    params['threshold_frequency'] = 50
     params['learning_rate'] = 1e-3
 
     params['data_path'] = os.getcwd() + '/'
@@ -167,15 +167,12 @@ def get_test_params(train_size = 100, max_data = 100000, noise = 1e-6):
     params['test_freq'] = 50
     params['train_print_freq'] = np.inf
     params['update_freq'] = 50
-    params['use_activation_mask'] = False
-    params['use_median'] = False
-    params['avg_crossval'] = False
+    params['zero_threshold'] = .1
+    params['accept_threshold'] = .6
     params['c_loss'] = False
     params['scramble'] = False
     params['eval'] = False
-    params['plot_vals'] = []
-    params['expand_sample'] = True
-    params['hybrid_reg'] = False
+    params['expand_sample'] = False
     params['bagn_factor'] = 1
     params['true_coeffs'] = training_data['sindy_coefficients']
     params['print_factor'] = 1000

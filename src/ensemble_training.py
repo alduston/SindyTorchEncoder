@@ -22,33 +22,20 @@ def clear_plt():
     return True
 
 
-def process_bag_coeffs(Bag_coeffs, model, avg = False):
+def process_bag_coeffs(Bag_coeffs, model):
     bag_coeffs = Bag_coeffs
     new_mask =  np.zeros(bag_coeffs.shape[1:])
-    #new_mask = np.zeros(bag_coeffs.shape)
     x,y = new_mask.shape
     agr_coeffs =  model.aggregate(bag_coeffs)
-    #agr_coeffs = bag_coeffs
+    coeff_criterion = model.criterion_f
 
-    ip_thresh = .6
     for ix in range(x):
         for iy in range(y):
-            #coeff = bag_coeffs[ix, iy]
-            #if coeff > .1:
-                #new_mask[ix, iy] = 1
-
-            coeffs_vec = bag_coeffs[:,ix,iy]
-            #coeffs_vec = bag_coeffs[ix, iy]
-            if avg:
-                if torch.abs(torch.mean(coeffs_vec)) > .1:
-                    new_mask[ix, iy] = 1
-            else:
-                ip = sum([abs(val) > .1 for val in coeffs_vec])/len(coeffs_vec)
-                if ip > ip_thresh:
-                     new_mask[ix, iy] = 1
+            if model.coefficient_mask[ix, iy]:
+                coeffs_vec = bag_coeffs[:,ix,iy]
+                new_mask[ix, iy] = float(coeff_criterion(coeffs_vec))
 
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = model.params['device'])
-    #return new_mask
     return new_mask, agr_coeffs
 
 
@@ -132,13 +119,10 @@ def train_ensemble_epoch(model, bag_loader, optimizer):
 
 
 def crossval(model):
-    #Bag_coeffs = deepcopy(torch.stack([model.sindy_coeffs.detach()]))
     Bag_coeffs = deepcopy(model.sub_model_coeffs.detach())
-    new_mask, agr_coeffs = process_bag_coeffs(Bag_coeffs, model, avg = model.params['avg_crossval'])
+    new_mask, agr_coeffs = process_bag_coeffs(Bag_coeffs, model)
     model.coefficient_mask = model.coefficient_mask * new_mask
     model.num_active_coeffs = int(torch.sum(copy(model.coefficient_mask)).cpu().detach())
-    #model.sindy_coeffs = model.coefficient_mask * agr_coeffs
-    #model.sindy_coeffs = torch.nn.Parameter(model.coefficient_mask * model.sindy_coeffs, requires_grad=True)
     return model
 
 
@@ -178,13 +162,8 @@ def validate_ensemble_epoch(model, data_loader, Loss_dict, true_coeffs = None):
     total_loss = 0
 
     total_loss_dict = {}
-
-    Bag_coeffs = deepcopy(model.sub_model_coeffs.detach())
     val_model = copy(model)
-
-    #agr_coeffs =  model.aggregate(Bag_coeffs)
     val_model.sindy_coeffs = model.get_sindy_coefficients()
-
     l = len(data_loader)
 
     for batch_index, data in enumerate(data_loader):
@@ -207,7 +186,6 @@ def validate_ensemble_epoch(model, data_loader, Loss_dict, true_coeffs = None):
         Loss_dict['coeff'].append(coeff_loss_val)
 
     for key, val in total_loss_dict.items():
-
         Loss_dict[key].append(float(val.detach().cpu()))
     model.params['eval'] = False
     return val_model, Loss_dict
@@ -236,8 +214,6 @@ def expand_tensor(tensor, r):
             row_idx = i*r +k
             expanded_tensor[row_idx, :] += tensor[i,:]
     return expanded_tensor
-
-
 
 
 def plot_mask(mask, savedir = 'mask.png'):
@@ -298,13 +274,10 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
 
     train_bag_loader = get_bag_loader(training_data, train_params, model_params, device=device,
                                       augment = True, replacement = model_params['replacement'])
-
-    #train_loader = get_loader(training_data, model_params, device=device)
     test_loader = get_loader(validation_data, model_params, device=device)
+    # train_loader = get_loader(training_data, model_params, device=device)
 
     net = SindyNetEnsemble(model_params).to(device)
-    #net.params['nbags'] = 1
-
     net.params['dx_error_lists'] = [[] for i in range(net.params['nbags']+1)]
     net.params['dx_errors'] = [0 for i in range(net.params['nbags']+1)]
 
@@ -328,16 +301,13 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
             for i in range(net.params['nbags'] + 1):
                 net.params['dx_error_lists'][i].append(net.params['dx_errors'][i])
             net.params['dx_errors'] = [0 for i in range(net.params['nbags'] + 1)]
-
             if printout:
                 print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in Loss_dict.items()])}')
-                #print(net.params['dx_errors'])
 
         if not epoch % crossval_freq and epoch >= net.params['pretrain_epochs']:
             net = crossval(net)
         net.params['dx_errors'] = [0 for i in range(net.params['nbags']+1)]
         train_ensemble_epoch(net, train_bag_loader, optimizer)
-
 
     net, Loss_dict = validate_ensemble_epoch(net, test_loader, Loss_dict)
     error_plot(net)
