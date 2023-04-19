@@ -272,7 +272,7 @@ def run():
     epochs = 8000
 
     params_1 = {'nbags': 50, 'replacement': True, 'criterion': 'stability', 'criteria_test': True,
-                 'coefficient_initialization': 'binary_xavier', 'max_epochs': epochs, 'test_freq': 50}
+                 'coefficient_initialization': 'xavier', 'max_epochs': epochs, 'test_freq': 50}
 
     params_2 = {'nbags': 1, 'expand_sample': False, 'refinement_epochs': 0,
                 'coefficient_initialization': 'constant', 'max_epochs': epochs, 'test_freq': 50}
@@ -286,7 +286,7 @@ def run():
         comparison_test(models_dict, exp_label, exp_size=(100, np.inf))
 
     else:
-        exp = 'criteria_test'
+        exp = 'binary_xavier'
         try:
             os.mkdir(f'../plots/{exp}')
         except OSError:
