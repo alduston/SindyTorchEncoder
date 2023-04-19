@@ -68,16 +68,12 @@ def anderson_criterion(vec, zero_threshold = .1):
     res = anderson(vec.numpy())
     beta = res.statistic > res.critical_values[2]
     bool = not (not alpha and beta)
-    if not bool:
-        plt.hist(vec)
-        i = len(os.lisdir('../data/misc/coeff_plots/')) + 1
-        plt.savefig(f'../data/misc/coeff_plots/histogram{i}.png')
     return bool
 
 
 def binarize_xavier(tensor):
     binary_tensor = (tensor >= 0).float() * 2
-    return binary_tensor - 1.0
+    return .5 * (binary_tensor - 1.0)
 
 
 def gmean(tensor, dim = 0):

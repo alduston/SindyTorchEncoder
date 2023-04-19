@@ -2,7 +2,7 @@ import numpy as np
 #import tensorflow as tf
 import pickle
 import torch
-from ensemble_model import SindyNetEnsemble, binarize
+from ensemble_model import SindyNetEnsemble, binarize, anderson_criterion
 from data_utils import get_test_params,get_loader, get_bag_loader
 from sindy_utils import get_initialized_weights
 from math import inf, isinf
@@ -12,6 +12,8 @@ from itertools import permutations
 import random
 import os
 from matplotlib.pyplot import figure
+from scipy.stats import anderson, normaltest
+import pandas as pd
 
 
 def clear_plt():
@@ -28,12 +30,33 @@ def process_bag_coeffs(Bag_coeffs, model):
     x,y = new_mask.shape
     agr_coeffs =  model.aggregate(bag_coeffs)
     coeff_criterion = model.criterion_f
+    criteria_test = model.params['criteria_test']
 
     for ix in range(x):
         for iy in range(y):
             if model.coefficient_mask[ix, iy]:
                 coeffs_vec = bag_coeffs[:,ix,iy]
-                new_mask[ix, iy] = float(coeff_criterion(coeffs_vec))
+                if criteria_test:
+                    mean = float(np.mean(coeffs_vec.numpy()))
+                    astat = float(anderson(coeffs_vec.numpy()).statistic)
+                    pstat = float(normaltest(coeffs_vec.numpy())[1])
+                    prop = float(sum([abs(val) > .1 for val in coeffs_vec])/len(coeffs_vec))
+
+                    try:
+                        model.params['criteria_info'][f'mean_{ix}_{iy}'].append(mean)
+                        model.params['criteria_info'][f'astat_{ix}_{iy}'].append(astat)
+                        model.params['criteria_info'][f'pstat_{ix}_{iy}'].append(pstat)
+                        model.params['criteria_info'][f'prop_{ix}_{iy}'].append(prop)
+
+                    except KeyError:
+                        model.params['criteria_info'][f'mean_{ix}_{iy}'] = [mean]
+                        model.params['criteria_info'][f'astat_{ix}_{iy}'] = [astat]
+                        model.params['criteria_info'][f'pstat_{ix}_{iy}'] = [pstat]
+                        model.params['criteria_info'][f'prop_{ix}_{iy}'] = [prop]
+                    new_mask[ix, iy] = 1
+
+                else:
+                    new_mask[ix, iy] = float(coeff_criterion(coeffs_vec.cpu()))
 
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = model.params['device'])
     return new_mask, agr_coeffs
@@ -312,5 +335,14 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
     net, Loss_dict = validate_ensemble_epoch(net, test_loader, Loss_dict)
     error_plot(net)
     clear_plt()
+
+    if net.params['criteria_test']:
+        try:
+            os.mkdir(f'../data/criteria_test/')
+        except:
+            pass
+        l = len(os.listdir(f'../data/criteria_test/'))
+        criterion_df = pd.DataFrame.from_dict(net.params['criteria_info'])
+        criterion_df.to_csv(f'../data/criteria_test/criterion_df{i}.csv')
     return net, Loss_dict
 

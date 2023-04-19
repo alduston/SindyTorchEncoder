@@ -176,6 +176,8 @@ def get_test_params(train_size = 100, max_data = 100000, noise = 1e-6):
     params['bagn_factor'] = 1
     params['true_coeffs'] = training_data['sindy_coefficients']
     params['print_factor'] = 1000
+    params['criteria_test'] = False
+    params['criteria_info'] = {}
 
     return params,training_data, validation_data
 
