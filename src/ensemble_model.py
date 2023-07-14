@@ -428,13 +428,13 @@ class SindyNetEnsemble(nn.Module):
         return sub_dx
 
 
-    def agr_dx_old(self, x, dx):
+    def agr_dx(self, x, dx):
         dx_decodes = torch.stack([self.sub_dx(bag_idx, x, dx) for bag_idx in range(self.params['nbags'])])
         agr_dx_decode = self.aggregate(dx_decodes)
         return agr_dx_decode
 
 
-    def agr_dx(self, x, dx):
+    def agr_dx_alt(self, x, dx):
         submodels = self.submodels
         z_stack = torch.stack([submodel['encoder'](x) for submodel in submodels])
         z = self.aggregate(z_stack)
@@ -456,7 +456,7 @@ class SindyNetEnsemble(nn.Module):
             error = deepcopy(torch.mean((((dx_p.T - dx) ** 2))))
             self.params['dx_errors'][bag_idx] += float(error.detach())
             if bag_idx == 0:
-                dx_agr = self.agr_dx(x, dx)
+                dx_agr = self.agr_dx_alt(x, dx)
                 error = deepcopy(torch.mean((((dx_agr.T - dx) ** 2))))
                 self.params['dx_errors'][-1] += float(error.detach())
         return True
