@@ -267,11 +267,40 @@ def update_df_cols(df, update_num):
     return df.rename(columns=rename_dict)
 
 
+def test(size = 40, epochs = 1000, nbags = 10):
+    exp_name = 'small'
+
+    params_1 = {'nbags': nbags, 'replacement': True, 'criterion': 'stability', 'criteria_test': False,
+                'coefficient_initialization': 'xavier', 'max_epochs': epochs, 'test_freq': 50, 'exp_name': exp_name}
+    params_2 = {'nbags': 1, 'expand_sample': False, 'refinement_epochs': 0,
+                'coefficient_initialization': 'constant', 'max_epochs': epochs, 'test_freq': 50,  'exp_name': exp_name}
+
+    model_1 = {'params_updates': params_1, 'run_function': ea_test, 'label': 'Meta_EA'}
+    model_2 = {'params_updates': params_2, 'run_function': a_test, 'label': 'Meta_A'}
+    models_dict = {'Meta_EA': model_1, 'Meta_A': model_2}
+
+    comparison_test(models_dict, exp_name, exp_size=(size, np.inf))
+
+    label1 = 'Meta_EA'
+    label2 = 'Meta_A'
+
+    Meta_df_1 = pd.read_csv(f'../data/{exp_name}/{label1}.csv')
+    Meta_df_2 = pd.read_csv(f'../data/{exp_name}/{label2}.csv')
+
+    get_plots(Meta_df_1, Meta_df_2, exp_name, model_labels=['Meta_EA', 'Meta_A'], factor=1)
+
+    return True
+
+
 def run():
+    test(size = 5, epochs = 400, nbags = 4)
+
+
+    '''
     exp_label = 'celebration_long'
     epochs = 8000
 
-    params_1 = {'nbags': 40, 'replacement': True, 'criterion': 'stability', 'criteria_test': False,
+    params_1 = {'nbags': 10, 'replacement': True, 'criterion': 'stability', 'criteria_test': False,
                  'coefficient_initialization': 'xavier', 'max_epochs': epochs, 'test_freq': 50}
 
     params_2 = {'nbags': 1, 'expand_sample': False, 'refinement_epochs': 0,
@@ -281,7 +310,7 @@ def run():
     model_2 = {'params_updates': params_2, 'run_function': a_test, 'label': 'Meta_A'}
     models_dict = {'Meta_EA': model_1, 'Meta_A': model_2}
 
-
+    
     if torch.cuda.is_available():
         comparison_test(models_dict, exp_label, exp_size=(100, np.inf))
 
@@ -305,6 +334,7 @@ def run():
 
         get_plots(Meta_df_1, Meta_df_2, exp, model_labels = ['Meta_EA', 'Meta_A'],
                   nruns = 7, factor = 1000)
+    '''
 
 if __name__=='__main__':
     run()
