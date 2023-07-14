@@ -293,6 +293,7 @@ def test(size = 40, epochs = 1000, nbags = 10):
 
 
 def run():
+
     test(size = 40, epochs = 2000, nbags = 20)
 
 
