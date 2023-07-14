@@ -292,7 +292,7 @@ def test(size = 40, epochs = 1000, nbags = 10, exp_name = 'exp'):
 
 
 def run():
-    test(size = 50, epochs = 1000, nbags = 15)
+    test(size = 100, epochs = 5000, nbags = 30, exp_name='big')
 
 if __name__=='__main__':
     run()
