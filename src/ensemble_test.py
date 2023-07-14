@@ -290,9 +290,10 @@ def test(size = 40, epochs = 1000, nbags = 10, exp_name = 'exp'):
 
     return True
 
+#scp -r ald6fd@klone.hyak.uw.edu:/mmfs1/gscratch/dynamicsai/ald6fd/alt/SindyTorchEncoder/data/stuff /Users/aloisduston/Desktop/Math/Research/Kutz/SindyTorchEncoder/data/
 
 def run():
-    test(size = 50, epochs = 1500, nbags = 15, exp_name='medium')
+    test(size = 50, epochs = 3000, nbags = 20, exp_name='medium_agg')
 
 if __name__=='__main__':
     run()

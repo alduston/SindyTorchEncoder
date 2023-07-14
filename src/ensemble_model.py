@@ -416,11 +416,12 @@ class SindyNetEnsemble(nn.Module):
         return sindy_coefficients * coefficient_mask
 
 
-    def sub_dx(self, bag_idx, x, dx):
+    def sub_dx(self, bag_idx, x, dx, coeff_m_p = None):
         sub_model = self.submodels[bag_idx]
         z_p = sub_model['encoder'](x)
         Theta = self.Theta(z_p, x, dx)
-        coeff_m_p = self.sub_model_coeffs[bag_idx]
+        if not coeff_m_p:
+            coeff_m_p = self.sub_model_coeffs[bag_idx]
         sindy_predict = torch.matmul(Theta, self.coefficient_mask * coeff_m_p)
         decoder_weights, decoder_biases = self.decoder_weights()
         activation = self.params['activation']
@@ -428,8 +429,9 @@ class SindyNetEnsemble(nn.Module):
         return sub_dx
 
 
-    def agr_dx(self, x, dx):
-        dx_decodes = torch.stack([self.sub_dx(bag_idx, x, dx) for bag_idx in range(self.params['nbags'])])
+
+    def agr_dx(self, x, dx, coeff = None):
+        dx_decodes = torch.stack([self.sub_dx(bag_idx, x, dx, coeff) for bag_idx in range(self.params['nbags'])])
         agr_dx_decode = self.aggregate(dx_decodes)
         return agr_dx_decode
 
@@ -456,7 +458,8 @@ class SindyNetEnsemble(nn.Module):
             error = deepcopy(torch.mean((((dx_p.T - dx) ** 2))))
             self.params['dx_errors'][bag_idx] += float(error.detach())
             if bag_idx == 0:
-                dx_agr = self.agr_dx_alt(x, dx)
+                coeff = self.aggregate(self.sub_model_coeffs)
+                dx_agr = self.agr_dx(x, dx, coeff)
                 error = deepcopy(torch.mean((((dx_agr.T - dx) ** 2))))
                 self.params['dx_errors'][-1] += float(error.detach())
         return True
@@ -470,6 +473,9 @@ class SindyNetEnsemble(nn.Module):
             error = deepcopy(torch.mean((((x_p - x) ** 2))))
             self.params['decode_errors'][bag_idx] += float(error.detach())
             if bag_idx == 0:
+                #submodels = self.submodels
+                #z_stack = torch.stack([submodel['encoder'](x) for submodel in submodels])
+                #x_agr = self.aggregate(torch.stack([self.decoder(z) for z in z_stack]))
                 x_agr = self.decoder(self.agr_forward(x)[0])
                 error = deepcopy(torch.mean((((x_agr - x) ** 2))))
                 self.params['decode_errors'][-1] += float(error.detach())
