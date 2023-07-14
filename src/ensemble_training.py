@@ -275,16 +275,29 @@ def get_output_masks(net):
 
 
 def error_plot(net):
+
     for i in range(net.params['nbags']):
-        errors = np.log(np.asarray(net.params['dx_error_lists'][i]))
-        plt.plot(errors)
-    avg_errors = np.log(np.asarray(net.params['dx_error_lists'][-1]))
-    plt.plot(avg_errors, label=f'avg', marker='x')
+        dx_errors = np.log(np.asarray(net.params['dx_error_lists'][i]))
+        plt.plot(dx_errors)
+    avg_dx_errors = np.log(np.asarray(net.params['dx_error_lists'][-1]))
+    plt.plot(avg_dx_errors, label=f'avg', marker='x')
     plt.legend()
-    l = len(os.listdir('../data/misc/dx_plots/')) + 1
-    plt.savefig(f'../data/misc/dx_plots/dx_errors_{l}.png')
+    plt.savefig(f'../data/{net.params["exp_name"]}/dx_errors.png')
     clear_plt()
+
+    for i in range(net.params['nbags']):
+        decode_errors = np.log(np.asarray(net.params['decode_error_lists'][i]))
+        plt.plot(decode_errors)
+    avg_decode_errors = np.log(np.asarray(net.params['decode_error_lists'][-1]))
+    plt.plot(avg_decode_errors, label=f'avg', marker='x')
+    plt.legend()
+    plt.savefig(f'../data/{net.params["exp_name"]}/decode_errors.png')
+    clear_plt()
+
+
     return True
+
+
 
 
 def train_ea_sindy(model_params, train_params, training_data, validation_data, printout = False):
@@ -301,6 +314,10 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
     # train_loader = get_loader(training_data, model_params, device=device)
 
     net = SindyNetEnsemble(model_params).to(device)
+
+    net.params['decode_error_lists'] = [[] for i in range(net.params['nbags'] + 1)]
+    net.params['decode_errors'] = [0 for i in range(net.params['nbags'] + 1)]
+
     net.params['dx_error_lists'] = [[] for i in range(net.params['nbags']+1)]
     net.params['dx_errors'] = [0 for i in range(net.params['nbags']+1)]
 
@@ -323,13 +340,17 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
 
             for i in range(net.params['nbags'] + 1):
                 net.params['dx_error_lists'][i].append(net.params['dx_errors'][i])
+                net.params['decode_error_lists'][i].append(net.params['decode_errors'][i])
+
             net.params['dx_errors'] = [0 for i in range(net.params['nbags'] + 1)]
+            net.params['decode_errors'] = [0 for i in range(net.params['nbags'] + 1)]
             if printout:
-                print(f'{str_list_sum(["TEST: "] + [print_keyval(key,val) for key,val in Loss_dict.items()])}')
+                print(f'{str_list_sum(["TEST: "] + [print_keyval(key, val) for key, val in Loss_dict.items()])}')
 
         if not epoch % crossval_freq and epoch >= net.params['pretrain_epochs']:
             net = crossval(net)
-        net.params['dx_errors'] = [0 for i in range(net.params['nbags']+1)]
+        net.params['dx_errors'] = [0 for i in range(net.params['nbags'] + 1)]
+        net.params['decode_errors'] = [0 for i in range(net.params['nbags'] + 1)]
         train_ensemble_epoch(net, train_bag_loader, optimizer)
 
     net, Loss_dict = validate_ensemble_epoch(net, test_loader, Loss_dict)

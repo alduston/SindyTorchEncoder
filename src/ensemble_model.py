@@ -447,17 +447,17 @@ class SindyNetEnsemble(nn.Module):
         return True
 
 
-    def get_decode_errors(self, x, dx):
+    def get_decode_errors(self, x):
         sub_models = self.submodels
         for bag_idx, sub_model in enumerate(sub_models):
             z_p = sub_model['encoder'](x)
             x_p = self.decoder(z_p)
             error = deepcopy(torch.mean((((x_p - x) ** 2))))
-            self.params['dx_errors'][bag_idx] += float(error.detach())
+            self.params['decode_errors'][bag_idx] += float(error.detach())
             if bag_idx == 0:
                 x_agr = self.decoder(self.agr_forward(x)[0])
                 error = deepcopy(torch.mean((((x_agr - x) ** 2))))
-                self.params['dx_errors'][-1] += float(error.detach())
+                self.params['decode_errors'][-1] += float(error.detach())
         return True
 
 
@@ -465,6 +465,7 @@ class SindyNetEnsemble(nn.Module):
         if self.params['eval']:
             dx_decode = self.agr_dx(x, dx)
             self.get_dx_errors(x, dx)
+            self.get_decode_errors(x)
         else:
             sindy_predict = self.sindy_predict(z, x, dx)
             decoder_weights, decoder_biases = self.decoder_weights()
