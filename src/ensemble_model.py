@@ -416,11 +416,11 @@ class SindyNetEnsemble(nn.Module):
         return sindy_coefficients * coefficient_mask
 
 
-    def sub_dx(self, bag_idx, x, dx, coeff_m_p = None):
+    def sub_dx(self, bag_idx, x, dx, coeff_m_p = []):
         sub_model = self.submodels[bag_idx]
         z_p = sub_model['encoder'](x)
         Theta = self.Theta(z_p, x, dx)
-        if not coeff_m_p:
+        if not len(coeff_m_p):
             coeff_m_p = self.sub_model_coeffs[bag_idx]
         sindy_predict = torch.matmul(Theta, self.coefficient_mask * coeff_m_p)
         decoder_weights, decoder_biases = self.decoder_weights()
@@ -430,7 +430,7 @@ class SindyNetEnsemble(nn.Module):
 
 
 
-    def agr_dx(self, x, dx, coeff = None):
+    def agr_dx(self, x, dx, coeff = []):
         dx_decodes = torch.stack([self.sub_dx(bag_idx, x, dx, coeff) for bag_idx in range(self.params['nbags'])])
         agr_dx_decode = self.aggregate(dx_decodes)
         return agr_dx_decode
