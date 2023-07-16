@@ -429,26 +429,10 @@ class SindyNetEnsemble(nn.Module):
         return sub_dx
 
 
-
     def agr_dx(self, x, dx, coeff = []):
         dx_decodes = torch.stack([self.sub_dx(bag_idx, x, dx, coeff) for bag_idx in range(self.params['nbags'])])
         agr_dx_decode = self.aggregate(dx_decodes)
         return agr_dx_decode
-
-
-    def agr_dx_alt(self, x, dx):
-        submodels = self.submodels
-        z_stack = torch.stack([submodel['encoder'](x) for submodel in submodels])
-        z = self.aggregate(z_stack)
-        Theta = self.Theta(z, x, dx)
-        coeff_m = self.aggregate(self.sub_model_coeffs)
-        sindy_predict = torch.matmul(Theta, self.coefficient_mask * coeff_m)
-        decoder_weights, decoder_biases = self.decoder_weights()
-        activation = self.params['activation']
-        dx_decode = z_derivative(z, sindy_predict, decoder_weights, decoder_biases, activation=activation)
-        #dx_decodes = torch.stack([self.sub_dx(bag_idx, x, dx) for bag_idx in range(self.params['nbags'])])
-        #agr_dx = self.aggregate(dx_decodes)
-        return dx_decode
 
 
     def get_dx_errors(self, x, dx):
@@ -473,9 +457,6 @@ class SindyNetEnsemble(nn.Module):
             error = deepcopy(torch.mean((((x_p - x) ** 2))))
             self.params['decode_errors'][bag_idx] += float(error.detach())
             if bag_idx == 0:
-                #submodels = self.submodels
-                #z_stack = torch.stack([submodel['encoder'](x) for submodel in submodels])
-                #x_agr = self.aggregate(torch.stack([self.decoder(z) for z in z_stack]))
                 x_agr = self.decoder(self.agr_forward(x)[0])
                 error = deepcopy(torch.mean((((x_agr - x) ** 2))))
                 self.params['decode_errors'][-1] += float(error.detach())
