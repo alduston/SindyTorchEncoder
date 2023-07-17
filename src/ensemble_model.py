@@ -249,9 +249,6 @@ class SindyNetEnsemble(nn.Module):
         return criterion_function
 
 
-
-
-
     def decoder_weights(self):
         decoder_weights = []
         decoder_biases = []
@@ -494,7 +491,7 @@ class SindyNetEnsemble(nn.Module):
         return torch.stack([submodel['output_mask'] for submodel in self.submodels])
 
 
-    def aggregate(self, tensors, agr_key = 'median'):
+    def aggregate(self, tensors, agr_key = 'mean'):
         if agr_key == 'median':
             return torch.median(tensors,0)[0]
         if agr_key == 'mean':

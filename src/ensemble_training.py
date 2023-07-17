@@ -277,18 +277,18 @@ def get_output_masks(net):
 def error_plot(net):
 
     for i in range(net.params['nbags']):
-        dx_errors = np.log(np.asarray(net.params['dx_error_lists'][i]))
+        dx_errors = np.log(np.asarray(net.params['dx_error_lists'][i])[1:])
         plt.plot(dx_errors)
-    avg_dx_errors = np.log(np.asarray(net.params['dx_error_lists'][-1]))
+    avg_dx_errors = np.log(np.asarray(net.params['dx_error_lists'][-1])[1:])
     plt.plot(avg_dx_errors, label=f'avg', marker='x')
     plt.legend()
     plt.savefig(f'../data/{net.params["exp_name"]}/dx_errors.png')
     clear_plt()
 
     for i in range(net.params['nbags']):
-        decode_errors = np.log(np.asarray(net.params['decode_error_lists'][i]))
+        decode_errors = np.log(np.asarray(net.params['decode_error_lists'][i])[1:])
         plt.plot(decode_errors)
-    avg_decode_errors = np.log(np.asarray(net.params['decode_error_lists'][-1]))
+    avg_decode_errors = np.log(np.asarray(net.params['decode_error_lists'][-1])[1:])
     plt.plot(avg_decode_errors, label=f'avg', marker='x')
     plt.legend()
     plt.savefig(f'../data/{net.params["exp_name"]}/decode_errors.png')
