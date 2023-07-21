@@ -643,11 +643,11 @@ class SindyNetEnsemble(nn.Module):
         x_stack, dx_stack, z_stack2, decode_stack = self.alt_forward(x, dx)
 
         decoder_loss = self.alt_decoder_loss(x_stack, decode_stack)
-        sindy_x_loss = self.alt_sindy_x_loss(x_stack, dx_stack)
+        #sindy_x_loss = self.alt_sindy_x_loss(x_stack, dx_stack)
 
         #decoder_loss = self.decoder_loss(x, x_decode)
         sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx)
-        #sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
+        sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
         reg_loss = self.sindy_reg_loss(alt = False)
         latent_loss = self.latent_loss(z_stack)
 
