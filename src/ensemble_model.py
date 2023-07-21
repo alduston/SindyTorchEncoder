@@ -651,7 +651,7 @@ class SindyNetEnsemble(nn.Module):
 
         decoder_loss = self.decoder_loss(x, x_decode)
         sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
-        sindy_z_loss = 0 * decoder_loss
+        sindy_z_loss = self.sindy_z_loss(self, z, x, dx)
         reg_loss = self.sindy_reg_loss(alt = False)
         latent_loss = self.latent_loss(z_stack)
 
