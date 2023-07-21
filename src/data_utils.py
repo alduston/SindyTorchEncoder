@@ -81,11 +81,11 @@ class model_data(Dataset):
                                           augment = bag_params['augment'], sample_size = bag_params['bag_size'],
                                          replacement = bag_params['replacement'], device = self.device)
 
-            self.x_bags = self.x
-            self.dx_bags = self.dx
+            #self.x_bags = self.x
+            #self.dx_bags = self.dx
 
-            #self.x_bags = x_bags
-            #self.dx_bags = dx_bags
+            self.x_bags = x_bags
+            self.dx_bags = dx_bags
 
             self.n_samples = self.x_bags.shape[0]
         if expand_factor:
