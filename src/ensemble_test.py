@@ -268,16 +268,16 @@ def update_df_cols(df, update_num):
 
 
 def test(size = 40, epochs = 1000, nbags = 10, exp_name = 'exp'):
+    params_1 = {'nbags': nbags, 'replacement': True, 'criterion': 'stability', 'use_bags': False,
+                'coefficient_initialization': 'xavier', 'max_epochs': epochs, 'test_freq': 50, 'exp_name': exp_name}
 
     params_2 = {'nbags': 1, 'replacement': False, 'criterion': 'avg', 'coefficient_initialization': 'constant',
                 'max_epochs': epochs, 'test_freq': 50, 'exp_name': exp_name, 'use_bags': False}
 
-    params_1 = {'nbags': nbags, 'replacement': True, 'criterion': 'stability', 'use_bags': False,
-                'coefficient_initialization': 'xavier', 'max_epochs': epochs, 'test_freq': 50, 'exp_name': exp_name}
 
     model_1 = {'params_updates': params_1, 'run_function': ea_test, 'label': 'Meta_EA'}
     model_2 = {'params_updates': params_2, 'run_function': ea_test, 'label': 'Meta_A'}
-    models_dict = {'Meta_EA': model_1, 'Meta_A': model_2}
+    models_dict = {'Meta_A': model_2, 'Meta_EA': model_1}
 
     comparison_test(models_dict, exp_name, exp_size=(size, np.inf))
 
