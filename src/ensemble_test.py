@@ -269,11 +269,11 @@ def update_df_cols(df, update_num):
 
 def test(size = 40, epochs = 1000, nbags = 10, exp_name = 'exp'):
 
-    params_1 = {'nbags': nbags, 'replacement': True, 'criterion': 'stability', 'use_bags': False,
-                'coefficient_initialization': 'xavier', 'max_epochs': epochs, 'test_freq': 50, 'exp_name': exp_name}
-
     params_2 = {'nbags': 1, 'replacement': False, 'criterion': 'avg', 'coefficient_initialization': 'constant',
                 'max_epochs': epochs, 'test_freq': 50, 'exp_name': exp_name, 'use_bags': False}
+
+    params_1 = {'nbags': nbags, 'replacement': True, 'criterion': 'stability', 'use_bags': False,
+                'coefficient_initialization': 'xavier', 'max_epochs': epochs, 'test_freq': 50, 'exp_name': exp_name}
 
     model_1 = {'params_updates': params_1, 'run_function': ea_test, 'label': 'Meta_EA'}
     model_2 = {'params_updates': params_2, 'run_function': ea_test, 'label': 'Meta_A'}
@@ -294,7 +294,7 @@ def test(size = 40, epochs = 1000, nbags = 10, exp_name = 'exp'):
 #scp -r ald6fd@klone.hyak.uw.edu:/mmfs1/gscratch/dynamicsai/ald6fd/alt/SindyTorchEncoder/data/stuff /Users/aloisduston/Desktop/Math/Research/Kutz/SindyTorchEncoder/data/
 
 def run():
-    test(size = 50, epochs = 3000, nbags = 30, exp_name='basic_new')
+    test(size = 50, epochs = 4000, nbags = 30, exp_name='basic_new')
 
 if __name__=='__main__':
     run()
