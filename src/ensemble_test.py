@@ -293,7 +293,7 @@ def test(size = 40, epochs = 1000, nbags = 10, exp_name = 'exp'):
 #scp -r ald6fd@klone.hyak.uw.edu:/mmfs1/gscratch/dynamicsai/ald6fd/alt/SindyTorchEncoder/data/stuff /Users/aloisduston/Desktop/Math/Research/Kutz/SindyTorchEncoder/data/
 
 def run():
-    test(size = 50, epochs = 2200, nbags = 25, exp_name='basic_1')
+    test(size = 50, epochs = 2200, nbags = 25, exp_name='basic_2')
 
 if __name__=='__main__':
     run()
