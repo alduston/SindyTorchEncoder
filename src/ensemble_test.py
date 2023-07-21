@@ -26,7 +26,7 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
 
     l = len(training_data['x'])
     train_params = {'bag_epochs': model_params['max_epochs'], 'nbags': model_params['nbags'],
-                    'bag_size': l, 'refinement_epochs': 0}
+                    'bag_size': l, 'refinement_epochs': 0, 'use_bags': model_params['use_bags']}
 
     model_params['batch_size'] = l
     model_params['crossval_freq'] = 50
@@ -269,11 +269,11 @@ def update_df_cols(df, update_num):
 
 def test(size = 40, epochs = 1000, nbags = 10, exp_name = 'exp'):
 
-    params_1 = {'nbags': nbags, 'replacement': True, 'criterion': 'stability',
+    params_1 = {'nbags': nbags, 'replacement': True, 'criterion': 'stability', 'use_bags': False,
                 'coefficient_initialization': 'xavier', 'max_epochs': epochs, 'test_freq': 50, 'exp_name': exp_name}
 
     params_2 = {'nbags': 1, 'replacement': False, 'criterion': 'avg', 'coefficient_initialization': 'constant',
-                'max_epochs': epochs, 'test_freq': 50, 'exp_name': exp_name}
+                'max_epochs': epochs, 'test_freq': 50, 'exp_name': exp_name, 'use_bags': False}
 
     model_1 = {'params_updates': params_1, 'run_function': ea_test, 'label': 'Meta_EA'}
     model_2 = {'params_updates': params_2, 'run_function': ea_test, 'label': 'Meta_A'}
