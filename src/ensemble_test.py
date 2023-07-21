@@ -277,7 +277,8 @@ def test(size = 40, epochs = 1000, nbags = 10, exp_name = 'exp'):
 
     model_1 = {'params_updates': params_1, 'run_function': ea_test, 'label': 'Meta_EA'}
     model_2 = {'params_updates': params_2, 'run_function': ea_test, 'label': 'Meta_A'}
-    models_dict = {'Meta_A': model_2, 'Meta_EA': model_1}
+    #models_dict = {'Meta_A': model_2, 'Meta_EA': model_1}
+    models_dict = {'Meta_EA': model_1, 'Meta_A': model_2}
 
     comparison_test(models_dict, exp_name, exp_size=(size, np.inf))
 
@@ -295,7 +296,7 @@ def test(size = 40, epochs = 1000, nbags = 10, exp_name = 'exp'):
 
 def run():
     for i in range(5):
-        test(size = 50, epochs = 3000, nbags = 30, exp_name='basic_new')
+        test(size = 20, epochs = 500, nbags = 2, exp_name='test')
 
 if __name__=='__main__':
     run()
