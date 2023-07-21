@@ -93,6 +93,7 @@ class SindyNetEnsemble(nn.Module):
                 self.device = 'cuda'
             else:
                 self.device = 'cpu'
+        self.dtype = torch.float32
         params['device'] = self.device
         self.params = params
         self.activation_f = self.get_activation_f(params)
@@ -104,6 +105,8 @@ class SindyNetEnsemble(nn.Module):
         self.sub_model_coeffs = torch.nn.Parameter(torch.stack([submodel['sindy_coeffs'] for submodel in self.submodels]),
                                                    requires_grad= True)
         self.sindy_coeffs = self.get_sindy_coefficients()
+
+        self.Encode_indexes = self.init_ED_indexes()
 
 
         decoder, decoder_layers = self.Decoder(self.params)
@@ -118,6 +121,7 @@ class SindyNetEnsemble(nn.Module):
         self.exp_label = params['exp_label']
         self.true_coeffs = torch.tensor(params['true_coeffs'], dtype=torch.float32, device=self.device)
         self.torch_params =  self.get_params()
+
 
 
 
@@ -145,24 +149,23 @@ class SindyNetEnsemble(nn.Module):
             submodels.append(submodel)
         return submodels
 
+    def init_ED_indexes(self):
+        Encode_indexes = []
+        n = self.params['batch_size']
+        base_indexes = np.asarray(range(self.params['batch_size']))
 
-    def get_network(self, input_dim, widths, final_dim, activation):
-        layers = []
-        for output_dim in widths:
-            layer = nn.Linear(input_dim, output_dim)
-            nn.init.xavier_uniform(layer.weight)
-            nn.init.constant_(layer.bias.data, 0)
+        for encoder in self.submodels:
+            encoder_idxs = np.random.choice(base_indexes, size  = n, replace = True)
+            encoder_idxs = torch.tensor(encoder_idxs, device = self.device, dtype = self.dtype).long()
+            Encode_indexes.append(encoder_idxs)
+        return Encode_indexes
 
-            input_dim = output_dim
-            layers.append(layer)
-            layers.append(activation)
 
-        layer = nn.Linear(input_dim,  final_dim)
-        nn.init.xavier_uniform(layer.weight)
-        nn.init.constant_(layer.bias.data, 0)
-        layers.append(layer)
-        net = nn.Sequential(*layers)
-        return net, layers
+    def ed_sample(self, x, dx, encode_idx):
+        e_indexes = self.Encode_indexes[encode_idx]%len(x)
+        xed = x[e_indexes]
+        dxed = dx[e_indexes]
+        return xed, dxed
 
 
     def Encoder(self, params):
@@ -188,13 +191,6 @@ class SindyNetEnsemble(nn.Module):
         Encoder = nn.Sequential(*layers)
         return Encoder, layers
 
-
-    def Translator(self, params):
-        activation_function = self.get_activation_f(params)
-        input_dim = params['latent_dim']
-        widths = [2 * input_dim]
-        final_dim = params['input_dim']
-        return self.get_network(input_dim, widths, final_dim, activation_function)
 
 
     def Decoder(self, params):
@@ -602,21 +598,14 @@ class SindyNetEnsemble(nn.Module):
         decode_stack = []
         x_stack = []
         dx_stack = []
-        N = len(x)
         for bag_idx, submodel in enumerate(self.submodels):
-            mask = self.sub_model_masks()[bag_idx]
-            mask_idx = self.mask_indexes(mask, N)
-            sub_x = x[mask_idx]
-            sub_dx = dx[mask_idx]
-
-            if len(sub_x):
-                z = self.submodels[bag_idx]['encoder'](sub_x)
-                x_decode = self.decoder(z)
-                z_stack.append(z)
-                decode_stack.append(x_decode)
-                x_stack.append(sub_x)
-                dx_stack.append(sub_dx)
-
+            sub_x, sub_dx = self.ed_sample(x, dx, bag_idx)
+            z = self.submodels[bag_idx]['encoder'](sub_x)
+            x_decode = self.decoder(z)
+            z_stack.append(z)
+            decode_stack.append(x_decode)
+            x_stack.append(sub_x)
+            dx_stack.append(sub_dx)
 
         x_stack = torch.stack(x_stack)
         dx_stack = torch.stack(dx_stack)
