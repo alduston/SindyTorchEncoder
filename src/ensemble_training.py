@@ -30,33 +30,12 @@ def process_bag_coeffs(Bag_coeffs, model):
     x,y = new_mask.shape
     agr_coeffs =  model.aggregate(bag_coeffs)
     coeff_criterion = model.criterion_f
-    criteria_test = model.params['criteria_test']
 
     for ix in range(x):
         for iy in range(y):
             if model.coefficient_mask[ix, iy]:
                 coeffs_vec = bag_coeffs[:,ix,iy]
-                if criteria_test:
-                    mean = float(np.mean(coeffs_vec.numpy()))
-                    astat = float(anderson(coeffs_vec.numpy()).statistic)
-                    pstat = float(normaltest(coeffs_vec.numpy())[1])
-                    prop = float(sum([abs(val) > .1 for val in coeffs_vec])/len(coeffs_vec))
-
-                    try:
-                        model.params['criteria_info'][f'mean_{ix}_{iy}'].append(mean)
-                        model.params['criteria_info'][f'astat_{ix}_{iy}'].append(astat)
-                        model.params['criteria_info'][f'pstat_{ix}_{iy}'].append(pstat)
-                        model.params['criteria_info'][f'prop_{ix}_{iy}'].append(prop)
-
-                    except KeyError:
-                        model.params['criteria_info'][f'mean_{ix}_{iy}'] = [mean]
-                        model.params['criteria_info'][f'astat_{ix}_{iy}'] = [astat]
-                        model.params['criteria_info'][f'pstat_{ix}_{iy}'] = [pstat]
-                        model.params['criteria_info'][f'prop_{ix}_{iy}'] = [prop]
-                    new_mask[ix, iy] = 1
-
-                else:
-                    new_mask[ix, iy] = float(coeff_criterion(coeffs_vec.cpu()))
+                new_mask[ix, iy] = float(coeff_criterion(coeffs_vec.cpu()))
 
     new_mask = torch.tensor(new_mask, dtype = torch.float32, device = model.params['device'])
     return new_mask, agr_coeffs
@@ -66,7 +45,6 @@ def train_one_step(model, data, optimizer):
     optimizer.zero_grad()
     if model.params['model_order'] == 1:
         loss, loss_refinement, losses = model.auto_Loss(x = data['x'], dx = data['dx'])
-
     else:
         loss, loss_refinement, losses = model.auto_Loss(x=data['x'], dx=data['dx'], dxx = data['dxx'])
     loss.backward()

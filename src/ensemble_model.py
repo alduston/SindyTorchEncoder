@@ -125,7 +125,6 @@ class SindyNetEnsemble(nn.Module):
         params = list(self.parameters())
         for i,model in enumerate(self.submodels):
             params += model['encoder'].parameters()
-            #params += model['translator'].parameters()
         for i,tensor in enumerate(params):
             self.register_parameter(name=f'param{i}', param = tensor)
         return params
@@ -133,10 +132,8 @@ class SindyNetEnsemble(nn.Module):
 
     def init_submodel(self, idx):
         encoder, encoder_layers = self.Encoder(self.params)
-        #translator, translator_layers = self.Translator(self.params)
         sindy_coeffs =  torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad=True)
         submodel = {'encoder' : encoder, 'encoder_layers': encoder_layers,
-                    #'translator': translator, 'translator_layers': translator_layers,
                     'sindy_coeffs': sindy_coeffs}
         return submodel
 
@@ -459,6 +456,10 @@ class SindyNetEnsemble(nn.Module):
                 self.params['decode_errors'][-1] += float(error.detach())
         return True
 
+    def mask_indexes(self, mask, N = torch.inf):
+        idx = torch.where(torch.sum(mask, 1) != 0)[0].long()
+        idx = idx[idx < N]
+        return idx
 
     def dx_decode(self,z, x, dx = None):
         if self.params['eval']:
@@ -491,7 +492,7 @@ class SindyNetEnsemble(nn.Module):
         return torch.stack([submodel['output_mask'] for submodel in self.submodels])
 
 
-    def aggregate(self, tensors, agr_key = 'mean'):
+    def aggregate(self, tensors, agr_key = 'median'):
         if agr_key == 'median':
             return torch.median(tensors,0)[0]
         if agr_key == 'mean':
@@ -593,9 +594,23 @@ class SindyNetEnsemble(nn.Module):
         return self.params['loss_weight_latent'] * stack_var
 
 
+    def alt_decoder_loss(self, x):
+        decoder_loss = 0
+        N = len(x)
+        for bag_idx, submodel in enumerate(self.submodels):
+            mask = self.sub_model_masks()[bag_idx]
+            mask_idx = self.mask_indexes(mask, N)
+            sub_x = x[mask_idx]
+            if len(sub_x):
+                z = self.submodels[bag_idx]['encoder'](sub_x)
+                dx_decode = self.decoder(z)
+                decoder_loss += self.params['bagn_factor'] * nn.MSELoss()(sub_x, dx_decode)
+        return decoder_loss
+
+
     def Loss(self, x, dx, ddx = None):
         x_decode, z, z_stack = self.forward(x)
-        decoder_loss = self.decoder_loss(x, x_decode)
+        decoder_loss = self.alt_decoder_loss(x)
         sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx)
         sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
         reg_loss = self.sindy_reg_loss(alt = False)
