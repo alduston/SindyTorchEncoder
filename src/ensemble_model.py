@@ -635,18 +635,18 @@ class SindyNetEnsemble(nn.Module):
         x_stack, dx_stack, z_stack_alt, decode_stack = self.alt_forward(x, dx)
         latent_stack = torch.stack([submodel['encoder'](x[:10000]) for submodel in self.submodels])
 
-
         decoder_loss = self.alt_decoder_loss(x_stack, decode_stack)
         sindy_x_loss = self.alt_sindy_x_loss(x_stack, dx_stack)
         latent_loss = self.latent_loss(latent_stack)
         sindy_z_loss = 0 * decoder_loss
+        reg_loss = self.sindy_reg_loss(alt=False)
 
         if self.params['eval']:
             x_decode, z, z_stack = self.forward(x)
             decoder_loss = self.decoder_loss(x, x_decode)
             sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
             latent_loss = self.latent_loss(z_stack)
-            sindy_z_loss = self.sindy_z_loss(self, z, x, dx)
+            sindy_z_loss = self.sindy_z_loss(z, x, dx)
 
         '''
         x_decode, z, z_stack = self.forward(x)
@@ -654,7 +654,6 @@ class SindyNetEnsemble(nn.Module):
         decoder_loss = self.decoder_loss(x, x_decode)
         sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
         sindy_z_loss = self.sindy_z_loss(self, z, x, dx)
-        reg_loss = self.sindy_reg_loss(alt = False)
         latent_loss = self.latent_loss(z_stack)
         '''
 
