@@ -113,6 +113,7 @@ def train_ensemble_epoch(model, bag_loader, optimizer):
     model.train()
     epoch_loss = 0
     model.epoch += 1
+
     for bag_idx, bag in enumerate(bag_loader):
         loss, loss_refinement, losses = train_ensemble_step(model, bag, optimizer)
         epoch_loss += loss

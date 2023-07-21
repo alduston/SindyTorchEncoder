@@ -457,6 +457,9 @@ class SindyNetEnsemble(nn.Module):
         return True
 
     def mask_indexes(self, mask, N = torch.inf):
+        M = len(mask)
+        if M > N:
+            mask = mask[::M//N]
         idx = torch.where(torch.sum(mask, 1) != 0)[0].long()
         idx = idx[idx < N]
         return idx
@@ -605,27 +608,28 @@ class SindyNetEnsemble(nn.Module):
             mask_idx = self.mask_indexes(mask, N)
             sub_x = x[mask_idx]
             sub_dx = dx[mask_idx]
+
             if len(sub_x):
                 z = self.submodels[bag_idx]['encoder'](sub_x)
                 x_decode = self.decoder(z)
                 z_stack.append(z)
-                decode_stack.append(self.decoder(x_decode))
+                decode_stack.append(x_decode)
                 x_stack.append(sub_x)
                 dx_stack.append(sub_dx)
+
 
         x_stack = torch.stack(x_stack)
         dx_stack = torch.stack(dx_stack)
         z_stack = torch.stack(z_stack)
         decode_stack = torch.stack(decode_stack)
-
         return x_stack, dx_stack, z_stack, decode_stack
 
 
-    def alt_sindy_x_loss(self, x_stack, z_stack):
+    def alt_sindy_x_loss(self, x_stack, dx_stack):
         dx_loss = 0
         bag_idx = 0
-        for x,dx in zip(x_stack, z_stack):
-            dx_pred = self.sub_dx(bag_idx, x, dx)
+        for x,dx in zip(x_stack, dx_stack):
+            dx_pred = self.sub_dx(bag_idx, x, dx).T
             dx_loss += nn.MSELoss()(dx, dx_pred)
             bag_idx += 1
         return self.params['loss_weight_sindy_x'] * dx_loss
@@ -640,14 +644,14 @@ class SindyNetEnsemble(nn.Module):
 
     def Loss(self, x, dx, ddx = None):
         x_decode, z, z_stack = self.forward(x)
-        x_stack, dx_stack, z_stack2, decode_stack = self.alt_forward(x, dx)
+        x_stack, dx_stack, z_stack_alt, decode_stack = self.alt_forward(x, dx)
 
-        #decoder_loss = self.alt_decoder_loss(x_stack, decode_stack)
-        #sindy_x_loss = self.alt_sindy_x_loss(x_stack, dx_stack)
+        decoder_loss = self.alt_decoder_loss(x_stack, decode_stack)
+        sindy_x_loss = self.alt_sindy_x_loss(x_stack, dx_stack)
+        #decoder_loss = self.decoder_loss(x, x_decode)
+        #sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
 
-        decoder_loss = self.decoder_loss(x, x_decode)
         sindy_z_loss = self.sindy_z_loss(z, x, dx, ddx)
-        sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
         reg_loss = self.sindy_reg_loss(alt = False)
         latent_loss = self.latent_loss(z_stack)
 
