@@ -630,11 +630,9 @@ class SindyNetEnsemble(nn.Module):
             decoder_loss += nn.MSELoss()(x, x_decode)
         return self.params['loss_weight_decoder'] * decoder_loss
 
-
-    def Loss(self, x, dx, ddx = None):
-
+    def Loss_new(self, x, dx, ddx = None):
         x_stack, dx_stack, z_stack_alt, decode_stack = self.alt_forward(x, dx)
-        latent_stack = torch.stack([submodel['encoder'](x[:10000]) for submodel in self.submodels])
+        latent_stack = torch.stack([submodel['encoder'](x) for submodel in self.submodels])
 
         decoder_loss = self.alt_decoder_loss(x_stack, decode_stack)
         sindy_x_loss = self.alt_sindy_x_loss(x_stack, dx_stack)
@@ -649,8 +647,19 @@ class SindyNetEnsemble(nn.Module):
             latent_loss = self.latent_loss(z_stack)
             sindy_z_loss = self.sindy_z_loss(z, x, dx)
 
+        loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss + latent_loss
+        loss = loss_refinement + reg_loss
+        losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss, 'sindy_x': sindy_x_loss,
+                  'latent': latent_loss, 'reg': reg_loss}
+        losses = {key: self.params['print_factor'] * val for (key, val) in losses.items()}
 
-        '''
+        return loss, loss_refinement, losses
+
+    def Loss(self, x, dx, ddx = None):
+
+        if not self.params['new']:
+            return self.Loss_new(self, x, dx)
+
         x_decode, z, z_stack = self.forward(x)
 
         decoder_loss = self.decoder_loss(x, x_decode)
@@ -658,7 +667,6 @@ class SindyNetEnsemble(nn.Module):
         sindy_z_loss = self.sindy_z_loss(z, x, dx)
         latent_loss = self.latent_loss(z_stack)
         reg_loss = self.sindy_reg_loss(alt=False)
-        '''
 
         loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss + latent_loss
         loss = loss_refinement + reg_loss
