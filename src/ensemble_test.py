@@ -28,7 +28,7 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
     train_params = {'bag_epochs': model_params['max_epochs'], 'nbags': model_params['nbags'],
                     'bag_size': l, 'refinement_epochs': 0}
 
-    model_params['batch_size'] = l//2
+    model_params['batch_size'] = l
     model_params['crossval_freq'] = 50
     model_params['run'] = run
     model_params['pretrain_epochs'] = 100
@@ -269,13 +269,14 @@ def update_df_cols(df, update_num):
 
 def test(size = 40, epochs = 1000, nbags = 10, exp_name = 'exp'):
 
-    params_1 = {'nbags': nbags, 'replacement': True, 'criterion': 'stability', 'criteria_test': False,
+    params_1 = {'nbags': nbags, 'replacement': True, 'criterion': 'stability',
                 'coefficient_initialization': 'xavier', 'max_epochs': epochs, 'test_freq': 50, 'exp_name': exp_name}
-    params_2 = {'nbags': 1, 'expand_sample': False, 'refinement_epochs': 0,
-                'coefficient_initialization': 'constant', 'max_epochs': epochs, 'test_freq': 50,  'exp_name': exp_name}
+
+    params_2 = {'nbags': 1, 'replacement': False, 'criterion': 'avg', 'coefficient_initialization': 'constant',
+                'max_epochs': epochs, 'test_freq': 50, 'exp_name': exp_name}
 
     model_1 = {'params_updates': params_1, 'run_function': ea_test, 'label': 'Meta_EA'}
-    model_2 = {'params_updates': params_2, 'run_function': a_test, 'label': 'Meta_A'}
+    model_2 = {'params_updates': params_2, 'run_function': ea_test, 'label': 'Meta_A'}
     models_dict = {'Meta_EA': model_1, 'Meta_A': model_2}
 
     comparison_test(models_dict, exp_name, exp_size=(size, np.inf))
@@ -293,7 +294,7 @@ def test(size = 40, epochs = 1000, nbags = 10, exp_name = 'exp'):
 #scp -r ald6fd@klone.hyak.uw.edu:/mmfs1/gscratch/dynamicsai/ald6fd/alt/SindyTorchEncoder/data/stuff /Users/aloisduston/Desktop/Math/Research/Kutz/SindyTorchEncoder/data/
 
 def run():
-    test(size = 50, epochs = 2200, nbags = 25, exp_name='basic_old')
+    test(size = 50, epochs = 3000, nbags = 30, exp_name='basic_new')
 
 if __name__=='__main__':
     run()
