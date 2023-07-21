@@ -633,7 +633,7 @@ class SindyNetEnsemble(nn.Module):
 
     def Loss(self, x, dx, ddx = None):
         x_stack, dx_stack, z_stack_alt, decode_stack = self.alt_forward(x, dx)
-        latent_stack = torch.stach([submodel['encoder'](x[:10000]) for submodel in self.submodels])
+        latent_stack = torch.stack([submodel['encoder'](x[:10000]) for submodel in self.submodels])
 
 
         decoder_loss = self.alt_decoder_loss(x_stack, decode_stack)
