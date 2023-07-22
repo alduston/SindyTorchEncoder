@@ -333,16 +333,8 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
         train_ensemble_epoch(net, train_bag_loader, optimizer)
 
     net, Loss_dict = validate_ensemble_epoch(net, test_loader, Loss_dict)
-    error_plot(net)
-    clear_plt()
-
-    if net.params['criteria_test']:
-        try:
-            os.mkdir(f'../data/criteria_test/')
-        except:
-            pass
-        l = len(os.listdir(f'../data/criteria_test/'))
-        criterion_df = pd.DataFrame.from_dict(net.params['criteria_info'])
-        criterion_df.to_csv(f'../data/criteria_test/criterion_df{i}.csv')
+    if net.params['error_plot']:
+        error_plot(net)
+        clear_plt()
     return net, Loss_dict
 

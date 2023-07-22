@@ -642,9 +642,6 @@ class SindyNetEnsemble(nn.Module):
             x_decode, z, z_stack = self.forward(x)
             decoder_loss = self.decoder_loss(x, x_decode)
             sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
-            error = self.get_dx_errors(x, dx)
-            print(f'Error was {float(sindy_x_loss.detach().cpu())} and {float(error.detach().cpu())}')
-            
             latent_loss = self.latent_loss(z_stack)
             sindy_z_loss = self.sindy_z_loss(z, x, dx)
 
@@ -654,17 +651,14 @@ class SindyNetEnsemble(nn.Module):
         losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss, 'sindy_x': sindy_x_loss,
                   'latent': latent_loss, 'reg': reg_loss}
         losses = {key: self.params['print_factor'] * val for (key, val) in losses.items()}
-
         return loss, loss_refinement, losses
 
 
     def Loss(self, x, dx, ddx = None):
-
         if self.params['new']:
             return self.Loss_new(x, dx)
 
         x_decode, z, z_stack = self.forward(x)
-
         decoder_loss = self.decoder_loss(x, x_decode)
         sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
         sindy_z_loss = self.sindy_z_loss(z, x, dx)
