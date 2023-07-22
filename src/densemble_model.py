@@ -517,6 +517,10 @@ class SindyNetDEnsemble(nn.Module):
             ddx_decode = torch.transpose(ddx_decode,0,1)
             return  self.params['loss_weight_sindy_x'] * criterion(ddx , ddx_decode)
 
+    def decode_div_loss(self, decode_stack):
+        stack_mean = torch.mean(decode_stack, dim=0)
+        stack_var = torch.mean((decode_stack - stack_mean)**2)
+        return self.params['loss_weight_div'] * stack_var
 
     def latent_loss(self, z_stack):
         z_med = compute_geometric_median([z for z in z_stack], weights=None, per_component=True).median
@@ -530,15 +534,16 @@ class SindyNetDEnsemble(nn.Module):
         dx_stack = []
         z_stack = []
 
+        sub_x, sub_dx = x, dx
         for bag_idx, submodel in enumerate(self.submodels):
-            sub_x, sub_dx = self.ed_sample(x, dx, bag_idx)
+            #sub_x, sub_dx = self.ed_sample(x, dx, bag_idx)
+
             z = self.encoder(sub_x)
 
             x_decode = submodel['decoder'](z)
             z_stack.append(z)
 
             decode_stack.append(x_decode)
-
             x_stack.append(sub_x)
             dx_stack.append(sub_dx)
 
@@ -575,6 +580,7 @@ class SindyNetDEnsemble(nn.Module):
         latent_loss = self.latent_loss(latent_stack)
         sindy_z_loss = 0 * decoder_loss
         reg_loss = self.sindy_reg_loss()
+        div_loss = self.decode_div_loss()
 
         if self.params['eval']:
             x_decode, z = self.forward(x)
@@ -584,10 +590,10 @@ class SindyNetDEnsemble(nn.Module):
             latent_loss = 0 * sindy_z_loss
 
 
-        loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss + latent_loss
+        loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss + div_loss #latent_loss
         loss = loss_refinement + reg_loss
         losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss, 'sindy_x': sindy_x_loss,
-                  'latent': latent_loss, 'reg': reg_loss}
+                  'latent': div_loss, 'reg': reg_loss}
         losses = {key: self.params['print_factor'] * val for (key, val) in losses.items()}
         return loss, loss_refinement, losses
 
