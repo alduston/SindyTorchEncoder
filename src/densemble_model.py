@@ -104,7 +104,6 @@ class SindyNetDEnsemble(nn.Module):
         self.sub_model_coeffs = torch.nn.Parameter(torch.stack([submodel['sindy_coeffs'] for submodel in self.submodels]),
                                                    requires_grad= True)
         self.sindy_coeffs = self.get_agr_coefficients()
-
         self.Decode_indexes = self.init_ED_indexes()
 
 
@@ -123,7 +122,6 @@ class SindyNetDEnsemble(nn.Module):
 
 
 
-
     def get_params(self):
         params = list(self.parameters())
         for i,model in enumerate(self.submodels):
@@ -136,8 +134,7 @@ class SindyNetDEnsemble(nn.Module):
     def init_submodel(self, idx):
         decoder, decoder_layers = self.Decoder(self.params)
         sindy_coeffs =  torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad=True)
-        submodel = {'decoder' : decoder, 'decoder_layers': decoder_layers,
-                    'sindy_coeffs': sindy_coeffs}
+        submodel = {'decoder' : decoder, 'decoder_layers': decoder_layers, 'sindy_coeffs': sindy_coeffs}
         return submodel
 
 
@@ -153,7 +150,7 @@ class SindyNetDEnsemble(nn.Module):
         n = self.params['batch_size']
         base_indexes = np.asarray(range(self.params['batch_size']))
 
-        for encoder in self.submodels:
+        for decoder in self.submodels:
             decoder_idxs = np.random.choice(base_indexes, size  = n, replace = True)
             decoder_idxs = torch.tensor(decoder_idxs, device = self.device, dtype = self.dtype).long()
             Decode_indexes.append(decoder_idxs)
@@ -463,20 +460,6 @@ class SindyNetDEnsemble(nn.Module):
         return x_pred, x_stack
 
 
-    def stack_decode(self, z_stack):
-        x_stack = torch.stack([self.decoder(z) for z in z_stack])
-        return self.aggregate(x_stack)
-
-
-    def masked_forward(self, x):
-        submodels = self.submodels
-        masks = self.sub_model_masks()
-        z_stack = torch.stack([submodel['encoder'](x) for submodel in submodels])
-        z_masks = torch.stack([self.reshape_mask(mask, z.shape, first = False) for mask, z in zip(masks, z_stack)])
-        z = torch.sum(z_masks * z_stack, 0)
-        return z, z_stack
-
-
     def masked_decode(self, z):
         submodels = self.submodels
         masks = self.sub_model_masks()
@@ -546,13 +529,16 @@ class SindyNetDEnsemble(nn.Module):
         x_stack = []
         dx_stack = []
         z_stack = []
+
         for bag_idx, submodel in enumerate(self.submodels):
             sub_x, sub_dx = self.ed_sample(x, dx, bag_idx)
             z = self.encoder(sub_x)
 
             x_decode = submodel['decoder'](z)
             z_stack.append(z)
+
             decode_stack.append(x_decode)
+
             x_stack.append(sub_x)
             dx_stack.append(sub_dx)
 
