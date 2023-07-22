@@ -436,7 +436,7 @@ class SindyNetEnsemble(nn.Module):
                 dx_agr = self.agr_dx(x, dx, coeff)
                 error = deepcopy(torch.mean((((dx_agr.T - dx) ** 2))))
                 self.params['dx_errors'][-1] += float(error.detach())
-        return True
+        return error
 
 
     def get_decode_errors(self, x):
@@ -642,6 +642,9 @@ class SindyNetEnsemble(nn.Module):
             x_decode, z, z_stack = self.forward(x)
             decoder_loss = self.decoder_loss(x, x_decode)
             sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
+            error = self.get_dx_errors(x, dx)
+            print(f'Error was {float(sindy_x_loss.detach().cpu())} and {float(error.detach().cpu())}')
+            
             latent_loss = self.latent_loss(z_stack)
             sindy_z_loss = self.sindy_z_loss(z, x, dx)
 
