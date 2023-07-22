@@ -295,8 +295,9 @@ def test(size = 40, epochs = 1000, nbags = 10, exp_name = 'exp'):
 #scp -r ald6fd@klone.hyak.uw.edu:/mmfs1/gscratch/dynamicsai/ald6fd/alt/SindyTorchEncoder/data/stuff /Users/aloisduston/Desktop/Math/Research/Kutz/SindyTorchEncoder/data/
 
 def run():
-    for i in range(5):
-        test(size = 20, epochs = 500, nbags = 2, exp_name='test')
+    test(size = 20, epochs = 1000, nbags = 25, exp_name='test')
+    #for i in range(5):
+        #test(size = 20, epochs = 500, nbags = 2, exp_name='test')
 
 if __name__=='__main__':
     run()
