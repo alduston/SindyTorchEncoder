@@ -7,9 +7,7 @@ import datetime
 import pandas as pd
 import numpy as np
 from example_lorenz import get_lorenz_data
-import torch
 from sindy_utils import library_size
-from torch_training import train_sindy, clear_plt
 from ensemble_training import train_ea_sindy
 import pickle
 import warnings
@@ -17,6 +15,14 @@ from data_utils import get_test_params, get_loader
 import matplotlib.pyplot as plt
 from copy import deepcopy, copy
 warnings.filterwarnings("ignore")
+
+
+def clear_plt():
+    plt.figure().clear()
+    plt.close()
+    plt.cla()
+    plt.clf()
+    return True
 
 
 def ea_test(model_params, training_data, validation_data, run  = 0):
@@ -34,19 +40,6 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
     model_params['pretrain_epochs'] = 100
     model_params['test_freq'] = model_params['test_freq']
     net, Loss_dict = train_ea_sindy(model_params, train_params, training_data, validation_data,  printout = True)
-    return net, Loss_dict
-
-
-def a_test(model_params, training_data, validation_data, run = 0):
-    model_params['sequential_thresholding'] = True
-    l = len(training_data['x'])
-    train_params = {'bag_epochs': 0, 'pretrain_epochs':  model_params['max_epochs'], 'nbags': 1,
-                    'refinement_epochs': model_params['refinement_epochs']}
-
-    model_params['batch_size'] = l//2
-    model_params['print_freq'] = model_params['test_freq']
-    model_params['run'] = run
-    net, Loss_dict = train_sindy(model_params, train_params, training_data, validation_data, printout = True)
     return net, Loss_dict
 
 
@@ -297,7 +290,7 @@ def test(size = 40, epochs = 1000, nbags = 10, exp_name = 'exp'):
 #scp -r ald6fd@klone.hyak.uw.edu:/mmfs1/gscratch/dynamicsai/ald6fd/alt/SindyTorchEncoder/data/stuff /Users/aloisduston/Desktop/Math/Research/Kutz/SindyTorchEncoder/data/
 
 def run():
-    test(size = 20, epochs = 1000, nbags = 25, exp_name='test')
+    test(size = 20, epochs = 2000, nbags = 20, exp_name='test')
     #for i in range(5):
         #test(size = 20, epochs = 500, nbags = 2, exp_name='test')
 

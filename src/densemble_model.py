@@ -82,7 +82,7 @@ def gmean(tensor, dim = 0):
     return torch.exp(torch.mean(log_x, dim=dim)) - min - 1
 
 
-class SindyNetEnsemble(nn.Module):
+class SindyNetDEnsemble(nn.Module):
     def __init__(self, params, device = None):
         super().__init__()
         if device:
@@ -103,14 +103,14 @@ class SindyNetEnsemble(nn.Module):
         self.coefficient_mask = torch.tensor(params['coefficient_mask'], dtype=torch.float32, device=self.device)
         self.sub_model_coeffs = torch.nn.Parameter(torch.stack([submodel['sindy_coeffs'] for submodel in self.submodels]),
                                                    requires_grad= True)
-        self.sindy_coeffs = self.get_sindy_coefficients()
+        self.sindy_coeffs = self.get_agr_coefficients()
 
-        self.Encode_indexes = self.init_ED_indexes()
+        self.Decode_indexes = self.init_ED_indexes()
 
 
-        decoder, decoder_layers = self.Decoder(self.params)
-        self.decoder = decoder
-        self.decoder_layers = decoder_layers
+        encoder, encoder_layers = self.Encoder(self.params)
+        self.encoder = encoder
+        self.encoder_layers = encoder_layers
 
         self.iter_count = torch.tensor(0, device = device)
         self.epoch = torch.tensor(0, device = device)
@@ -127,16 +127,16 @@ class SindyNetEnsemble(nn.Module):
     def get_params(self):
         params = list(self.parameters())
         for i,model in enumerate(self.submodels):
-            params += model['encoder'].parameters()
+            params += model['decoder'].parameters()
         for i,tensor in enumerate(params):
             self.register_parameter(name=f'param{i}', param = tensor)
         return params
 
 
     def init_submodel(self, idx):
-        encoder, encoder_layers = self.Encoder(self.params)
+        decoder, decoder_layers = self.Decoder(self.params)
         sindy_coeffs =  torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad=True)
-        submodel = {'encoder' : encoder, 'encoder_layers': encoder_layers,
+        submodel = {'decoder' : decoder, 'decoder_layers': decoder_layers,
                     'sindy_coeffs': sindy_coeffs}
         return submodel
 
@@ -149,19 +149,19 @@ class SindyNetEnsemble(nn.Module):
         return submodels
 
     def init_ED_indexes(self):
-        Encode_indexes = []
+        Decode_indexes = []
         n = self.params['batch_size']
         base_indexes = np.asarray(range(self.params['batch_size']))
 
         for encoder in self.submodels:
-            encoder_idxs = np.random.choice(base_indexes, size  = n, replace = True)
-            encoder_idxs = torch.tensor(encoder_idxs, device = self.device, dtype = self.dtype).long()
-            Encode_indexes.append(encoder_idxs)
-        return Encode_indexes
+            decoder_idxs = np.random.choice(base_indexes, size  = n, replace = True)
+            decoder_idxs = torch.tensor(decoder_idxs, device = self.device, dtype = self.dtype).long()
+            Decode_indexes.append(decoder_idxs)
+        return Decode_indexes
 
 
     def ed_sample(self, x, dx, encode_idx):
-        e_indexes = self.Encode_indexes[encode_idx]%len(x)
+        e_indexes = self.Decode_indexes[encode_idx]%len(x)
         xed = x[e_indexes]
         dxed = dx[e_indexes]
         return xed, dxed
@@ -241,10 +241,11 @@ class SindyNetEnsemble(nn.Module):
         return criterion_function
 
 
-    def decoder_weights(self):
+    def decoder_weights(self, bag_idx):
         decoder_weights = []
         decoder_biases = []
-        for layer in self.decoder_layers:
+        decoder_layers = self.submodels[bag_idx]['decoder_layers']
+        for layer in decoder_layers:
             try:
                 decoder_weights.append(layer.weight)
                 decoder_biases.append(layer.bias)
@@ -253,10 +254,10 @@ class SindyNetEnsemble(nn.Module):
         return decoder_weights, decoder_biases
 
 
-    def encoder_weights(self, bag_idx):
+    def encoder_weights(self):
         encoder_weights = []
         encoder_biases = []
-        encoder_layers = self.submodels[bag_idx]['encoder_layers']
+        encoder_layers = self.encoder_layers
         for layer in encoder_layers:
             try:
                 encoder_weights.append(layer.weight)
@@ -266,58 +267,11 @@ class SindyNetEnsemble(nn.Module):
         return encoder_weights, encoder_biases
 
 
-    def Encoder_weights(self):
-        encoder_weights = []
-        encoder_biases = []
-        for layer in self.encoder_layers:
-            try:
-                encoder_weights.append(layer.weight)
-                encoder_biases.append(layer.bias)
-            except AttributeError:
-                pass
-        return encoder_weights, encoder_biases
-
-
-    def sub_dz(self, x, dx, sub_idx):
-        encoder_weights, encoder_biases = self.encoder_weights(sub_idx)
+    def dz(self, x, dx):
+        encoder_weights, encoder_biases = self.encoder_weights()
         activation = self.params['activation']
         sub_dz = z_derivative(x, dx, encoder_weights, encoder_biases, activation)
         return sub_dz
-
-
-    def agr_dz(self, x, dx):
-        activation = self.params['activation']
-        dzs = []
-        for sub_idx in range(self.params['nbags']):
-            encoder_weights, encoder_biases = self.encoder_weights(sub_idx)
-            dz_sub = z_derivative(x, dx, encoder_weights, encoder_biases, activation)
-            dzs.append(dz_sub)
-        dz = self.aggregate(torch.stack(dzs))
-        return dz
-
-
-    def masked_dz(self, x, dx):
-        sub_models = self.submodels
-        masks = [deepcopy(submodel['output_mask']) for submodel in self.submodels]
-        dz_stack = torch.stack([self.sub_dz(x, dx, bag_idx) for bag_idx in range(len(sub_models))])
-        dz_masks = torch.stack([self.reshape_mask(mask, dz.T.shape, first=False).T for mask, dz in zip(masks, dz_stack)])
-        dz = torch.sum(dz_stack*dz_masks, 0)
-        return dz
-
-
-    def dz(self, x, dx):
-        if self.params['eval']:
-            dz = self.agr_dz(x,dx)
-        else:
-            dz = self.masked_dz(x, dx)
-        return dz
-
-
-    def ddz(self, x , dx, ddx, bag_idx):
-        activation = self.params['activation']
-        encoder_weights, encoder_biases = self.encoder_weights(bag_idx)
-        dz, ddz = z_derivative_order2(x, dx, ddx, encoder_weights, encoder_biases, activation=activation)
-        return dz, ddz
 
 
     def initializer(self):
@@ -346,9 +300,13 @@ class SindyNetEnsemble(nn.Module):
         return weights
 
 
-    def get_sindy_coefficients(self):
+    def get_agr_coefficients(self):
         sindy_coeffs = self.aggregate(self.sub_model_coeffs)
         return sindy_coeffs
+
+
+    def get_sindy_coefficients(self):
+        return self.get_agr_coefficients()
 
 
     def Theta(self, z, x = None, dx = None):
@@ -377,7 +335,7 @@ class SindyNetEnsemble(nn.Module):
     def sindy_predict(self, z, x = None, dx = None):
         Theta = self.Theta(z, x, dx)
         if self.params['eval']:
-            sindy_coefficients = self.get_sindy_coefficients()
+            sindy_coefficients = self.get_agr_coefficients()
             return torch.matmul(Theta, self.coefficient_mask * sindy_coefficients)
         else:
             return self.masked_predict(Theta)
@@ -400,19 +358,18 @@ class SindyNetEnsemble(nn.Module):
 
 
     def active_coeffs(self):
-        sindy_coefficients = self.get_sindy_coefficients()
+        sindy_coefficients = self.get_agr_coefficients()
         coefficient_mask = self.coefficient_mask
         return sindy_coefficients * coefficient_mask
 
 
     def sub_dx(self, bag_idx, x, dx, coeff_m_p = []):
-        sub_model = self.submodels[bag_idx]
-        z_p = sub_model['encoder'](x)
+        z_p = self.encoder(x)
         Theta = self.Theta(z_p, x, dx)
         if not len(coeff_m_p):
             coeff_m_p = self.sub_model_coeffs[bag_idx]
         sindy_predict = torch.matmul(Theta, self.coefficient_mask * coeff_m_p)
-        decoder_weights, decoder_biases = self.decoder_weights()
+        decoder_weights, decoder_biases = self.decoder_weights(bag_idx)
         activation = self.params['activation']
         sub_dx = z_derivative(z_p, sindy_predict, decoder_weights, decoder_biases, activation=activation)
         return sub_dx
@@ -440,16 +397,17 @@ class SindyNetEnsemble(nn.Module):
 
     def get_decode_errors(self, x):
         sub_models = self.submodels
+        z = self.encoder(x)
         for bag_idx, sub_model in enumerate(sub_models):
-            z_p = sub_model['encoder'](x)
-            x_p = self.decoder(z_p)
+            x_p = sub_model['decoder'](z)
             error = deepcopy(torch.mean((((x_p - x) ** 2))))
             self.params['decode_errors'][bag_idx] += float(error.detach())
             if bag_idx == 0:
-                x_agr = self.decoder(self.agr_forward(x)[0])
+                x_agr = self.agr_decode(z)[0]
                 error = deepcopy(torch.mean((((x_agr - x) ** 2))))
                 self.params['decode_errors'][-1] += float(error.detach())
         return True
+
 
     def mask_indexes(self, mask, N = torch.inf):
         M = len(mask)
@@ -458,6 +416,7 @@ class SindyNetEnsemble(nn.Module):
         idx = torch.where(torch.sum(mask, 1) != 0)[0].long()
         idx = idx[idx < N]
         return idx
+
 
     def dx_decode(self,z, x, dx = None):
         if self.params['eval']:
@@ -497,13 +456,6 @@ class SindyNetEnsemble(nn.Module):
             return torch.mean(tensors,0)
 
 
-    def agr_forward(self, x):
-        submodels = self.submodels
-        z_stack = torch.stack([submodel['encoder'](x) for submodel in submodels])
-        z = self.aggregate(z_stack)
-        return z, z_stack
-
-
     def agr_decode(self, z):
         submodels = self.submodels
         x_stack = torch.stack([submodel['decoder'](z) for submodel in submodels])
@@ -536,12 +488,12 @@ class SindyNetEnsemble(nn.Module):
 
     def forward(self, x):
         if self.params['eval']:
-            z, z_stack = self.agr_forward(x)
-            x_decode = self.decoder(z)
+            z = self.encoder(x)
+            x_decode = self.agr_decode(z)[0]
         else:
-            z, z_stack = self.masked_forward(x)
-            x_decode = self.decoder(z)
-        return x_decode, z, z_stack
+            z = self.encoder(x)
+            x_decode = self.masked_decode(z)[0]
+        return x_decode, z
 
 
     def decoder_loss(self, x, x_pred):
@@ -590,14 +542,15 @@ class SindyNetEnsemble(nn.Module):
 
 
     def alt_forward(self, x, dx):
-        z_stack = []
         decode_stack = []
         x_stack = []
         dx_stack = []
+        z_stack = []
         for bag_idx, submodel in enumerate(self.submodels):
             sub_x, sub_dx = self.ed_sample(x, dx, bag_idx)
-            z = self.submodels[bag_idx]['encoder'](sub_x)
-            x_decode = self.decoder(z)
+            z = self.encoder(sub_x)
+
+            x_decode = submodel['decoder'](z)
             z_stack.append(z)
             decode_stack.append(x_decode)
             x_stack.append(sub_x)
@@ -627,9 +580,9 @@ class SindyNetEnsemble(nn.Module):
         return self.params['loss_weight_decoder'] * decoder_loss
 
 
-    def Loss_new(self, x, dx, ddx = None):
+    def Loss(self, x, dx, ddx = None):
         x_stack, dx_stack, z_stack_alt, decode_stack = self.alt_forward(x, dx)
-        latent_stack = torch.stack([submodel['encoder'](x) for submodel in self.submodels])
+        latent_stack = torch.stack([self.encoder(x) for submodel in self.submodels])
 
         decoder_loss = self.alt_decoder_loss(x_stack, decode_stack)
         sindy_x_loss = self.alt_sindy_x_loss(x_stack, dx_stack)
@@ -638,11 +591,11 @@ class SindyNetEnsemble(nn.Module):
         reg_loss = self.sindy_reg_loss()
 
         if self.params['eval']:
-            x_decode, z, z_stack = self.forward(x)
+            x_decode, z = self.forward(x)
             decoder_loss = self.decoder_loss(x, x_decode)
             sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
-            latent_loss = self.latent_loss(z_stack)
             sindy_z_loss = self.sindy_z_loss(z, x, dx)
+            latent_loss = 0 * sindy_z_loss
 
 
         loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss + latent_loss
@@ -652,24 +605,6 @@ class SindyNetEnsemble(nn.Module):
         losses = {key: self.params['print_factor'] * val for (key, val) in losses.items()}
         return loss, loss_refinement, losses
 
-
-    def Loss(self, x, dx, ddx = None):
-        if self.params['new']:
-            return self.Loss_new(x, dx)
-
-        x_decode, z, z_stack = self.forward(x)
-        decoder_loss = self.decoder_loss(x, x_decode)
-        sindy_x_loss = self.sindy_x_loss(z, x, dx, ddx)
-        sindy_z_loss = self.sindy_z_loss(z, x, dx)
-        latent_loss = self.latent_loss(z_stack)
-        reg_loss = self.sindy_reg_loss()
-
-        loss_refinement = decoder_loss + sindy_z_loss + sindy_x_loss + latent_loss
-        loss = loss_refinement + reg_loss
-        losses = {'decoder': decoder_loss, 'sindy_z': sindy_z_loss, 'sindy_x': sindy_x_loss,
-                  'latent': latent_loss, 'reg': reg_loss}
-        losses = {key: self.params['print_factor'] * val for (key,val) in losses.items()}
-        return loss, loss_refinement, losses
 
 
     def loss(self, x, x_decode, z, dx, ddx=None):

@@ -3,6 +3,7 @@ import numpy as np
 import pickle
 import torch
 from ensemble_model import SindyNetEnsemble, binarize, anderson_criterion
+from densemble_model import SindyNetDEnsemble
 from data_utils import get_test_params,get_loader, get_bag_loader
 from sindy_utils import get_initialized_weights
 from math import inf, isinf
@@ -292,7 +293,8 @@ def train_ea_sindy(model_params, train_params, training_data, validation_data, p
     test_loader = get_loader(validation_data, model_params, device=device)
     # train_loader = get_loader(training_data, model_params, device=device)
 
-    net = SindyNetEnsemble(model_params).to(device)
+    #net = SindyNetEnsemble(model_params).to(device)
+    net = SindyNetDEnsemble(model_params).to(device)
 
     net.params['decode_error_lists'] = [[] for i in range(net.params['nbags'] + 1)]
     net.params['decode_errors'] = [0 for i in range(net.params['nbags'] + 1)]
