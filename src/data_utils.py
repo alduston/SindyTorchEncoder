@@ -7,13 +7,11 @@ import os
 import numpy as np
 from example_lorenz import get_lorenz_data
 import torch
-import pickle
 import warnings
 import random
 from sindy_utils import library_size
 from torch.utils.data import Dataset, DataLoader
-from copy import copy
-import matplotlib.pyplot as plt
+
 warnings.filterwarnings("ignore")
 
 
@@ -78,15 +76,9 @@ class model_data(Dataset):
         if bag_params:
             x_bags,dx_bags = make_samples([self.x,self.dx], n_samples = bag_params['nbags'],
                                           augment = bag_params['augment'], sample_size = bag_params['bag_size'],
-                                         replacement = bag_params['replacement'], device = self.device)
-
-            if  bag_params['use_bags']:
-                self.x_bags = x_bags
-                self.dx_bags = dx_bags
-
-            else:
-                self.x_bags = self.x
-                self.dx_bags = self.dx
+                                          replacement = bag_params['replacement'], device = self.device)
+            self.x_bags = x_bags
+            self.dx_bags = dx_bags
 
             self.n_samples = self.x_bags.shape[0]
         if expand_factor:
@@ -114,14 +106,15 @@ class model_data(Dataset):
         return self.n_samples
 
 
-def get_test_params(train_size = 100, max_data = 100000, noise = 1e-6):
-    noise_strength = 1e-4
+def get_lorenz_params(train_size = 100, max_data = 100000, noise = 1e-6, test_size = 20):
     training_data = get_lorenz_data(train_size, noise_strength=noise)
-    validation_data = get_lorenz_data(30, noise_strength=noise)
+    validation_data = get_lorenz_data(test_size, noise_strength=noise)
+
 
     training_data = {key: vec[:min(max_data, len(training_data['x']))] for key,vec in training_data.items()}
     validation_data = {key: vec[:min(max_data, len(validation_data['x']))] for key, vec in validation_data.items()}
     params = {}
+
 
     params['input_dim'] = 128
     params['latent_dim'] = 3
@@ -139,17 +132,13 @@ def get_test_params(train_size = 100, max_data = 100000, noise = 1e-6):
     # loss function weighting
     params['loss_weight_decoder'] = .1
     params['loss_weight_sindy_z'] =  0
-    params['loss_weight_sindy_x'] = 1e-4
-    #params['loss_weight_sindy_regularization'] = 0
-    #params['loss_weight_sindy_x'] = 0
+    params['loss_weight_sindy_x'] =  1e-4
     params['loss_weight_sindy_regularization'] = 1e-5
-    params['loss_weight_latent'] = 1e-6
-    params['loss_weight_div'] = -1e-6
-    #params['loss_weight_consistency'] = 1e-2
+    params['loss_weight_latent'] = 5e-4
 
     params['activation'] = 'sigmoid'
-    params['widths'] = [64,32]
     params['widths'] = [64, 32]
+    params['translator_widths'] = [15,15]
 
     # training parameters
     params['epoch_size'] = training_data['x'].shape[0]
@@ -172,18 +161,61 @@ def get_test_params(train_size = 100, max_data = 100000, noise = 1e-6):
     params['train_print_freq'] = np.inf
     params['update_freq'] = 50
     params['zero_threshold'] = .1
-    params['accept_threshold'] = .6
-    params['c_loss'] = False
-    params['scramble'] = False
-    params['eval'] = False
-    params['expand_sample'] = False
-    params['bagn_factor'] = 1
-    params['true_coeffs'] = training_data['sindy_coefficients']
+    params['accept_threshold'] = .8
+
+    try:
+        params['true_coeffs'] = training_data['sindy_coefficients']
+    except KeyError:
+        params['true_coeffs'] = None
+
     params['print_factor'] = 1000
-    params['criteria_test'] = False
-    params['criteria_info'] = {}
+    params['stage'] = 1
 
     return params,training_data, validation_data
+
+
+def get_rd_params(train_size = 100, max_data = 100000, noise = 1e-6, test_size = 20):
+    training_data, val_data, test_data = get_rd_data()
+    params = {}
+
+    params['input_dim'] = training_data['y1'].size * training_data['y2'].size
+    params['latent_dim'] = 2
+    params['model_order'] = 1
+    params['poly_order'] = 3
+    params['include_sine'] = True
+    params['library_dim'] = library_size(params['latent_dim'], params['poly_order'], params['include_sine'], True)
+
+    # sequential thresholding parameters
+    params['sequential_thresholding'] = True
+    params['coefficient_threshold'] = 0.1
+    params['threshold_frequency'] = 500
+    params['coefficient_mask'] = np.ones((params['library_dim'], params['latent_dim']))
+    params['coefficient_initialization'] = 'constant'
+
+    # loss function weighting
+    params['loss_weight_decoder'] = 1.0
+    params['loss_weight_sindy_z'] = 0.01
+    params['loss_weight_sindy_x'] = 0.5
+    params['loss_weight_sindy_regularization'] = 0.1
+    params['loss_weight_latent'] = 5e-4
+
+
+    params['activation'] = 'sigmoid'
+    params['widths'] = [256]
+
+    # training parameters
+    params['epoch_size'] = training_data['t'].size
+    params['batch_size'] = 1000
+    params['learning_rate'] = 1e-3
+
+    params['data_path'] = os.getcwd() + '/'
+    params['print_progress'] = True
+    params['print_frequency'] = 100
+
+    # training time cutoffs
+    params['max_epochs'] = 3001
+    params['refinement_epochs'] = 1001
+
 
 
 def get_loader(data, params, workers = 0, device = 'cpu', expand_factor = None):
@@ -200,13 +232,14 @@ def get_bag_loader(data, train_params, model_params,  workers = 0,
 
 
 def run():
-    model_params, training_data, validation_data = get_test_params()
-    train_params = {'bag_epochs': 1, 'pretrain_epochs': 40, 'nbags': 5000, 'bag_size': 7}
+    #TEST: Epoch: 475, Decoder: 0.000618613, Sindy_x: 0.000576975, Sindy_z: 0.0, Reg: 3.86e-06, Latent: 2.064e-06
+    #model_params, training_data, validation_data = get_test_params()
+    #train_params = {'bag_epochs': 1, 'pretrain_epochs': 40, 'nbags': 5000, 'bag_size': 7}
     if torch.cuda.is_available():
         device = 'cuda:0'
     else:
         device = 'cpu'
-    bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
+    #bag_loader = get_bag_loader(training_data, train_params, model_params, device=device)
 
 
 if __name__=='__main__':

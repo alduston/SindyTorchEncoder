@@ -3,19 +3,19 @@ import os
 sys.path.append("../src")
 sys.path.append("../tf_model/src")
 sys.path.append("../examples/lorenz")
-import datetime
 import pandas as pd
 import numpy as np
-from example_lorenz import get_lorenz_data
-from sindy_utils import library_size
-from ensemble_training import train_ea_sindy
-import pickle
+import torch
+from ensemble_training import train_eas, train_eas_1, train_eas_2, train_step2
 import warnings
-from data_utils import get_test_params, get_loader
+from data_utils import get_lorenz_params
 import matplotlib.pyplot as plt
-from copy import deepcopy, copy
-warnings.filterwarnings("ignore")
+from copy import deepcopy
+from compressor_model import SindyNetCompEnsemble
+import dill
+import pickle
 
+warnings.filterwarnings("ignore")
 
 def clear_plt():
     plt.figure().clear()
@@ -24,6 +24,28 @@ def clear_plt():
     plt.clf()
     return True
 
+def ea_s1_test(model_params, training_data, validation_data, run  = 0):
+    model_params['sequential_thresholding'] = False
+    model_params['use_activation_mask'] = False
+    model_params['add_noise'] = False
+
+    l = len(training_data['x'])
+    train_params = {'s1_epochs': model_params['s1_epochs'],'bag_size': l, 'refinement_epochs': 0,
+                    'n_encoders': model_params['n_encoders'],'n_decoders': model_params['n_decoders']}
+    train_params['nbags'] = 1 #max(train_params['n_encoders'], train_params['n_decoders'])
+
+    model_params['batch_size'] = l
+    model_params['run'] = run
+    model_params['test_freq'] = model_params['test_freq']
+    net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data, two_stage=False)
+    return net, Loss_dict, bag_loader, test_loader
+
+
+def ea_s2_test(model, bag_loader, test_loader):
+    params = model.params
+    net, Loss_dict, bag_loader, test_loader  = train_eas_2(model, bag_loader, test_loader, params)
+    return net, Loss_dict
+
 
 def ea_test(model_params, training_data, validation_data, run  = 0):
     model_params['sequential_thresholding'] = False
@@ -31,15 +53,15 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
     model_params['add_noise'] = False
 
     l = len(training_data['x'])
-    train_params = {'bag_epochs': model_params['max_epochs'], 'nbags': model_params['nbags'],
-                    'bag_size': l, 'refinement_epochs': 0, 'use_bags': model_params['use_bags']}
+    train_params = {'s1_epochs': model_params['s1_epochs'],'bag_size': l, 'refinement_epochs': 0,
+                    'n_encoders': model_params['n_encoders'],'n_decoders': model_params['n_decoders']}
+    train_params['nbags'] = train_params['n_encoders']
 
-    model_params['batch_size'] = l
-    model_params['crossval_freq'] = 50
+
+    model_params['batch_size'] = l//2
     model_params['run'] = run
-    model_params['pretrain_epochs'] = 100
     model_params['test_freq'] = model_params['test_freq']
-    net, Loss_dict = train_ea_sindy(model_params, train_params, training_data, validation_data,  printout = True)
+    net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data)
     return net, Loss_dict
 
 
@@ -77,13 +99,13 @@ def comparison_test(models, exp_label = '', exp_size = (128,np.inf), noise = 1e-
     except OSError:
         pass
 
-    base_params, training_data, validation_data = get_test_params(exp_size[0], max_data=exp_size[1], noise=noise)
+    base_params, training_data, validation_data = get_lorenz_params(exp_size[0], max_data=exp_size[1], noise=noise)
     base_params['exp_label'] = exp_label
     for model, model_dict in models.items():
         model_params = deepcopy(base_params)
         model_params.update(model_dict['params_updates'])
         run_function = model_dict['run_function']
-        net, loss_dict = run_function(model_params, training_data, validation_data)
+        net, loss_dict = run_function(model_params, training_data, validation_data)[:2]
 
         l = len(loss_dict['epoch'])
         loss_dict = {key:val[:l] for key,val in loss_dict.items()}
@@ -92,7 +114,7 @@ def comparison_test(models, exp_label = '', exp_size = (128,np.inf), noise = 1e-
     return True
 
 
-def trajectory_plot(model1_df, model2_df, exp_label, plot_key, runix, model_labels = ['A', 'EA']):
+def trajectory_plot(model1_df, model2_df, exp_label, plot_key, runix, model_labels = ['EA', 'A']):
     label1, label2 = model_labels
     if plot_key in ["sindy_x_","decoder_", "sindy_z"]:
         plt.plot(model1_df['epoch'], np.log(model1_df[f'{plot_key}{runix}']), label=label1)
@@ -109,7 +131,7 @@ def trajectory_plot(model1_df, model2_df, exp_label, plot_key, runix, model_labe
     return True
 
 
-def sub_trajectory_plot(dfs, exp_label, plot_key, runix, df_labels = ['A','EA'],
+def sub_trajectory_plot(dfs, exp_label, plot_key, runix, df_labels = ['EA','A'],
                     test_label= 'A v EA', sub_label = ''):
     if plot_key in ["sindy_x_","decoder_", "sindy_z"]:
         for df, df_label in zip(dfs,df_labels):
@@ -129,7 +151,7 @@ def sub_trajectory_plot(dfs, exp_label, plot_key, runix, df_labels = ['A','EA'],
     return True
 
 
-def avg_trajectory_plot(model1_df, model2_df, avg1, avg2, exp_label, plot_key, model_labels = ['A', 'EA']):
+def avg_trajectory_plot(model1_df, model2_df, avg1, avg2, exp_label, plot_key, model_labels = ['EA', 'A']):
     label1,label2 = model_labels
     if plot_key in ["sindy_x_","decoder_","sindy_z_"]:
         plt.plot(model1_df['epoch'], np.log(avg1), label=label1)
@@ -168,6 +190,7 @@ def get_key_med(df,key, nruns):
     med = key_df.median(axis = 1)
     return np.asarray(med)
 
+
 def list_in(str, str_list):
     for sub_str in str_list:
         if sub_str in str:
@@ -175,17 +198,41 @@ def list_in(str, str_list):
     return False
 
 
-def get_plots(model1_df, model2_df, exp_label, plot_keys = ["sindy_x_","decoder_", "active_coeffs_", "coeff_"],
-              model_labels = ['A', 'EA'], nruns = None, factor = 1):
+def agg_comparison_plots(model, exp_label = 'exp', loss_keys = ['decoder', 'sindy_x', 'sindy_z']):
+    save_dir = f'../data/{exp_label}/'
     try:
-        os.mkdir(f'../plots/{exp_label}/')
+        os.mkdir(save_dir)
+    except OSError:
+        pass
+    marker_freq = max(1, len(list(model.item_loss_dict.values())[0])//40)
+    item_loss_dict = model.item_loss_dict
+    for loss_key in loss_keys:
+        for (key, losses) in item_loss_dict.items():
+            if key.startswith(loss_key):
+                if key.endswith('agg'):
+                    plt.plot(np.log(np.asarray(losses)), label='agg', marker='x', markevery=marker_freq)
+                else:
+                    plt.plot(np.log(np.asarray(losses)))
+        plt.ylabel(loss_key)
+        plt.xlabel('epoch')
+        plt.legend()
+        plt.title(f'Agg v Submodel {loss_key} log loss')
+        plt.savefig(f'{save_dir}{loss_key}_agg_v_sub.png')
+        clear_plt()
+    return True
+
+
+def get_plots(model1_df, model2_df, exp_label, plot_keys = ["sindy_x_","decoder_"],
+              model_labels = ['EA', 'A'], nruns = None, factor = 1):
+    save_dir = f'../data/{exp_label}/'
+    try:
+        os.mkdir(save_dir)
     except OSError:
         pass
 
     str_list = ['decoder', 'sindy_x', 'sindy_z']
     for col in model1_df.columns:
         if list_in(col, str_list):
-
             model1_df[col] = model1_df[col] / factor
 
     for col in model2_df.columns:
@@ -194,8 +241,14 @@ def get_plots(model1_df, model2_df, exp_label, plot_keys = ["sindy_x_","decoder_
 
 
     if not nruns:
-        runs_1 = max([int(key[-1]) for key in model1_df.columns if key.startswith('coeff')])
-        runs_2 = max([int(key[-1]) for key in model2_df.columns if key.startswith('coeff')])
+        try:
+            runs_1 = max([int(key[-1]) for key in model1_df.columns if key.startswith('coeff')])
+        except ValueError:
+            runs_1 = 0
+        try:
+            runs_2 = max([int(key[-1]) for key in model2_df.columns if key.startswith('coeff')])
+        except ValueError:
+            runs_2 = 0
         nruns = min(runs_1, runs_2) + 1
 
     for key in plot_keys:
@@ -216,33 +269,6 @@ def get_plots(model1_df, model2_df, exp_label, plot_keys = ["sindy_x_","decoder_
     return True
 
 
-def get_sub_plots(Meta_PA_df, n_runs, exp_label, nbags,
-              plot_keys = ["sindy_x_"]):
-    try:
-        os.mkdir(f'../data/{exp_label}')
-    except OSError:
-        pass
-
-    for i in range(nbags):
-        sub_label = f'bag{i}'
-        try:
-            os.mkdir(f'../data/{exp_label}/{sub_label}')
-        except OSError:
-            pass
-        sub_df = {key: val for (key,val) in Meta_PA_df.items() if key.startswith(f'bag{i}')}
-        sub_df['epoch'] = Meta_PA_df['epoch']
-        for key in plot_keys:
-            avg_PA = np.zeros(len(Meta_PA_df[f'epoch']))
-            for i in range(n_runs):
-                avg_PA += sub_df[f'{sub_label}_{key}{i}']
-                sub_trajectory_plot([sub_df], exp_label, key, i,
-                            df_labels = ['EA'], test_label='EA', sub_label=sub_label)
-
-            avg_PA *= (1/n_runs)
-            avg_sub_trajectory_plot(sub_df, sub_df, avg_PA, avg_PA, exp_label, sub_label, key)
-    return True
-
-
 def update_df_cols(df, update_num):
     rename_dict = {}
     for col in df.columns:
@@ -260,39 +286,55 @@ def update_df_cols(df, update_num):
     return df.rename(columns=rename_dict)
 
 
-def test(size = 40, epochs = 1000, nbags = 10, exp_name = 'exp'):
-    params_1 = {'nbags': nbags, 'replacement': True, 'criterion': 'stability', 'use_bags': False, 'new': True,
-                'coefficient_initialization': 'xavier', 'max_epochs': epochs, 'test_freq': 50, 'exp_name': exp_name,
-                'error_plot': True}
-
-    params_2 = {'nbags': 1, 'replacement': False, 'criterion': 'avg', 'coefficient_initialization': 'constant',
-                'max_epochs': epochs, 'test_freq': 50, 'exp_name': exp_name, 'use_bags': False, 'new': False,
-                'error_plot': False}
-
-
-    model_1 = {'params_updates': params_1, 'run_function': ea_test, 'label': 'Meta_EA'}
-    model_2 = {'params_updates': params_2, 'run_function': ea_test, 'label': 'Meta_A'}
-    #models_dict = {'Meta_A': model_2, 'Meta_EA': model_1}
-    models_dict = {'Meta_EA': model_1, 'Meta_A': model_2}
-
-    comparison_test(models_dict, exp_name, exp_size=(size, np.inf))
-
-    label1 = 'Meta_EA'
-    label2 = 'Meta_A'
-
-    Meta_df_1 = pd.read_csv(f'../data/{exp_name}/{label1}.csv')
-    Meta_df_2 = pd.read_csv(f'../data/{exp_name}/{label2}.csv')
-
-    get_plots(Meta_df_1, Meta_df_2, exp_name, model_labels=['Meta_EA', 'Meta_A'], factor=1)
-
+def save_model(model, bag_loader, test_loader, save_dir = 'model'):
+    try:
+        os.mkdir(f'../data/models/{save_dir}')
+    except OSError:
+        pass
+    torch.save(model, f'../data/models/{save_dir}/model.pkl')
+    torch.save(bag_loader, f'../data/models/{save_dir}/bag_loader.pkl')
+    torch.save(test_loader, f'../data/models/{save_dir}/test_loader.pkl')
     return True
 
-#scp -r ald6fd@klone.hyak.uw.edu:/mmfs1/gscratch/dynamicsai/ald6fd/alt/SindyTorchEncoder/data/stuff /Users/aloisduston/Desktop/Math/Research/Kutz/SindyTorchEncoder/data/
+
+def load_model(save_dir = 'model'):
+    model = torch.load(f'../data/models/{save_dir}/model.pkl')
+    bag_loader =  torch.load(f'../data/models/{save_dir}/bag_loader.pkl')
+    test_loader = torch.load(f'../data/models/{save_dir}/test_loader.pkl')
+    return model,bag_loader, test_loader
+
+
+#scp -r ald6fd@klone.hyak.uw.edu:/mmfs1/gscratch/dynamicsai/ald6fd/SindyTorchEncoder/data/stuff /Users/aloisduston/Desktop/Math/Research/Kutz/SindyEnsemble/data/
+
+def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0'):
+    try:
+        os.mkdir(f'../data/{exp_label}')
+    except OSError:
+        pass
+
+    params, training_data, validation_data = get_lorenz_params(train_size=40, test_size=10)
+    params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
+                     'n_encoders': 25, 'n_decoders': 25, 'criterion': 'avg', 's1_epochs': 2000,
+                     'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
+
+    params.update(params_update)
+    model1, Loss_dict, bag_loader, test_loader = ea_s1_test(params, training_data, validation_data)
+    save_model(model1, bag_loader, test_loader, save_dir = model_save_name)
+    agg_comparison_plots(model1,exp_label )
+
 
 def run():
-    test(size = 50, epochs = 5000, nbags = 25, exp_name='test')
-    #for i in range(5):
-        #test(size = 20, epochs = 500, nbags = 2, exp_name='test')
+    indep_model, bag_loader, test_loader = load_model('model0')
+    compressor_model = SindyNetCompEnsemble(indep_model)
+    model_params = compressor_model.params
+    model_params['s2_epochs'] = 20000
+    train_step2(compressor_model, bag_loader, test_loader, compressor_model.params)
+
+
+
+
+
+
 
 if __name__=='__main__':
     run()
