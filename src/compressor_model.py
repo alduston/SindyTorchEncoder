@@ -168,23 +168,18 @@ class SindyNetCompEnsemble(nn.Module):
         self.epoch = 0
 
 
-    def get_residual_lat_activation(self, activation_f, input_dim):
-        return InputActivation(activation_f, input_dim)
-
-
     def Stacked_encoder(self, params):
         indep_models = self.params['indep_models']
         n_encoders = params['n_encoders']
         weights = []
         biases = []
+
         for j in range(len(indep_models.encoder_weights(0)[0])):
-            w_list = [indep_models.encoder_weights(0)[0][j] for i in range(n_encoders)]
-            #w_list = [indep_models.encoder_weights(i)[0][j] for i in range(n_encoders)]
+            w_list = [indep_models.encoder_weights(i)[0][j] for i in range(n_encoders)]
             w_stack = diagnolize_weights(w_list)
             weights.append(w_stack)
 
-            b_stack = torch.concat([indep_models.encoder_weights(0)[1][j] for i in range(n_encoders)], dim=0)
-            #b_stack = torch.concat([indep_models.encoder_weights(i)[1][j] for i in range(n_encoders)], dim=0)
+            b_stack = torch.concat([indep_models.encoder_weights(i)[1][j] for i in range(n_encoders)], dim=0)
             biases.append(b_stack)
 
         activation_function = self.activation_f
@@ -209,14 +204,6 @@ class SindyNetCompEnsemble(nn.Module):
         final_layer.bias.data = biases[-1]
         layers.append(final_layer)
 
-        rotation_matrixes = [torch.tensor(rand_rotation_matrix(1),device=self.device,
-                             dtype=self.dtype) for i in range(n_encoders)]
-        rotations_tensor = diagnolize_weights(rotation_matrixes)
-        rotation_layer = nn.Linear(latent_dim, latent_dim,  device=self.device)
-        rotation_layer.weight.data = rotations_tensor
-        rotation_layer.bias.data = torch.zeros(latent_dim, device = self.device, dtype=self.dtype)
-        layers.append(rotation_layer)
-
         Stacked_encoder = nn.Sequential(*layers)
 
         return Stacked_encoder, layers
@@ -228,34 +215,20 @@ class SindyNetCompEnsemble(nn.Module):
         weights = []
         biases = []
 
-
-
         for j in range(len(indep_models.decoder_weights(0)[0])):
-            #w_list = [indep_models.decoder_weights(i)[0][j] for i in range(n_decoders)]
-            w_list = [indep_models.decoder_weights(0)[0][j] for i in range(n_decoders)]
+            w_list = [indep_models.decoder_weights(i)[0][j] for i in range(n_decoders)]
             w_stack = diagnolize_weights(w_list)
             weights.append(w_stack)
 
-            #b_stack = torch.concat([indep_models.decoder_weights(i)[1][j] for i in range(n_decoders)],
-                                   #dim=0)
-
-            b_stack = torch.concat([indep_models.decoder_weights(0)[1][j] for i in range(n_decoders)],dim=0)
-
+            b_stack = torch.concat([indep_models.decoder_weights(i)[1][j] for i in range(n_decoders)],dim=0)
             biases.append(b_stack)
 
-        activation_function = self.activation_f #self.get_activation_f(params)
+        activation_function = self.activation_f 
         input_dim = params['latent_dim'] * n_decoders
         final_dim =  params['input_dim'] * n_decoders
         widths = np.asarray(params['widths']) * n_decoders
 
         layers = []
-        rotation_matrixes = [torch.tensor(rand_rotation_matrix(1), device=self.device,
-                                          dtype=self.dtype) for i in range(n_decoders)]
-        rotations_tensor = diagnolize_weights(rotation_matrixes)
-        rotation_layer = nn.Linear(input_dim, input_dim, device=self.device)
-        rotation_layer.weight.data = rotations_tensor
-        rotation_layer.bias.data = torch.zeros(input_dim, device=self.device, dtype=self.dtype)
-        layers.append(rotation_layer)
 
         for i,output_dim in enumerate(widths[::-1]):
             layer = nn.Linear(input_dim, output_dim, device= self.device)
@@ -307,7 +280,6 @@ class SindyNetCompEnsemble(nn.Module):
 
         for output_dim in widths:
             layer = ResidualBlock(init_dim, input_dim, output_dim, activation_function, self.device)
-
             input_dim = output_dim
             layers.append(layer)
 
@@ -326,7 +298,6 @@ class SindyNetCompEnsemble(nn.Module):
 
 
     def collapse(self,x_stack):
-
         N,m = x_stack.shape
         n = self.params['n_encoders']
         x_stack = x_stack.reshape((N,n,m//n))
@@ -342,7 +313,6 @@ class SindyNetCompEnsemble(nn.Module):
         x_encode = stacked_encoder(x_stack)
         x_comp = self.compressor(double(x_encode))
 
-        #x_comp_decode = self.decoder(x_comp)
         x_decomp = self.decompressor(double(x_comp))
         x_decomp_decode = stacked_decoder(x_decomp)
         x_decode = stacked_decoder(x_encode)
@@ -360,15 +330,14 @@ class SindyNetCompEnsemble(nn.Module):
         x_decomp, x_encode, x_decode, x_decomp_decode, x_stack = self.forward(x)
         #decompressor_loss = self.decode_loss(x_encode, x_decomp)
 
-        decompressor_loss = self.decode_loss(x_decomp,  x_encode)
-        s2_decoder_loss = self.decode_loss(x_decomp_decode,  x_stack)
+        decoder_loss = self.decode_loss(x_decomp_decode,  x_stack)
         s1_decoder_loss = self.decode_loss(self.collapse(x_decomp_decode), x)
-        sindy_z_loss = 0 * decompressor_loss
-        sindy_x_loss = 0 * decompressor_loss
-        reg_loss = 0 * decompressor_loss
-        loss = 0 * decompressor_loss + s2_decoder_loss  + s1_decoder_loss #+ sindy_z_loss + sindy_x_loss + reg_loss
+        sindy_z_loss = 0 * decoder_loss
+        sindy_x_loss = 0 * decoder_loss
+        reg_loss = 0 * decoder_loss
+        loss = decoder_loss #+ sindy_z_loss + sindy_x_loss + reg_loss
 
-        loss_dict = {'decoder': decompressor_loss , 'sindy_x': s2_decoder_loss, 'sindy_z': s1_decoder_loss, 'reg': reg_loss}
+        loss_dict = {'decoder': decoder_loss , 'sindy_x': s1_decoder_loss , 'sindy_z': sindy_z_loss, 'reg': reg_loss}
         return loss, loss_dict
 
 
