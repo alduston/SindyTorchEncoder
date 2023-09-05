@@ -135,7 +135,8 @@ class SindyNetCompEnsemble(nn.Module):
         self.compressor, self.compressor_layers = self.Residual_Compressor(self.params)
         self.decompressor, self.decompressor_layers = self.Residual_Decompressor(self.params)
         self.decoder, self.decoder_layers = indep_models.Decoder(params)
-        self.params['stacked_encoder'],self.params['stacked_encoder_layers'] = self.Stacked_encoder(self.params)
+        #self.params['stacked_encoder'],self.params['stacked_encoder_layers'] = self.Stacked_encoder(self.params)
+        self.stacked_encoder, self.stacked_encoder_layers = self.Stacked_encoder(self.params)
         self.params['stacked_decoder'], self.params['stacked_decoder_layers'] = self.Stacked_decoder(self.params)
 
         self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad=True)
@@ -233,7 +234,6 @@ class SindyNetCompEnsemble(nn.Module):
                 layer_shapes.append(layer.weight.shape)
             except AttributeError:
                 pass
-        #print(['Stacked decoder: '] + layer_shapes)
 
         return Stacked_decoder, layers
 
@@ -244,7 +244,6 @@ class SindyNetCompEnsemble(nn.Module):
         input_dim = params['latent_dim'] * params['n_encoders']
         latent_dim = params['latent_dim']
         widths = params['n_encoders'] * halving_widths( params['n_encoders'], 1)
-        print(f'Compressor widths:{ widths}')
         layers = [DoublingBlock(init_dim)]
 
         for output_dim in widths:
@@ -258,7 +257,6 @@ class SindyNetCompEnsemble(nn.Module):
         nn.init.constant_(final_layer.bias.data, 0)
         layers.append(final_layer)
         Compressor = nn.Sequential(*layers)
-        #print(['Compressor: '] + [layer.weight.shape for layer in layers])
         return Compressor, layers
 
 
@@ -267,10 +265,8 @@ class SindyNetCompEnsemble(nn.Module):
         input_dim = params['latent_dim']
         init_dim = deepcopy(input_dim)
         final_dim = params['latent_dim'] * params['n_encoders']
-        #widths = halving_widths(final_dim, input_dim)[::-1]
         widths = params['n_encoders'] * halving_widths(params['n_encoders'], 1)
         layers = [DoublingBlock(init_dim)]
-        #print(f'Deompressor widths:{widths[::-1]}')
 
         for output_dim in widths:
             layer = ResidualBlock(init_dim, input_dim, output_dim, activation_function, self.device)
@@ -283,7 +279,6 @@ class SindyNetCompEnsemble(nn.Module):
         layers.append(final_layer)
         Decompressor = nn.Sequential(*layers)
 
-        #print(['Decompressor: ']+[layer.weight.shape for layer in layers])
         return Decompressor, layers
 
     def get_comp_weights(self, layers):
@@ -354,7 +349,7 @@ class SindyNetCompEnsemble(nn.Module):
 
 
     def forward(self, x_stack):
-        stacked_encoder =  self.params['stacked_encoder']
+        stacked_encoder =  self.stacked_encoder #self.params['stacked_encoder']
         stacked_decoder = self.params['stacked_decoder']
 
         x_encode = stacked_encoder(x_stack)
@@ -368,10 +363,12 @@ class SindyNetCompEnsemble(nn.Module):
 
 
     def dz_comp(self, x, dx):
-        encoder_weights, encoder_biases =  self.get_encode_weights(self.params['stacked_encoder_layers'])
+        #encoder_weights, encoder_biases =  self.get_encode_weights(self.params['stacked_encoder_layers'])
+        encoder_weights, encoder_biases = self.get_encode_weights(self.stacked_encoder_layers)
         compressor_weights, compressor_biases = self.get_comp_weights(self.compressor_layers)
         activation = self.params['activation']
-        z = self.params['stacked_encoder'](x)
+        #z = self.params['stacked_encoder'](x)
+        z = self.stacked_encoder(x)
 
         dz = z_derivative(x, dx, encoder_weights, encoder_biases, activation).T
         dz_comp = residual_z_derivative(z, dz, compressor_weights, compressor_biases, activation).T

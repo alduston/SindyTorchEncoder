@@ -55,6 +55,7 @@ def train_epoch(model, bag_loader, optimizer):
 
 
 def validate_step(model, data):
+    print(model.device)
     loss, losses = model.Loss(x=data['x'].to(model.device), dx=data['dx'].to(model.device))
     return loss, losses
 
