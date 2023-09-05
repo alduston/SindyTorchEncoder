@@ -130,7 +130,7 @@ class SindyNetCompEnsemble(nn.Module):
 
         self.params = params
         self.params['indep_models'] = indep_models
-        self.params['loss_weight_sindy_z'] = 1e-5
+        self.params['loss_weight_sindy_z'] = 0
         self.activation_f = indep_models.activation_f
         self.compressor, self.compressor_layers = self.Residual_Compressor(self.params)
         self.decompressor, self.decompressor_layers = self.Residual_Decompressor(self.params)
