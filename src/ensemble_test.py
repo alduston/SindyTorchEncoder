@@ -312,9 +312,9 @@ def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0
     except OSError:
         pass
 
-    params, training_data, validation_data = get_lorenz_params(train_size=40, test_size=10)
+    params, training_data, validation_data = get_lorenz_params(train_size=50, test_size=20)
     params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                     'n_encoders': 25, 'n_decoders': 25, 'criterion': 'avg', 's1_epochs': 4000,
+                     'n_encoders': 30, 'n_decoders': 30, 'criterion': 'avg', 's1_epochs':10000,
                      'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
@@ -324,7 +324,7 @@ def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0
 
 
 def run():
-    basic_test()
+    basic_test(model_save_name = 'model0')
     indep_model, bag_loader, test_loader = load_model('model0')
     compressor_model = SindyNetCompEnsemble(indep_model)
     model_params = compressor_model.params
@@ -334,8 +334,15 @@ def run():
 
 
 
-
-
-
 if __name__=='__main__':
     run()
+
+
+'''
+x_stack has shape torch.Size([250, 384])
+x_encode has shape torch.Size([250, 9])
+x_comp has shape torch.Size([250, 3])
+x_decomp has shape torch.Size([250, 9])
+x_decomp_decode has shape torch.Size([250, 384])
+x_decode has shape torch.Size([250, 384])
+'''

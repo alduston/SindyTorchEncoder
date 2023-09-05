@@ -1,71 +1,24 @@
 import torch
 import torch.nn as nn
-#from sindy_utils import z_derivative, get_initialized_weights, sindy_library_torch
-#from copy import copy, deepcopy
+from sindy_utils import z_derivative, get_initialized_weights, sindy_library_torch, residual_z_derivative
+from copy import copy, deepcopy
 import matplotlib.pyplot as plt
 import numpy as np
 from copy import deepcopy
 from scipy.spatial.transform import Rotation as R
 
 
-def rand_rotation_matrix(deflection=1.0):
-    """
-    Creates a random rotation matrix.
-
-    deflection: the magnitude of the rotation. For 0, no rotation; for 1, competely random rotation. Small
-    deflection => small perturbation.
-    """
-    # from http://www.realtimerendering.com/resources/GraphicsGems/gemsiii/rand_rotation.c
-
-    theta = np.random.uniform(0, 2.0 * deflection * np.pi)  # Rotation about the pole (Z).
-    phi = np.random.uniform(0, 2.0 * np.pi)  # For direction of pole deflection.
-    z = np.random.uniform(0, 2.0 * deflection)  # For magnitude of pole deflection.
-
-    # Compute a vector V used for distributing points over the sphere
-    # via the reflection I - V Transpose(V).  This formulation of V
-    # will guarantee that if x[1] and x[2] are uniformly distributed,
-    # the reflected points will be uniform on the sphere.  Note that V
-    # has length sqrt(2) to eliminate the 2 in the Householder matrix.
-
-    r = np.sqrt(z)
-    Vx, Vy, Vz = V = (
-        np.sin(phi) * r,
-        np.cos(phi) * r,
-        np.sqrt(2.0 - z)
-    )
-
-    # Compute the row vector S = Transpose(V) * R, where R is a simple
-    # rotation by theta about the z-axis.  No need to compute Sz since
-    # it's just Vz.
-
-    st = np.sin(theta)
-    ct = np.cos(theta)
-    Sx = Vx * ct - Vy * st
-    Sy = Vx * st + Vy * ct
-
-    # Construct the rotation matrix  ( V Transpose(V) - I ) R, which
-    # is equivalent to V S - R.
-
-    M = np.array((
-        (
-            Vx * Sx - ct,
-            Vx * Sy - st,
-            Vx * Vz
-        ),
-        (
-            Vy * Sx + st,
-            Vy * Sy - ct,
-            Vy * Vz
-        ),
-        (
-            Vz * Sx,
-            Vz * Sy,
-            1.0 - z  # This equals Vz * Vz - 1.0
-        )
-    )
-    )
-    return M
-
+def format(n, n_digits = 6):
+    try:
+        if n > 1e-4:
+            return round(n,n_digits)
+        a = '%E' % n
+        str =  a.split('E')[0].rstrip('0').rstrip('.') + 'E' + a.split('E')[1]
+        scale = str[-5:]
+        digits = str[:-5]
+        return digits[:min(len(digits),n_digits)] + scale
+    except IndexError:
+        return n
 
 
 def dict_mean(dicts):
@@ -109,9 +62,9 @@ def stability_criterion(vec, zero_threshold = .1, accept_threshold = .6):
 
 def halving_widths(in_widht, out_width):
     widths = [in_widht]
-    while widths[-1] > 2 * out_width:
+    while widths[-1] > 1:
         widths.append(widths[-1]//2)
-    return widths[0:]
+    return np.asarray(widths[0:])
 
 
 def diagnolize_weights(w_list):
@@ -123,6 +76,21 @@ def diagnolize_weights(w_list):
     for i in range(n):
         diag_tensor[(i) * l:(i+1) * l, (i) * w:(i+1) * w] += w_list[i]
     return diag_tensor
+
+
+#(9x18 and 9x250)
+
+class DoublingBlock(nn.Module):
+    def __init__(self, n_input, device = 'cpu'):
+        super().__init__()
+        self.device = device
+        doubling_tensor = torch.eye(n_input, device = self.device)
+        self.doubling_tensor = torch.concat([doubling_tensor, doubling_tensor], dim = 0)
+        self.weight =  self.doubling_tensor
+        self.bias = torch.zeros(2 * n_input, device = self.device)
+
+    def forward(self, x):
+        return  torch.concat([x,x], dim = 1)
 
 
 class ResidualBlock(nn.Module):
@@ -137,11 +105,14 @@ class ResidualBlock(nn.Module):
         nn.init.constant_(linear_layer.bias.data, 0)
         self.lin_layer = linear_layer
 
+        self.weight =  self.lin_layer.weight
+        self.bias = self.lin_layer.bias
+
     def forward(self, x):
         n = self.n
         activation_f = self.activation_f
         x_linear = x[:, :n]
-        return torch.concat([activation_f(self.lin_layer(x)), x_linear], dim=1)
+        return torch.concat([x_linear, activation_f(self.lin_layer(x))], dim=1)
 
 
 class SindyNetCompEnsemble(nn.Module):
@@ -156,15 +127,19 @@ class SindyNetCompEnsemble(nn.Module):
                 self.device = 'cpu'
         self.dtype = indep_models.dtype
         params = indep_models.params
+
         self.params = params
         self.params['indep_models'] = indep_models
-
+        self.params['loss_weight_sindy_z'] = 1e-5
         self.activation_f = indep_models.activation_f
         self.compressor, self.compressor_layers = self.Residual_Compressor(self.params)
         self.decompressor, self.decompressor_layers = self.Residual_Decompressor(self.params)
         self.decoder, self.decoder_layers = indep_models.Decoder(params)
         self.params['stacked_encoder'],self.params['stacked_encoder_layers'] = self.Stacked_encoder(self.params)
         self.params['stacked_decoder'], self.params['stacked_decoder_layers'] = self.Stacked_decoder(self.params)
+
+        self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad=True)
+        self.coefficient_mask = torch.tensor(deepcopy(self.params['coefficient_mask']),dtype=self.dtype, device=self.device)
         self.epoch = 0
 
 
@@ -205,6 +180,13 @@ class SindyNetCompEnsemble(nn.Module):
         layers.append(final_layer)
 
         Stacked_encoder = nn.Sequential(*layers)
+        layer_shapes = []
+        for layer in layers:
+            try:
+                layer_shapes.append(layer.weight.shape)
+            except AttributeError:
+                pass
+        #print(['Stacked encoder: '] + layer_shapes)
 
         return Stacked_encoder, layers
 
@@ -223,7 +205,7 @@ class SindyNetCompEnsemble(nn.Module):
             b_stack = torch.concat([indep_models.decoder_weights(i)[1][j] for i in range(n_decoders)],dim=0)
             biases.append(b_stack)
 
-        activation_function = self.activation_f 
+        activation_function = self.activation_f
         input_dim = params['latent_dim'] * n_decoders
         final_dim =  params['input_dim'] * n_decoders
         widths = np.asarray(params['widths']) * n_decoders
@@ -245,6 +227,14 @@ class SindyNetCompEnsemble(nn.Module):
         layers.append(final_layer)
         Stacked_decoder = nn.Sequential(*layers)
 
+        layer_shapes = []
+        for layer in layers:
+            try:
+                layer_shapes.append(layer.weight.shape)
+            except AttributeError:
+                pass
+        #print(['Stacked decoder: '] + layer_shapes)
+
         return Stacked_decoder, layers
 
 
@@ -253,8 +243,9 @@ class SindyNetCompEnsemble(nn.Module):
         init_dim = deepcopy(params['latent_dim'] * params['n_encoders'])
         input_dim = params['latent_dim'] * params['n_encoders']
         latent_dim = params['latent_dim']
-        widths = halving_widths(input_dim, latent_dim)
-        layers = []
+        widths = params['n_encoders'] * halving_widths( params['n_encoders'], 1)
+        print(f'Compressor widths:{ widths}')
+        layers = [DoublingBlock(init_dim)]
 
         for output_dim in widths:
             layer = ResidualBlock(init_dim, input_dim, output_dim, activation_function, self.device)
@@ -267,6 +258,7 @@ class SindyNetCompEnsemble(nn.Module):
         nn.init.constant_(final_layer.bias.data, 0)
         layers.append(final_layer)
         Compressor = nn.Sequential(*layers)
+        #print(['Compressor: '] + [layer.weight.shape for layer in layers])
         return Compressor, layers
 
 
@@ -275,8 +267,10 @@ class SindyNetCompEnsemble(nn.Module):
         input_dim = params['latent_dim']
         init_dim = deepcopy(input_dim)
         final_dim = params['latent_dim'] * params['n_encoders']
-        widths = halving_widths(final_dim, input_dim)[::-1]
-        layers = []
+        #widths = halving_widths(final_dim, input_dim)[::-1]
+        widths = params['n_encoders'] * halving_widths(params['n_encoders'], 1)
+        layers = [DoublingBlock(init_dim)]
+        #print(f'Deompressor widths:{widths[::-1]}')
 
         for output_dim in widths:
             layer = ResidualBlock(init_dim, input_dim, output_dim, activation_function, self.device)
@@ -288,7 +282,56 @@ class SindyNetCompEnsemble(nn.Module):
         nn.init.constant_(final_layer.bias.data, 0)
         layers.append(final_layer)
         Decompressor = nn.Sequential(*layers)
+
+        #print(['Decompressor: ']+[layer.weight.shape for layer in layers])
         return Decompressor, layers
+
+    def get_comp_weights(self, layers):
+        weights = []
+        biases = []
+        for layer in layers:
+            weights.append(layer.weight)
+            biases.append(layer.bias)
+        return weights, biases
+
+
+    def get_encode_weights(self, layers):
+        weights = []
+        biases = []
+        for layer in layers[::2]:
+            weights.append(layer.weight)
+            biases.append(layer.bias)
+        return weights, biases
+
+
+    def initializer(self):
+        init_param = None
+        init = self.params['coefficient_initialization']
+        if init == 'xavier':
+            intializer = torch.nn.init.xavier_uniform
+        elif init == 'binary_xavier':
+            intializer = torch.nn.init.xavier_uniform
+        elif init == 'constant':
+            intializer = torch.nn.init.constant_
+            init_param = [1]
+        elif init == 'normal':
+            intializer = torch.nn.init.normal_
+        return intializer, init_param
+
+
+    def init_sindy_coefficients(self):
+        library_dim = self.params['library_dim']
+        latent_dim = self.params['latent_dim']
+        initializer, init_param = self.initializer()
+        return get_initialized_weights([library_dim, latent_dim], initializer,
+                                       init_param = init_param, device = self.device)
+
+    def Theta(self, z):
+        poly_order = self.params['poly_order']
+        include_sine = self.params['include_sine']
+        latent_dim = self.params['latent_dim']
+        Theta = sindy_library_torch(z, latent_dim, poly_order, include_sine, device = self.device)
+        return Theta
 
 
     def expand(self, x):
@@ -305,19 +348,61 @@ class SindyNetCompEnsemble(nn.Module):
         return x
 
 
-    def forward(self, x):
-        x_stack = self.expand(x)
+    def sindy_predict(self, z):
+        Theta = self.Theta(z)
+        return torch.matmul(Theta, self.coefficient_mask * self.sindy_coeffs)
+
+
+    def forward(self, x_stack):
         stacked_encoder =  self.params['stacked_encoder']
         stacked_decoder = self.params['stacked_decoder']
 
         x_encode = stacked_encoder(x_stack)
-        x_comp = self.compressor(double(x_encode))
+        x_comp = self.compressor(x_encode)
 
-        x_decomp = self.decompressor(double(x_comp))
+        x_decomp = self.decompressor(x_comp)
         x_decomp_decode = stacked_decoder(x_decomp)
         x_decode = stacked_decoder(x_encode)
 
-        return x_decomp, x_encode, x_decode, x_decomp_decode, x_stack
+        return  x_encode, x_comp, x_decomp, x_decomp_decode, x_decode
+
+
+    def dz_comp(self, x, dx):
+        encoder_weights, encoder_biases =  self.get_encode_weights(self.params['stacked_encoder_layers'])
+        compressor_weights, compressor_biases = self.get_comp_weights(self.compressor_layers)
+        activation = self.params['activation']
+        z = self.params['stacked_encoder'](x)
+
+        dz = z_derivative(x, dx, encoder_weights, encoder_biases, activation).T
+        dz_comp = residual_z_derivative(z, dz, compressor_weights, compressor_biases, activation).T
+        return dz_comp
+
+
+    def dx_decode(self, z, dz):
+        decoder_weights, decoder_biases = self.get_encode_weights(self.params['stacked_decoder_layers'])
+        decompressor_weights, decompressor_biases = self.get_comp_weights(self.decompressor_layers)
+        activation = self.params['activation']
+
+        dz_g = residual_z_derivative(z, dz, decompressor_weights, decompressor_biases, activation).T
+        z_g = self.decompressor(z)
+        dx_decode = z_derivative(z_g, dz_g, decoder_weights, decoder_biases, activation).T
+        return dx_decode
+
+
+    def dz_loss(self, x, dx, z):
+        dz_pred = self.sindy_predict(z)
+        dz_comp = self.dz_comp(x, dx)
+        criterion = nn.MSELoss()
+        loss = self.params['loss_weight_sindy_z'] * criterion(dz_pred, dz_comp)
+        return loss
+
+
+    def dx_loss(self, z, dx):
+        dz_pred = self.sindy_predict(z)
+        dx_pred = self.dx_decode(z, dz_pred)
+        criterion = nn.MSELoss()
+        loss = self.params['loss_weight_sindy_x'] * criterion(dx, dx_pred)
+        return loss, dx_pred
 
 
     def decode_loss(self, x, x_pred):
@@ -326,18 +411,31 @@ class SindyNetCompEnsemble(nn.Module):
         return loss
 
 
+    def reg_loss(self):
+        return self.params['loss_weight_sindy_regularization'] * torch.sum(torch.abs(self.sindy_coeffs))
+
+
     def Loss(self, x, dx):
-        x_decomp, x_encode, x_decode, x_decomp_decode, x_stack = self.forward(x)
-        #decompressor_loss = self.decode_loss(x_encode, x_decomp)
+        x_stack = self.expand(x)
+        dx_stack = self.expand(dx)
 
-        decoder_loss = self.decode_loss(x_decomp_decode,  x_stack)
-        s1_decoder_loss = self.decode_loss(self.collapse(x_decomp_decode), x)
-        sindy_z_loss = 0 * decoder_loss
-        sindy_x_loss = 0 * decoder_loss
-        reg_loss = 0 * decoder_loss
-        loss = decoder_loss #+ sindy_z_loss + sindy_x_loss + reg_loss
+        x_encode, x_comp, x_decomp, x_decomp_decode, x_decode = self.forward(x_stack)
+        decoder_loss = self.decode_loss(x_decomp_decode, x_stack)
+        sindy_z_loss =  self.dz_loss(x_stack, dx_stack, x_comp)
+        sindy_x_loss, dx_pred = self.dx_loss(x_comp, dx_stack)
+        reg_loss = self.reg_loss()
 
-        loss_dict = {'decoder': decoder_loss , 'sindy_x': s1_decoder_loss , 'sindy_z': sindy_z_loss, 'reg': reg_loss}
+        loss = decoder_loss + sindy_x_loss + sindy_z_loss + reg_loss
+        loss_dict = {'decoder': decoder_loss , 'sindy_x': sindy_x_loss , 'sindy_z': sindy_z_loss, 'reg': reg_loss}
+
+        if self.params['eval']:
+            criterion = nn.MSELoss()
+            agr_decoder_loss = float(self.decode_loss(self.collapse(x_decode), x).detach().cpu())
+            agr_decomp_loss = float(self.decode_loss(self.collapse(x_decomp_decode), x).detach().cpu())
+            agr_dx_loss = float(criterion(self.collapse(dx_pred), dx).detach().cpu()) * 1e-4
+
+            print(f'TEST: Epoch {self.epoch},  EDecoder: {format(agr_decoder_loss)}, '
+                  f'EDecomp {format(agr_decomp_loss)}, ESindy_x: {format(agr_dx_loss)} ')
         return loss, loss_dict
 
 

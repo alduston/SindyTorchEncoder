@@ -2,6 +2,7 @@ import numpy as np
 from scipy.special import binom
 from scipy.integrate import odeint
 import torch
+from copy import deepcopy, copy
 
 
 def library_size(n, poly_order, use_sine=False, include_constant=True):
@@ -262,8 +263,14 @@ def sindy_library_torch_order2(z, dz, latent_dim, poly_order, include_sine=False
 
     return torch.stack(library, axis=1)
 
+#input as shape torch.Size([9, 250])
+#dx as shape torch.Size([9, 250])
+#weights have shape[torch.Size([18, 9]), torch.Size([9, 18]), torch.Size([3, 18]), torch.Size([3, 3])]
+#biases have shape[torch.Size([18, 1]), torch.Size([9, 1]), torch.Size([3, 1]), torch.Size([3, 1])]
+#activation = sigmoid
 
-def z_derivative(input, dx, weights, biases, activation='elu'):
+
+def z_derivative(input, dx, weights, biases, activation='elu', return_input = False):
     input = torch.transpose(input, 0, 1)
     dx = torch.transpose(dx, 0, 1)
     """
@@ -280,9 +287,17 @@ def z_derivative(input, dx, weights, biases, activation='elu'):
     Returns:
         dz - Tensorflow array, first order time derivatives of the network output.
     """
+
     dz = dx
     biases = [bias.view(len(bias), 1) for bias in biases]
-    if activation == 'elu':
+    if activation == 'sigmoid':
+        for i in range(len(weights) - 1):
+            input = torch.add(torch.matmul(weights[i], input), biases[i])
+            input = torch.nn.Sigmoid()(input)
+            dz = torch.multiply(torch.multiply(input, 1 - input), torch.matmul(weights[i], dz))
+        dz = torch.matmul(weights[-1], dz)
+
+    elif activation == 'elu':
         for i in range(len(weights) - 1):
             input = torch.add(torch.matmul(weights[i], input), biases[i])
             dz = torch.multiply(torch.minimum(torch.exp(input), torch.full(input.shape, 1.0)),
@@ -298,17 +313,37 @@ def z_derivative(input, dx, weights, biases, activation='elu'):
             dz = torch.multiply(bool_tensor, torch.matmul(dz, weights[i]))
             input = torch.nn.ReLU()(input)
         dz = torch.matmul(dz, weights[-1])
-    elif activation == 'sigmoid':
-        for i in range(len(weights) - 1):
-            input = torch.add(torch.matmul(weights[i], input), biases[i])
-            input = torch.nn.Sigmoid()(input)
-            dz = torch.multiply(torch.multiply(input, 1 - input), torch.matmul(weights[i], dz))
-        dz = torch.matmul(weights[-1], dz)
+
     else:
         for i in range(len(weights) - 1):
             dz = torch.matmul(weights[-1], dz)
         dz = torch.matmul(weights[-1], dz)
+    if return_input:
+        return dz, input
     return dz
+
+
+def sub_deriv(input, dx, weight, bias, activation = 'elu'):
+    Id = torch.eye(weight.shape[0], device = input.device)
+    weights = [weight, Id]
+    biases = [bias]
+    dz, input  = z_derivative(input, dx, weights, biases, activation=activation, return_input=True)
+    return dz, input
+
+
+
+def residual_z_derivative(input, dx, weights, biases, activation='elu'):
+    dz = torch.concat([dx, dx], dim = 1)
+    x = copy(input)
+    biases = [bias.view(len(bias), 1) for bias in biases]
+
+    for i, weight in enumerate(weights[1:-1]):
+        input = torch.concat([x, input], dim=1)
+        dz_tilde, input = sub_deriv(input, dz, weight, biases[i+1], activation = activation)
+        dz = torch.concat([dx, dz_tilde.T], dim = 1)
+        input = input.T
+    return weights[-1] @ dz.T
+
 
 
 def z_derivative_order2(input, dx, ddx, weights, biases, activation='elu'):
