@@ -450,8 +450,9 @@ class SindyNetCompEnsemble(nn.Module):
         stacked_dx_pred = self.stacked_dx_decode(x_encode, dx)
 
         criterion = nn.MSELoss()
-        loss = self.params['loss_weight_sindy_x'] * (criterion(dx, dx_pred) + criterion(stacked_dx_pred, dx_pred))
-        return loss, dx_pred, stacked_dx_pred
+        loss = self.params['loss_weight_sindy_x'] * (criterion(dx, dx_pred))
+        ensemble_loss = self.params['loss_weight_sindy_x'] * (criterion(stacked_dx_pred, dx_pred))
+        return loss, ensemble_loss, dx_pred, stacked_dx_pred
 
 
     def decode_loss(self, x, x_pred):
@@ -465,11 +466,10 @@ class SindyNetCompEnsemble(nn.Module):
 
 
     def corr_loss(self, Z, z_comp):
-        correlations = []
         z_split = self.split(Z)
         z_comp_mean = torch.mean(z_comp, dim=0)
         z_comp_centered = z_comp - z_comp_mean
-
+        corr_sum = 0
         c = torch.trace(z_comp_centered.T  @ z_comp_centered)
         for z in z_split:
             z_mean = torch.mean(z, dim = 0)
@@ -477,10 +477,9 @@ class SindyNetCompEnsemble(nn.Module):
 
             a = torch.trace(z_centered.T @ z_comp_centered)
             b = torch.trace(z_centered.T @ z_centered)
-            correlations.append(a/((b * c)**(1/2)))
+            corr_sum  += (a/((b * c)**(1/2)))**2
 
-        mean_square_corr =  torch.mean(torch.tensor(correlations, device = self.device)**2)
-        return -self.params['loss_weight_corr'] * mean_square_corr
+        return -self.params['loss_weight_corr'] * corr_sum * (1/len(z_split))
 
 
     def Loss(self, x, dx):
@@ -491,11 +490,11 @@ class SindyNetCompEnsemble(nn.Module):
         #decoder_loss = self.decode_loss(x_decomp_decode, x_stack)
         decoder_loss = self.decode_loss(x_decomp_decode, x_decode) + self.decode_loss(x_decomp_decode, x_stack)
         sindy_z_loss =  self.dz_loss(x_stack, dx_stack, x_comp)
-        sindy_x_loss, dx_pred, stacked_dx_pred = self.dx_loss(x_comp, x_encode, dx_stack)
+        sindy_x_loss, esindy_x_loss , dx_pred, stacked_dx_pred = self.dx_loss(x_comp, x_encode, dx_stack)
         reg_loss = self.reg_loss()
         corr_loss = self.corr_loss(x_encode, x_comp)
 
-        loss = decoder_loss + sindy_x_loss + sindy_z_loss + reg_loss + corr_loss
+        loss = decoder_loss + sindy_x_loss + sindy_z_loss + reg_loss + corr_loss + esindy_x_loss
         loss_dict = {'decoder': decoder_loss , 'sindy_x': sindy_x_loss , 'sindy_z': corr_loss, 'reg': reg_loss}
 
         if self.params['eval']:
