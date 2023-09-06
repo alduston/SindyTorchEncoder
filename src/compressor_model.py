@@ -413,6 +413,14 @@ class SindyNetCompEnsemble(nn.Module):
         return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(self.sindy_coeffs))
 
 
+    def corr_loss(self, z, z_comp):
+        z_mean = torch.mean(z, dim = 0)
+        z_comp_mean = torch.mean(z_comp, dim = 0)
+        numerator = torch.diag((z - z_mean).T @ (z_comp - z_comp_mean))
+        denominator = torch.diag(torch.sqrt(((z - z_mean)**2).T @ (((z_comp - z_comp_mean))**2)))
+        correlations = numerator/denominator
+        return -self.params['loss_weight_corr'] * torch.mean(correlations**2)
+
     def Loss(self, x, dx):
         x_stack = self.expand(x)
         dx_stack = self.expand(dx)
@@ -422,15 +430,17 @@ class SindyNetCompEnsemble(nn.Module):
         sindy_z_loss =  self.dz_loss(x_stack, dx_stack, x_comp)
         sindy_x_loss, dx_pred = self.dx_loss(x_comp, dx_stack)
         reg_loss = self.reg_loss()
+        corr_loss = self.corr_loss(x_encode, x_comp)
 
-        loss = decoder_loss + sindy_x_loss + sindy_z_loss + reg_loss
-        loss_dict = {'decoder': decoder_loss , 'sindy_x': sindy_x_loss , 'sindy_z': sindy_z_loss, 'reg': reg_loss}
+        loss = decoder_loss + sindy_x_loss + sindy_z_loss + reg_loss + corr_loss
+        loss_dict = {'decoder': decoder_loss , 'sindy_x': sindy_x_loss , 'sindy_z': corr_loss, 'reg': reg_loss}
 
         if self.params['eval']:
             criterion = nn.MSELoss()
             agr_decoder_loss = float(self.decode_loss(self.collapse(x_decode), x).detach().cpu())
             agr_decomp_loss = float(self.decode_loss(self.collapse(x_decomp_decode), x).detach().cpu())
-            agr_dx_loss = float(criterion(self.collapse(dx_pred), dx).detach().cpu()) * 1e-4
+            agr_dx_loss = float(criterion(self.collapse(dx_pred), dx).detach().cpu())\
+                          * self.params['loss_weight_sindy_x']
 
             print(f'TEST: Epoch {self.epoch},  EDecoder: {format(agr_decoder_loss)}, '
                   f'EDecomp {format(agr_decomp_loss)}, ESindy_x: {format(agr_dx_loss)} ')

@@ -330,7 +330,6 @@ class SindyNetEnsemble(nn.Module):
 
 
     def num_active_coeffs(self):
-        print([torch.sum(mask) for mask in self.coefficient_masks])
         return torch.mean(torch.stack([torch.sum(mask) for mask in self.coefficient_masks]))
 
 
