@@ -306,10 +306,15 @@ def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0
     except OSError:
         pass
 
+    #params, training_data, validation_data = get_lorenz_params(train_size=40, test_size=20)
+    #params_update = {'replacement': True, 'coefficient_initialization': 'xavier', 'pretrain_epochs': 200,
+                     #'n_encoders': 20, 'n_decoders': 20, 'criterion': 'avg', 's1_epochs':10000,
+                     #'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
+
     params, training_data, validation_data = get_lorenz_params(train_size=40, test_size=20)
     params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
                      'n_encoders': 20, 'n_decoders': 20, 'criterion': 'avg', 's1_epochs':10000,
-                     'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
+                      'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
     model1, Loss_dict, bag_loader, test_loader = ea_s1_test(params, training_data, validation_data)
@@ -320,6 +325,7 @@ def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0
 def run():
     basic_test(model_save_name = 'model2')
     indep_model, bag_loader, test_loader = load_model('model2')
+    indep_model.params['coefficient_initialization'] = 'constant'
     compressor_model = SindyNetCompEnsemble(indep_model)
     model_params = compressor_model.params
     model_params['s2_epochs'] =15000

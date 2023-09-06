@@ -410,7 +410,7 @@ class SindyNetCompEnsemble(nn.Module):
 
 
     def reg_loss(self):
-        return self.params['loss_weight_sindy_regularization'] * torch.sum(torch.abs(self.sindy_coeffs))
+        return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(self.sindy_coeffs))
 
 
     def Loss(self, x, dx):
