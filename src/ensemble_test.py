@@ -318,8 +318,8 @@ def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0
 
 
 def run():
-    basic_test(model_save_name = 'small_model')
-    indep_model, bag_loader, test_loader = load_model('small_model')
+    basic_test(model_save_name = 'model2')
+    indep_model, bag_loader, test_loader = load_model('model2')
     compressor_model = SindyNetCompEnsemble(indep_model)
     model_params = compressor_model.params
     model_params['s2_epochs'] =15000
