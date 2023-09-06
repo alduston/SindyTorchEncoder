@@ -311,9 +311,9 @@ def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0
                      #'n_encoders': 20, 'n_decoders': 20, 'criterion': 'avg', 's1_epochs':10000,
                      #'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
 
-    params, training_data, validation_data = get_lorenz_params(train_size=40, test_size=20)
+    params, training_data, validation_data = get_lorenz_params(train_size=4, test_size=2)
     params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                     'n_encoders': 20, 'n_decoders': 20, 'criterion': 'avg', 's1_epochs': 10000,
+                     'n_encoders': 3, 'n_decoders': 3, 'criterion': 'avg', 's1_epochs': 3000,
                       'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
@@ -323,12 +323,12 @@ def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0
 
 
 def run():
-    basic_test(model_save_name = 'model2')
-    indep_model, bag_loader, test_loader = load_model('model2')
+    #basic_test(model_save_name = 'small_model')
+    indep_model, bag_loader, test_loader = load_model('small_model')
     indep_model.params['coefficient_initialization'] = 'constant'
     compressor_model = SindyNetCompEnsemble(indep_model)
     model_params = compressor_model.params
-    model_params['s2_epochs'] = 10000
+    model_params['s2_epochs'] = 20000
     train_step2(compressor_model, bag_loader, test_loader, compressor_model.params)
 
 
@@ -338,11 +338,17 @@ if __name__=='__main__':
     run()
 
 
-'''
-x_stack has shape torch.Size([250, 384])
-x_encode has shape torch.Size([250, 9])
-x_comp has shape torch.Size([250, 3])
-x_decomp has shape torch.Size([250, 9])
-x_decomp_decode has shape torch.Size([250, 384])
-x_decode has shape torch.Size([250, 384])
-'''
+#TEST: Epoch: 2900, Decoder: 0.001342672, Sindy_x: 0.002060541, Sindy_z: 0.001255479, Reg: 5.829e-06, Active_coeffs: 36
+
+
+#TEST: Epoch 8200,  EDecoder: 0.001064, EDecomp 0.001058, ESindy_x: 0.001437
+#TEST: Epoch: 8200, Decoder: 0.001169904, Sindy_x: 0.001454224, Sindy_z: -426.53515625, Reg: 5.906e-06, Active_coeffs: 34
+#0.00139449, Sindy_x: 0.000346457
+
+
+#TEST: Epoch: 9900, Decoder: 0.000141091, Sindy_x: 0.001239868, Sindy_z: -254.534484863, Reg: 8.762e-06, Active_coeffs: 46
+#TEST: Epoch 10000,  EDecoder: 0.001064, EDecomp 0.001143, ESindy_x: 0.001212
+
+
+#TEST: Epoch: 9900, Decoder: 0.001400615, Sindy_x: 0.001279983, Sindy_z: -249.767318726, Reg: 5.376e-06, Active_coeffs: 25
+#TEST: Epoch 10000,  EDecoder: 0.001064, EDecomp 0.0011, ESindy_x: 0.001249

@@ -8,6 +8,22 @@ from copy import deepcopy
 from scipy.spatial.transform import Rotation as R
 
 
+def corr2_coeff(A, B):
+    # Rowwise mean of input arrays & subtract from input arrays themeselves
+    A_mA = A - torch.mean(A, dim = 1)
+    B_mB = B - torch.mean(A, dim = 1)
+
+    # Sum of squares across rows
+    ssA = torch.sum(A_mA**2, dim = 1)
+    ssB = torch.sum(B_mB**2, dim = 1)
+
+    top = A_mA @ B_mB.T
+    bottom =  np.sqrt(ssA * ssB)
+
+    # Finally get corr coeff
+    return np.dot(A_mA, B_mB.T) / np.sqrt(np.dot(ssA[:, None],ssB[None]))
+
+
 def format(n, n_digits = 6):
     try:
         if n > 1e-4:
@@ -131,6 +147,7 @@ class SindyNetCompEnsemble(nn.Module):
         self.params = params
         self.params['indep_models'] = indep_models
         self.params['loss_weight_sindy_z'] = 0
+        self.params['loss_weight_corr'] = 1000
         self.activation_f = indep_models.activation_f
         self.criterion_f = indep_models.criterion_f
         self.compressor, self.compressor_layers = self.Residual_Compressor(self.params)
@@ -346,6 +363,18 @@ class SindyNetCompEnsemble(nn.Module):
         return x
 
 
+    def split(self, x_stack):
+        N, m = x_stack.shape
+        n = self.params['n_encoders']
+        l =  m // n
+        x_stack = x_stack.reshape((N, n, m // n))
+        x_split = x_stack.permute(1,0,2)
+
+        #x_split = [x_stack[:, i*l: (i+1)*l] for i in range(n)]
+        #x_split = x_stack.reshape((n, N, m // n))
+        return x_split
+
+
     def sindy_predict(self, z):
         Theta = self.Theta(z)
         return torch.matmul(Theta, self.coefficient_mask * self.sindy_coeffs)
@@ -376,6 +405,16 @@ class SindyNetCompEnsemble(nn.Module):
         return dz_comp
 
 
+    def stacked_dx_decode(self, x, dx):
+        decoder_weights, decoder_biases = self.get_encode_weights(self.params['stacked_decoder_layers'])
+        encoder_weights, encoder_biases =  self.get_encode_weights(self.params['stacked_encoder_layers'])
+        weights = encoder_weights + decoder_weights
+        biases = encoder_biases + decoder_biases
+        activation = self.params['activation']
+        stacked_dx_decode = z_derivative(x, dx, weights, biases, activation).T
+        return stacked_dx_decode
+
+
     def dx_decode(self, z, dz):
         decoder_weights, decoder_biases = self.get_encode_weights(self.params['stacked_decoder_layers'])
         decompressor_weights, decompressor_biases = self.get_comp_weights(self.decompressor_layers)
@@ -395,11 +434,13 @@ class SindyNetCompEnsemble(nn.Module):
         return loss
 
 
-    def dx_loss(self, z, dx):
+    def dx_loss(self, z, x, dx):
         dz_pred = self.sindy_predict(z)
         dx_pred = self.dx_decode(z, dz_pred)
+        stacked_dx_pred = self.stacked_dx_decode(x, dx)
+
         criterion = nn.MSELoss()
-        loss = self.params['loss_weight_sindy_x'] * criterion(dx, dx_pred)
+        loss = self.params['loss_weight_sindy_x'] * (criterion(dx, dx_pred) + criterion(stacked_dx_pred, dx_pred))
         return loss, dx_pred
 
 
@@ -413,22 +454,33 @@ class SindyNetCompEnsemble(nn.Module):
         return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(self.sindy_coeffs))
 
 
-    def corr_loss(self, z, z_comp):
-        z_mean = torch.mean(z, dim = 0)
-        z_comp_mean = torch.mean(z_comp, dim = 0)
-        numerator = torch.diag((z - z_mean).T @ (z_comp - z_comp_mean))
-        denominator = torch.diag(torch.sqrt(((z - z_mean)**2).T @ (((z_comp - z_comp_mean))**2)))
-        correlations = numerator/denominator
-        return -self.params['loss_weight_corr'] * torch.mean(correlations**2)
+    def corr_loss(self, Z, z_comp, print_stuff = False):
+        correlations = []
+        z_split = self.split(Z)
+        z_comp_mean = torch.mean(z_comp, dim=0)
+        z_comp_centered = z_comp - z_comp_mean
+
+        c = torch.trace(z_comp_centered.T  @ z_comp_centered)
+        for z in z_split:
+            z_mean = torch.mean(z, dim = 0)
+            z_centered = z - z_mean
+
+            a = torch.trace(z_centered.T @ z_comp_centered)
+            b = torch.trace(z_centered.T @ z_centered)
+            correlations.append(a/((b * c)**(1/2)))
+
+        mean_square_corr =  torch.mean(torch.tensor(correlations, device = self.device)**2)
+        return -self.params['loss_weight_corr'] * mean_square_corr
 
     def Loss(self, x, dx):
         x_stack = self.expand(x)
         dx_stack = self.expand(dx)
 
         x_encode, x_comp, x_decomp, x_decomp_decode, x_decode = self.forward(x_stack)
-        decoder_loss = self.decode_loss(x_decomp_decode, x_stack)
+        #decoder_loss = self.decode_loss(x_decomp_decode, x_stack)
+        decoder_loss = self.decode_loss(x_decomp_decode, x_decode) + self.decode_loss(x_decomp_decode, x_stack)
         sindy_z_loss =  self.dz_loss(x_stack, dx_stack, x_comp)
-        sindy_x_loss, dx_pred = self.dx_loss(x_comp, dx_stack)
+        sindy_x_loss, dx_pred = self.dx_loss(x_comp, x_stack, dx_stack)
         reg_loss = self.reg_loss()
         corr_loss = self.corr_loss(x_encode, x_comp)
 
@@ -444,10 +496,6 @@ class SindyNetCompEnsemble(nn.Module):
 
             print(f'TEST: Epoch {self.epoch},  EDecoder: {format(agr_decoder_loss)}, '
                   f'EDecomp {format(agr_decomp_loss)}, ESindy_x: {format(agr_dx_loss)} ')
+
+
         return loss, loss_dict
-
-
-
-
-
-#0.00139449, Sindy_x: 0.000346457
