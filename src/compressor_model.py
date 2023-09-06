@@ -148,6 +148,7 @@ class SindyNetCompEnsemble(nn.Module):
         self.params['indep_models'] = indep_models
         self.params['loss_weight_sindy_z'] = 0
         self.params['loss_weight_corr'] = 1000
+        self.params['indep_models'] = indep_models
         self.activation_f = indep_models.activation_f
         self.criterion_f = indep_models.criterion_f
         self.compressor, self.compressor_layers = self.Residual_Compressor(self.params)
@@ -375,9 +376,13 @@ class SindyNetCompEnsemble(nn.Module):
         return x_split
 
 
-    def sindy_predict(self, z):
+    def sindy_predict(self, z, coeffs = [], mask = []):
         Theta = self.Theta(z)
-        return torch.matmul(Theta, self.coefficient_mask * self.sindy_coeffs)
+        if not len(mask):
+            mask = self.coefficient_mask
+        if not len(coeffs):
+            coeffs = self.sindy_coeffs
+        return torch.matmul(Theta, mask * coeffs)
 
 
     def forward(self, x_stack):
@@ -405,13 +410,18 @@ class SindyNetCompEnsemble(nn.Module):
         return dz_comp
 
 
-    def stacked_dx_decode(self, x, dx):
+    def stacked_dx_decode(self, x_encode, dx_stack):
         decoder_weights, decoder_biases = self.get_encode_weights(self.params['stacked_decoder_layers'])
-        encoder_weights, encoder_biases =  self.get_encode_weights(self.params['stacked_encoder_layers'])
-        weights = encoder_weights + decoder_weights
-        biases = encoder_biases + decoder_biases
+        indep_masks = self.params['indep_models'].coefficient_masks
+        indep_coeffs = self.params['indep_models'].Sindy_coeffs
+
+        x_split = self.split(x_encode)
+        z_preds = [self.sindy_predict(x, coeff, mask) for (x,coeff, mask) in zip(x_split, indep_coeffs, indep_masks)]
+        z_pred_stack = torch.concat(z_preds , dim = 1)
+
         activation = self.params['activation']
-        stacked_dx_decode = z_derivative(x, dx, weights, biases, activation).T
+        stacked_dx_decode = z_derivative(x_encode, z_pred_stack , decoder_weights,
+                                         decoder_biases, activation=activation).T
         return stacked_dx_decode
 
 
@@ -434,14 +444,14 @@ class SindyNetCompEnsemble(nn.Module):
         return loss
 
 
-    def dx_loss(self, z, x, dx):
+    def dx_loss(self, z, x_encode, dx):
         dz_pred = self.sindy_predict(z)
         dx_pred = self.dx_decode(z, dz_pred)
-        stacked_dx_pred = self.stacked_dx_decode(x, dx)
+        stacked_dx_pred = self.stacked_dx_decode(x_encode, dx)
 
         criterion = nn.MSELoss()
         loss = self.params['loss_weight_sindy_x'] * (criterion(dx, dx_pred) + criterion(stacked_dx_pred, dx_pred))
-        return loss, dx_pred
+        return loss, dx_pred, stacked_dx_pred
 
 
     def decode_loss(self, x, x_pred):
@@ -454,7 +464,7 @@ class SindyNetCompEnsemble(nn.Module):
         return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(self.sindy_coeffs))
 
 
-    def corr_loss(self, Z, z_comp, print_stuff = False):
+    def corr_loss(self, Z, z_comp):
         correlations = []
         z_split = self.split(Z)
         z_comp_mean = torch.mean(z_comp, dim=0)
@@ -472,6 +482,7 @@ class SindyNetCompEnsemble(nn.Module):
         mean_square_corr =  torch.mean(torch.tensor(correlations, device = self.device)**2)
         return -self.params['loss_weight_corr'] * mean_square_corr
 
+
     def Loss(self, x, dx):
         x_stack = self.expand(x)
         dx_stack = self.expand(dx)
@@ -480,7 +491,7 @@ class SindyNetCompEnsemble(nn.Module):
         #decoder_loss = self.decode_loss(x_decomp_decode, x_stack)
         decoder_loss = self.decode_loss(x_decomp_decode, x_decode) + self.decode_loss(x_decomp_decode, x_stack)
         sindy_z_loss =  self.dz_loss(x_stack, dx_stack, x_comp)
-        sindy_x_loss, dx_pred = self.dx_loss(x_comp, x_stack, dx_stack)
+        sindy_x_loss, dx_pred, stacked_dx_pred = self.dx_loss(x_comp, x_encode, dx_stack)
         reg_loss = self.reg_loss()
         corr_loss = self.corr_loss(x_encode, x_comp)
 
@@ -491,11 +502,14 @@ class SindyNetCompEnsemble(nn.Module):
             criterion = nn.MSELoss()
             agr_decoder_loss = float(self.decode_loss(self.collapse(x_decode), x).detach().cpu())
             agr_decomp_loss = float(self.decode_loss(self.collapse(x_decomp_decode), x).detach().cpu())
-            agr_dx_loss = float(criterion(self.collapse(dx_pred), dx).detach().cpu())\
+            agr_dx_decomp_loss = float(criterion(self.collapse(dx_pred), dx).detach().cpu())\
                           * self.params['loss_weight_sindy_x']
+            agr_dx_decode_loss = float(criterion(self.collapse(stacked_dx_pred), dx).detach().cpu()) \
+                                 * self.params['loss_weight_sindy_x']
 
-            print(f'TEST: Epoch {self.epoch},  EDecoder: {format(agr_decoder_loss)}, '
-                  f'EDecomp {format(agr_decomp_loss)}, ESindy_x: {format(agr_dx_loss)} ')
+            print(f'TEST: Epoch {self.epoch}, E_Decoder: {format(agr_decoder_loss)}, '
+                  f'Ecomp_Decoder {format(agr_decomp_loss)}, E_Sindy_x: {format(agr_dx_decode_loss)} '
+                  f'Ecomp_Sindy_x: {format(agr_dx_decomp_loss)} ')
 
 
         return loss, loss_dict
