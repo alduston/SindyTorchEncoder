@@ -306,14 +306,14 @@ def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0
     except OSError:
         pass
 
-    #params, training_data, validation_data = get_lorenz_params(train_size=40, test_size=20)
-    #params_update = {'replacement': True, 'coefficient_initialization': 'xavier', 'pretrain_epochs': 200,
-                     #'n_encoders': 20, 'n_decoders': 20, 'criterion': 'avg', 's1_epochs':10000,
+    #params, training_data, validation_data = get_lorenz_params(train_size=4, test_size=2)
+    #params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
+                     #'n_encoders': 5, 'n_decoders': 5, 'criterion': 'avg', 's1_epochs':5000,
                      #'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
 
-    params, training_data, validation_data = get_lorenz_params(train_size=40, test_size=20)
+    params, training_data, validation_data = get_lorenz_params(train_size=50, test_size=20)
     params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                     'n_encoders': 20, 'n_decoders': 20, 'criterion': 'avg', 's1_epochs': 10000,
+                     'n_encoders': 25, 'n_decoders': 25, 'criterion': 'avg', 's1_epochs': 10000,
                       'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
@@ -323,8 +323,8 @@ def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0
 
 
 def run():
-    #basic_test(model_save_name = 'small_model')
-    indep_model, bag_loader, test_loader = load_model('small_model')
+    basic_test(model_save_name = 'model1')
+    indep_model, bag_loader, test_loader = load_model('model1')
     indep_model.params['coefficient_initialization'] = 'constant'
     compressor_model = SindyNetCompEnsemble(indep_model)
     model_params = compressor_model.params
@@ -335,4 +335,4 @@ def run():
 if __name__=='__main__':
     run()
 
-#TEST: Epoch: 2900, Decoder: 0.000283266, Sindy_x: 0.000432139, Sindy_z: 0.000614181, Reg: 6.774e-06, Active_coeffs: 38
+#TEST: Epoch: 4900, Decoder: 0.000459012, Sindy_x: 0.002040497, Sindy_z: 0.000686536, Reg: 6.327e-06, Active_coeffs: 31

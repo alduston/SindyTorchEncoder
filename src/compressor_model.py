@@ -147,7 +147,7 @@ class SindyNetCompEnsemble(nn.Module):
         self.params = params
         self.params['indep_models'] = indep_models
         self.params['loss_weight_sindy_z'] = 0
-        self.params['loss_weight_corr'] = 1000
+        self.params['loss_weight_corr'] = 1e-2
         self.params['indep_models'] = indep_models
         self.activation_f = indep_models.activation_f
         self.criterion_f = indep_models.criterion_f
@@ -356,11 +356,14 @@ class SindyNetCompEnsemble(nn.Module):
         return x_stack
 
 
-    def collapse(self,x_stack):
+    def collapse(self,x_stack, agr_key = 'mean'):
         N,m = x_stack.shape
         n = self.params['n_encoders']
         x_stack = x_stack.reshape((N,n,m//n))
-        x = torch.mean(x_stack, dim = 1)
+        if agr_key == 'mean':
+            x = torch.mean(x_stack, dim = 1)
+        elif agr_key == 'median':
+            x = torch.median(x_stack, dim=1)[0]
         return x
 
 
@@ -488,22 +491,23 @@ class SindyNetCompEnsemble(nn.Module):
 
         x_encode, x_comp, x_decomp, x_decomp_decode, x_decode = self.forward(x_stack)
         #decoder_loss = self.decode_loss(x_decomp_decode, x_stack)
-        decoder_loss = self.decode_loss(x_decomp_decode, x_decode) + self.decode_loss(x_decomp_decode, x_stack)
+        decoder_loss = self.decode_loss(x_decomp_decode, x_decode)
+        edecoder_loss = self.decode_loss(x_decomp_decode, x_stack)
         sindy_z_loss =  self.dz_loss(x_stack, dx_stack, x_comp)
         sindy_x_loss, esindy_x_loss , dx_pred, stacked_dx_pred = self.dx_loss(x_comp, x_encode, dx_stack)
         reg_loss = self.reg_loss()
         corr_loss = self.corr_loss(x_encode, x_comp)
 
-        loss = decoder_loss + sindy_x_loss + sindy_z_loss + reg_loss + corr_loss + esindy_x_loss
+        loss = decoder_loss + sindy_x_loss + sindy_z_loss + reg_loss + corr_loss + esindy_x_loss + edecoder_loss
         loss_dict = {'decoder': decoder_loss , 'sindy_x': sindy_x_loss , 'sindy_z': corr_loss, 'reg': reg_loss}
 
         if self.params['eval']:
             criterion = nn.MSELoss()
-            agr_decoder_loss = float(self.decode_loss(self.collapse(x_decode), x).detach().cpu())
-            agr_decomp_loss = float(self.decode_loss(self.collapse(x_decomp_decode), x).detach().cpu())
-            agr_dx_decomp_loss = float(criterion(self.collapse(dx_pred), dx).detach().cpu())\
+            agr_decoder_loss = float(self.decode_loss(self.collapse(x_decode, agr_key='median'), x).detach().cpu())
+            agr_decomp_loss = float(self.decode_loss(self.collapse(x_decomp_decode, agr_key='median'), x).detach().cpu())
+            agr_dx_decomp_loss = float(criterion(self.collapse(dx_pred, agr_key='median'), dx).detach().cpu())\
                           * self.params['loss_weight_sindy_x']
-            agr_dx_decode_loss = float(criterion(self.collapse(stacked_dx_pred), dx).detach().cpu()) \
+            agr_dx_decode_loss = float(criterion(self.collapse(stacked_dx_pred,agr_key='median'), dx).detach().cpu()) \
                                  * self.params['loss_weight_sindy_x']
 
             print(f'TEST: Epoch {self.epoch}, E_Decoder: {format(agr_decoder_loss)}, '

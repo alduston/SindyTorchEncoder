@@ -436,7 +436,6 @@ class SindyNetEnsemble(nn.Module):
         return True
 
 
-
     def error_plot(self, x, dx):
         x_errors = [0.0]
         y_errors = [0.0]
@@ -472,9 +471,18 @@ class SindyNetEnsemble(nn.Module):
 
             dz_predict = self.sub_sindy_predict(z, coeffs, mask)
             dx_decodes.append(self.sub_dx_decode(z, dz_predict, encode_idx))
-        agr_dx_decode = self.aggregate(dx_decodes)
+        agr_dx_decode = self.aggregate(dx_decodes, agr_key='median')
         criterion = nn.MSELoss()
         return self.params['loss_weight_sindy_x'] * criterion(agr_dx_decode.T, dx)
+
+    def agr_decode_loss(self, x):
+        x_decodes = []
+        for encode_idx in range(self.params['n_encoders']):
+            z,x_decode =  self.sub_forward_s1(x, encode_idx, encode_idx)
+            x_decodes.append(x_decode)
+        agr_x_decode = self.aggregate(x_decodes, agr_key='median')
+        criterion = nn.MSELoss()
+        return self.params['loss_weight_decoder'] * criterion(agr_x_decode, x)
 
 
     def s1_Loss(self, x, dx):
@@ -492,6 +500,7 @@ class SindyNetEnsemble(nn.Module):
                 self.update_item_losses(loss_dict, encode_idx, decode_idx)
         loss_dict = dict_mean(loss_dicts)
         loss_dict['sindy_z'] = self.agr_dx_loss(x, dx)
+        loss_dict['decoder'] = self.agr_decode_loss(x)
         loss = torch.mean(torch.stack(losses))
         return loss, loss_dict
 
