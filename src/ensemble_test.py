@@ -6,7 +6,7 @@ sys.path.append("../examples/lorenz")
 import pandas as pd
 import numpy as np
 import torch
-from ensemble_training import train_eas, train_eas_1, train_eas_2, train_step2
+from ensemble_training import train_eas,train_step2
 import warnings
 from data_utils import get_lorenz_params
 import matplotlib.pyplot as plt
@@ -39,12 +39,6 @@ def ea_s1_test(model_params, training_data, validation_data, run  = 0):
     model_params['test_freq'] = model_params['test_freq']
     net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data, two_stage=False)
     return net, Loss_dict, bag_loader, test_loader
-
-
-def ea_s2_test(model, bag_loader, test_loader):
-    params = model.params
-    net, Loss_dict, bag_loader, test_loader  = train_eas_2(model, bag_loader, test_loader, params)
-    return net, Loss_dict
 
 
 def ea_test(model_params, training_data, validation_data, run  = 0):
@@ -314,7 +308,7 @@ def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0
 
     params, training_data, validation_data = get_lorenz_params(train_size=40, test_size=20)
     params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                     'n_encoders': 20, 'n_decoders': 20, 'criterion': 'avg', 's1_epochs':8000,
+                     'n_encoders': 20, 'n_decoders': 20, 'criterion': 'avg', 's1_epochs':10000,
                      'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
@@ -324,11 +318,11 @@ def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0
 
 
 def run():
-    basic_test(model_save_name = 'model0')
-    indep_model, bag_loader, test_loader = load_model('model0')
+    basic_test(model_save_name = 'small_model')
+    indep_model, bag_loader, test_loader = load_model('small_model')
     compressor_model = SindyNetCompEnsemble(indep_model)
     model_params = compressor_model.params
-    model_params['s2_epochs'] = 7000
+    model_params['s2_epochs'] =15000
     train_step2(compressor_model, bag_loader, test_loader, compressor_model.params)
 
 

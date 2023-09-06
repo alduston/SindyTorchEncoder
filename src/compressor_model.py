@@ -132,11 +132,11 @@ class SindyNetCompEnsemble(nn.Module):
         self.params['indep_models'] = indep_models
         self.params['loss_weight_sindy_z'] = 0
         self.activation_f = indep_models.activation_f
+        self.criterion_f = indep_models.criterion_f
         self.compressor, self.compressor_layers = self.Residual_Compressor(self.params)
         self.decompressor, self.decompressor_layers = self.Residual_Decompressor(self.params)
         self.decoder, self.decoder_layers = indep_models.Decoder(params)
-        #self.params['stacked_encoder'],self.params['stacked_encoder_layers'] = self.Stacked_encoder(self.params)
-        self.stacked_encoder, self.stacked_encoder_layers = self.Stacked_encoder(self.params)
+        self.params['stacked_encoder'],self.params['stacked_encoder_layers'] = self.Stacked_encoder(self.params)
         self.params['stacked_decoder'], self.params['stacked_decoder_layers'] = self.Stacked_decoder(self.params)
 
         self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad=True)
@@ -187,8 +187,6 @@ class SindyNetCompEnsemble(nn.Module):
                 layer_shapes.append(layer.weight.shape)
             except AttributeError:
                 pass
-        #print(['Stacked encoder: '] + layer_shapes)
-
         return Stacked_encoder, layers
 
 
@@ -239,7 +237,7 @@ class SindyNetCompEnsemble(nn.Module):
 
 
     def Residual_Compressor(self, params):
-        activation_function = self.activation_f #self.get_activation_f(params)
+        activation_function = self.activation_f
         init_dim = deepcopy(params['latent_dim'] * params['n_encoders'])
         input_dim = params['latent_dim'] * params['n_encoders']
         latent_dim = params['latent_dim']
@@ -280,6 +278,11 @@ class SindyNetCompEnsemble(nn.Module):
         Decompressor = nn.Sequential(*layers)
 
         return Decompressor, layers
+
+
+    def num_active_coeffs(self):
+        return torch.sum(self.coefficient_mask)
+
 
     def get_comp_weights(self, layers):
         weights = []
@@ -349,7 +352,7 @@ class SindyNetCompEnsemble(nn.Module):
 
 
     def forward(self, x_stack):
-        stacked_encoder =  self.stacked_encoder #self.params['stacked_encoder']
+        stacked_encoder =  self.params['stacked_encoder']
         stacked_decoder = self.params['stacked_decoder']
 
         x_encode = stacked_encoder(x_stack)
@@ -363,12 +366,10 @@ class SindyNetCompEnsemble(nn.Module):
 
 
     def dz_comp(self, x, dx):
-        #encoder_weights, encoder_biases =  self.get_encode_weights(self.params['stacked_encoder_layers'])
-        encoder_weights, encoder_biases = self.get_encode_weights(self.stacked_encoder_layers)
+        encoder_weights, encoder_biases =  self.get_encode_weights(self.params['stacked_encoder_layers'])
         compressor_weights, compressor_biases = self.get_comp_weights(self.compressor_layers)
         activation = self.params['activation']
-        #z = self.params['stacked_encoder'](x)
-        z = self.stacked_encoder(x)
+        z = self.params['stacked_encoder'](x)
 
         dz = z_derivative(x, dx, encoder_weights, encoder_biases, activation).T
         dz_comp = residual_z_derivative(z, dz, compressor_weights, compressor_biases, activation).T

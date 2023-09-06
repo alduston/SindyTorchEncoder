@@ -5,6 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/original_model/SindyAutoencoders/examples/lorenz" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/examples" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/data/models" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.7 (SindyTorch)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
