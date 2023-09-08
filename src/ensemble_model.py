@@ -6,6 +6,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+def format(n, n_digits = 6):
+    try:
+        n = float(n)
+        if n > 1e-4:
+            return round(n,n_digits)
+        a = '%E' % n
+        str =  a.split('E')[0].rstrip('0').rstrip('.') + 'E' + a.split('E')[1]
+        scale = str[-5:]
+        digits = str[:-5]
+        return digits[:min(len(digits),n_digits)] + scale
+    except IndexError:
+        return float(n)
+
+
 def dict_mean(dicts):
     mean_dict = {key: torch.mean(torch.stack([sub_dict[key] for sub_dict in dicts])) for key in dicts[0].keys()}
     return mean_dict
@@ -498,9 +512,14 @@ class SindyNetEnsemble(nn.Module):
             loss_dicts.append(loss_dict)
             if self.params['cp_batch']:
                 self.update_item_losses(loss_dict, encode_idx, decode_idx)
+
+        if self.params['cp_batch']:
+            agr_decoder_loss = self.agr_decode_loss(x).detach().cpu()
+            agr_x_loss = self.agr_dx_loss(x, dx).detach().cpu()
+            print(f'TEST: Epoch {self.epoch}, Indep_E_Decoder: {format(agr_decoder_loss)}'
+                  f', Indep_E_Sindy_x: {format(agr_x_loss)}')
+
         loss_dict = dict_mean(loss_dicts)
-        loss_dict['sindy_z'] = self.agr_dx_loss(x, dx)
-        loss_dict['decoder'] = self.agr_decode_loss(x)
         loss = torch.mean(torch.stack(losses))
         return loss, loss_dict
 

@@ -478,37 +478,27 @@ class SindyNetTCompEnsemble(nn.Module):
                                          decoder_biases, activation=activation).T
         return stacked_dx_decode
 
-    def val_test(self, x, dx, x_stack, x_translate_stack, x_decomp_decode_stack, dx_pred_stack):
-
+    def val_test(self, x, dx, x_translate_stack, x_decomp_decode_stack, dx_pred_stack, agr_key = 'mean'):
         criterion = nn.MSELoss()
-        x_encode = self.params['stacked_encoder'](x_stack)
-        x_decode = self.params['stacked_decoder'](x_encode)
 
-        agr_x_translate = self.collapse(x_translate_stack, agr_key='median')
+        agr_x_translate = self.collapse(x_translate_stack, agr_key=agr_key)
         agr_x_decomp_decode = self.params['stacked_decoder'](self.decompressor(agr_x_translate))
 
-        stacked_dx_pred = self.stacked_dx_decode(x_encode)
         agr_dz_pred = self.sindy_predict(agr_x_translate)
         agr_dx_pred = self.dx_decode(agr_x_translate, agr_dz_pred)
 
-        agr_decoder_loss = float(self.decode_loss(
-            self.collapse(x_decode, agr_key='median'), x).detach().cpu())
         agr_decomp_loss = float(self.decode_loss(
-            self.collapse(x_decomp_decode_stack, agr_key='median', double=True), x).detach().cpu())
+            self.collapse(x_decomp_decode_stack, agr_key=agr_key, double=True), x).detach().cpu())
         agr_decomp_loss2 = float(self.decode_loss(
-            self.collapse(agr_x_decomp_decode, agr_key='median'), x).detach().cpu())
+            self.collapse(agr_x_decomp_decode, agr_key=agr_key), x).detach().cpu())
 
         agr_dx_decomp_loss = criterion(self.collapse(
-            dx_pred_stack, agr_key='median', double=True), dx).detach().cpu() * self.params['loss_weight_sindy_x']
-        agr_dx_decode_loss = criterion(self.collapse(
-            stacked_dx_pred, agr_key='median'), dx).detach().cpu() * self.params['loss_weight_sindy_x']
+            dx_pred_stack, agr_key=agr_key, double=True), dx).detach().cpu() * self.params['loss_weight_sindy_x']
         agr_dx_decode_loss2 = criterion(self.collapse(
-            agr_dx_pred, agr_key='median'), dx).detach().cpu() * self.params['loss_weight_sindy_x']
+            agr_dx_pred, agr_key=agr_key), dx).detach().cpu() * self.params['loss_weight_sindy_x']
 
-        print(
-            f'TEST: Epoch {self.epoch}, E_Decoder: {format(agr_decoder_loss)}, E_Sindy_x: {format(agr_dx_decode_loss)}'
-            f'Ecomp_Decoder: {format(agr_decomp_loss)}, Ecomp_Sindy_x: {format(agr_dx_decomp_loss)}'
-            f'Ecompagr_Decoder: {format(agr_decomp_loss2)}, Ecompagr_Sindy_x: {format(agr_dx_decode_loss2)}')
+        print(f'TEST: Epoch: {self.epoch}, E_Decoder: {format(agr_decomp_loss)}, E_Sindy_x: {format(agr_dx_decomp_loss)}'
+              f' E_agr_Decoder: {format(agr_decomp_loss2)}, E_agr_Sindy_x: {format(agr_dx_decode_loss2)}')
 
     def Loss(self, x, dx):
         x_decomp_decode_stack, x_translate_stack = self.stack_forward(x)
@@ -528,7 +518,7 @@ class SindyNetTCompEnsemble(nn.Module):
         loss_dict = {'decoder': decoder_loss, 'sindy_x': sindy_x_loss, 'sindy_z': corr_loss, 'reg': reg_loss}
 
         if self.params['eval']:
-            self.val_test(x, dx, x_stack, x_translate_stack, x_decomp_decode_stack, dx_pred_stack)
+            self.val_test(x, dx, x_translate_stack, x_decomp_decode_stack, dx_pred_stack)
         return loss, loss_dict
 
 

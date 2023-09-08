@@ -6,7 +6,7 @@ sys.path.append("../examples/lorenz")
 import pandas as pd
 import numpy as np
 import torch
-from ensemble_training import train_eas,train_step2
+from ensemble_training import train_eas,train_step2, train_eas_1
 import warnings
 from data_utils import get_lorenz_params
 import matplotlib.pyplot as plt
@@ -308,14 +308,14 @@ def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0
         pass
 
     params, training_data, validation_data = get_lorenz_params(train_size=10, test_size=5)
-    params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                     'n_encoders': 5, 'n_decoders': 5, 'criterion': 'avg', 's1_epochs':5000,
-                     'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
-
-    #params, training_data, validation_data = get_lorenz_params(train_size=30, test_size=15)
     #params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                     #'n_encoders': 10, 'n_decoders': 10, 'criterion': 'avg', 's1_epochs': 5000,
-                      #'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
+                     #'n_encoders': 5, 'n_decoders': 5, 'criterion': 'avg', 's1_epochs':5000,
+                     #'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
+
+    params, training_data, validation_data = get_lorenz_params(train_size=30, test_size=15)
+    params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
+                     'n_encoders': 10, 'n_decoders': 10, 'criterion': 'avg', 's1_epochs': 10000,
+                      'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
     model1, Loss_dict, bag_loader, test_loader = ea_s1_test(params, training_data, validation_data)
@@ -324,12 +324,15 @@ def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0
 
 
 def run():
-   #basic_test(model_save_name = 'small_model')
-    indep_model, bag_loader, test_loader = load_model('small_model')
+    indep_model, bag_loader, test_loader = load_model('model0')
+    train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 10})
+    indep_model, bag_loader, test_loader = load_model('model0')
+    print(' ')
+
     indep_model.params['coefficient_initialization'] = 'constant'
     compressor_model = SindyNetTCompEnsemble(indep_model)
     model_params = compressor_model.params
-    model_params['s2_epochs'] = 10000
+    model_params['s2_epochs'] = 15000
     train_step2(compressor_model, bag_loader, test_loader, compressor_model.params)
 
 

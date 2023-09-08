@@ -480,9 +480,9 @@ class SindyNetCompEnsemble(nn.Module):
         if self.params['eval']:
             criterion = nn.MSELoss()
             stacked_dx_pred = self.stacked_dx_decode(x_encode, dx_stack)
-            agr_decoder_loss = float(self.decode_loss(self.collapse(x_decode, agr_key='median'), x).detach().cpu())
-            agr_decomp_loss = float(self.decode_loss(self.collapse(x_decomp_decode, agr_key='median'), x).detach().cpu())
-            agr_dx_decomp_loss = float(criterion(self.collapse(dx_pred, agr_key='median'), dx).detach().cpu())\
+            agr_decoder_loss = float(self.decode_loss(self.collapse(x_decode, agr_key='mean'), x).detach().cpu())
+            agr_decomp_loss = float(self.decode_loss(self.collapse(x_decomp_decode, agr_key='mean'), x).detach().cpu())
+            agr_dx_decomp_loss = float(criterion(self.collapse(dx_pred, agr_key='mean'), dx).detach().cpu())\
                           * self.params['loss_weight_sindy_x']
             agr_dx_decode_loss = float(criterion(self.collapse(stacked_dx_pred,agr_key='mean'), dx).detach().cpu()) \
                                  * self.params['loss_weight_sindy_x']

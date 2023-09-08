@@ -193,6 +193,7 @@ def train_step2(net, bag_loader, test_loader, model_params):
         if  (not epoch % test_freq):
             net, Loss_dict = validate_epoch(net, test_loader, Loss_dict)
             print(f'{str_list_sum(["TEST: "] + [print_keyval(key, val) for key, val in Loss_dict.items()])}')
+            print(' ')
         train_epoch(net, bag_loader, optimizer)
         if epoch > pretrain_epocs and not (epoch % cross_val_freq):
             net = cross_val(net)
@@ -202,7 +203,8 @@ def train_step2(net, bag_loader, test_loader, model_params):
 
 
 
-def train_eas(model_params, train_params, training_data, validation_data, two_stage = True):
+
+def train_eas(model_params, train_params, training_data, validation_data):
     if torch.cuda.is_available():
         device = 'cuda:0'
     else:
@@ -214,8 +216,5 @@ def train_eas(model_params, train_params, training_data, validation_data, two_st
 
     net = SindyNetEnsemble(model_params).to(device)
     net, Loss_dict = train_eas_1(net, bag_loader, test_loader, model_params)[:2]
-    if two_stage:
-        net, Loss_dict2 = train_eas_2(net, bag_loader, test_loader, model_params)[:2]
-        return net, Loss_dict, Loss_dict2, bag_loader, test_loader
     return net, Loss_dict, bag_loader, test_loader
 
