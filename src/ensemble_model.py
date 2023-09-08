@@ -471,7 +471,7 @@ class SindyNetEnsemble(nn.Module):
 
             dz_predict = self.sub_sindy_predict(z, coeffs, mask)
             dx_decodes.append(self.sub_dx_decode(z, dz_predict, encode_idx))
-        agr_dx_decode = self.aggregate(dx_decodes, agr_key='median')
+        agr_dx_decode = self.aggregate(dx_decodes, agr_key='mean')
         criterion = nn.MSELoss()
         return self.params['loss_weight_sindy_x'] * criterion(agr_dx_decode.T, dx)
 
@@ -480,7 +480,7 @@ class SindyNetEnsemble(nn.Module):
         for encode_idx in range(self.params['n_encoders']):
             z,x_decode =  self.sub_forward_s1(x, encode_idx, encode_idx)
             x_decodes.append(x_decode)
-        agr_x_decode = self.aggregate(x_decodes, agr_key='median')
+        agr_x_decode = self.aggregate(x_decodes, agr_key='mean')
         criterion = nn.MSELoss()
         return self.params['loss_weight_decoder'] * criterion(agr_x_decode, x)
 

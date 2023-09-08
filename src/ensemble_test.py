@@ -12,6 +12,7 @@ from data_utils import get_lorenz_params
 import matplotlib.pyplot as plt
 from copy import deepcopy
 from compressor_model import SindyNetCompEnsemble
+from translator_model import SindyNetTCompEnsemble
 import dill
 import pickle
 
@@ -306,15 +307,15 @@ def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0
     except OSError:
         pass
 
-    #params, training_data, validation_data = get_lorenz_params(train_size=4, test_size=2)
-    #params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                     #'n_encoders': 5, 'n_decoders': 5, 'criterion': 'avg', 's1_epochs':5000,
-                     #'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
-
-    params, training_data, validation_data = get_lorenz_params(train_size=50, test_size=20)
+    params, training_data, validation_data = get_lorenz_params(train_size=10, test_size=5)
     params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                     'n_encoders': 25, 'n_decoders': 25, 'criterion': 'avg', 's1_epochs': 10000,
-                      'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
+                     'n_encoders': 5, 'n_decoders': 5, 'criterion': 'avg', 's1_epochs':5000,
+                     'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
+
+    #params, training_data, validation_data = get_lorenz_params(train_size=30, test_size=15)
+    #params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
+                     #'n_encoders': 10, 'n_decoders': 10, 'criterion': 'avg', 's1_epochs': 5000,
+                      #'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
     model1, Loss_dict, bag_loader, test_loader = ea_s1_test(params, training_data, validation_data)
@@ -323,12 +324,12 @@ def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0
 
 
 def run():
-    basic_test(model_save_name = 'model1')
-    indep_model, bag_loader, test_loader = load_model('model1')
+    basic_test(model_save_name = 'small_model')
+    indep_model, bag_loader, test_loader = load_model('small_model')
     indep_model.params['coefficient_initialization'] = 'constant'
-    compressor_model = SindyNetCompEnsemble(indep_model)
+    compressor_model = SindyNetTCompEnsemble(indep_model)
     model_params = compressor_model.params
-    model_params['s2_epochs'] = 20000
+    model_params['s2_epochs'] = 1000
     train_step2(compressor_model, bag_loader, test_loader, compressor_model.params)
 
 
@@ -336,3 +337,5 @@ if __name__=='__main__':
     run()
 
 #TEST: Epoch: 4900, Decoder: 0.000459012, Sindy_x: 0.002040497, Sindy_z: 0.000686536, Reg: 6.327e-06, Active_coeffs: 31
+#TEST: Epoch 7300, E_Decoder: 0.000657, Ecomp_Decoder 0.00072, E_Sindy_x: 0.000686 Ecomp_Sindy_x: 0.000616
+#TEST: Epoch: 7300, Decoder: 0.000763106, Sindy_x: 0.000764128, Sindy_z: -8.706e-05, Reg: 5.935e-06, Active_coeffs: 27
