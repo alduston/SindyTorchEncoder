@@ -528,7 +528,7 @@ class SindyNetTCompEnsemble(nn.Module):
         loss_dict = {'decoder': decoder_loss, 'sindy_x': sindy_x_loss, 'sindy_z': corr_loss, 'reg': reg_loss}
 
         if self.params['eval']:
-            self.val_test()
+            self.val_test(x, dx, x_stack, x_translate_stack, x_decomp_decode_stack, dx_pred_stack)
         return loss, loss_dict
 
 

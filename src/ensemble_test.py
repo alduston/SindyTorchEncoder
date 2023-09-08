@@ -324,7 +324,7 @@ def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0
 
 
 def run():
-    basic_test(model_save_name = 'small_model')
+   #basic_test(model_save_name = 'small_model')
     indep_model, bag_loader, test_loader = load_model('small_model')
     indep_model.params['coefficient_initialization'] = 'constant'
     compressor_model = SindyNetTCompEnsemble(indep_model)
