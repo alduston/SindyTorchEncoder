@@ -329,13 +329,9 @@ def run():
     indep_model.params['coefficient_initialization'] = 'constant'
     compressor_model = SindyNetTCompEnsemble(indep_model)
     model_params = compressor_model.params
-    model_params['s2_epochs'] = 1000
+    model_params['s2_epochs'] = 10000
     train_step2(compressor_model, bag_loader, test_loader, compressor_model.params)
 
 
 if __name__=='__main__':
     run()
-
-#TEST: Epoch: 4900, Decoder: 0.000459012, Sindy_x: 0.002040497, Sindy_z: 0.000686536, Reg: 6.327e-06, Active_coeffs: 31
-#TEST: Epoch 7300, E_Decoder: 0.000657, Ecomp_Decoder 0.00072, E_Sindy_x: 0.000686 Ecomp_Sindy_x: 0.000616
-#TEST: Epoch: 7300, Decoder: 0.000763106, Sindy_x: 0.000764128, Sindy_z: -8.706e-05, Reg: 5.935e-06, Active_coeffs: 27
