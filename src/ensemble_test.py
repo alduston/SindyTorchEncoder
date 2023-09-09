@@ -317,16 +317,21 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0'):
 
 def run():
     #basic_test(model_save_name='model1')
-    indep_model, bag_loader, test_loader = load_model('model1')
+    indep_model, bag_loader, test_loader = load_model('small_model')
     train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 10})
-    indep_model, bag_loader, test_loader = load_model('model1')
+    indep_model, bag_loader, test_loader = load_model('small_model')
     print(' ')
 
     indep_model.params['coefficient_initialization'] = 'constant'
     compressor_model = SindyNetTCompEnsemble(indep_model)
     model_params = compressor_model.params
-    model_params['s2_epochs'] = 15000
+    model_params['s2_epochs'] = 15
     train_step2(compressor_model, bag_loader, test_loader, compressor_model.params)
+
+    final_coeffs = compressor_model.sindy_coeffs * compressor_model.coefficient_mask
+    final_coeffs = np.round(final_coeffs.detach().cpu().numpy(), 2)
+    print(f'Final coeffs were: \n {final_coeffs}')
+
 
 
 if __name__=='__main__':
