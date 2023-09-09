@@ -71,7 +71,7 @@ class SindyNetEnsemble(nn.Module):
         self.params = params
         self.activation_f = self.get_activation_f(params)
         self.params['activation_f'] =  self.activation_f
-        self.criterion_f = self.get_criterion_f(params)
+        self.criterion_f = self.criterion_function
 
         self.Encoders, self.Decoders, self.Sindy_coeffs =  self.init_sub_components()
         self.Encode_indexes, self.Decode_indexes = self.init_ED_indexes()
@@ -244,16 +244,6 @@ class SindyNetEnsemble(nn.Module):
         elif criterion == 'avg':
             zero_threshold = self.params['zero_threshold']
             return avg_criterion(vec, zero_threshold)
-
-
-    def get_criterion_f(self, params):
-        return self.criterion_function
-
-
-    def criterion_f(self, vec):
-        zero_threshold = self.params['zero_threshold']
-        accept_threshold = self.params['accept_threshold']
-        return stability_criterion(vec, zero_threshold, accept_threshold)
 
 
     def decoder_weights(self, decoder_idx):
@@ -503,7 +493,6 @@ class SindyNetEnsemble(nn.Module):
     def val_test(self, x, dx):
         if self.refresh_val_dict:
             self.val_dict = {'E_Decoder': [],  'E_Sindy_x': []}
-        print(self.val_dict.keys())
 
         agr_decoder_loss = self.agr_decode_loss(x).detach().cpu()
         agr_dx_loss = self.agr_dx_loss(x, dx).detach().cpu()

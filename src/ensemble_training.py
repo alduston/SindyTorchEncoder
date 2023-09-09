@@ -130,7 +130,7 @@ def process_bag_coeffs(bag_coeffs, model, plot = False):
     return new_mask, agr_coeffs
 
 
-def process_coeffs(bag_coeffs, model, plot = False):
+def process_coeffs(bag_coeffs, model):
     new_mask =  np.zeros(bag_coeffs.shape)
     x,y = new_mask.shape
     coeff_criterion = model.criterion_f
@@ -168,7 +168,10 @@ def sub_crossval(model, idx):
 
 def cross_val(model):
     bag_coeffs = deepcopy(model.sindy_coeffs.detach())
-    new_mask = process_coeffs(bag_coeffs, model)
+    if len(bag_coeffs.shape) > 2:
+        new_mask = process_bag_coeffs(bag_coeffs, model)[0]
+    else:
+        new_mask = process_coeffs(bag_coeffs, model)
     model.coefficient_mask *=  new_mask
     return model
 
@@ -197,6 +200,7 @@ def print_val_losses1(net):
     print(f'TEST: Epoch: {epoch}, E_Decoder: {E_Decoder}, E_Sindy_x: {E_Sindy_x}')
     net.refresh_val_dict = True
     return True
+
 
 def train_eas_1(net, bag_loader, test_loader, model_params):
     Loss_dict = {'epoch': [], 'decoder': [], 'sindy_x': [], 'sindy_z': [], 'reg': [],

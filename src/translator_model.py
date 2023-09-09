@@ -137,7 +137,7 @@ class SindyNetTCompEnsemble(nn.Module):
         self.params['indep_models'] = indep_models
 
         self.activation_f = indep_models.activation_f
-        self.criterion_f = indep_models.criterion_f
+        self.criterion_f = self.criterion_function
 
         self.translators = self.init_translators()
         self.decompressor, self.decompressor_layers = self.Residual_Decompressor(self.params)
@@ -145,7 +145,10 @@ class SindyNetTCompEnsemble(nn.Module):
         self.params['stacked_decoder'], self.params['stacked_decoder_layers'] = self.Stacked_decoder(self.params)
         self.params['stacked_encoder'], self.params['stacked_encoder_layers'] = self.Stacked_encoder(self.params)
 
-        self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad=True)
+        self.sindy_coeffs = [self.init_sindy_coefficients() for i in range(self.params['n_encoders'])]
+        self.sindy_coeffs = torch.nn.Parameter(torch.stack(self.sindy_coeffs), requires_grad=True)
+
+        #self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad=True)
         self.coefficient_mask = torch.tensor(deepcopy(self.params['coefficient_mask']),dtype=self.dtype, device=self.device)
         self.epoch = 0
         self.refresh_val_dict = True
@@ -295,8 +298,30 @@ class SindyNetTCompEnsemble(nn.Module):
         return Decompressor, layers
 
 
+    def criterion_function(self, vec):
+        criterion = self.params['criterion']
+        if criterion == 'stability':
+            zero_threshold = self.params['zero_threshold']
+            accept_threshold = self.params['accept_threshold']
+            return stability_criterion(vec, zero_threshold, accept_threshold)
+        elif criterion == 'avg':
+            zero_threshold = self.params['zero_threshold']
+            return avg_criterion(vec, zero_threshold)
+
+
     def num_active_coeffs(self):
         return torch.sum(self.coefficient_mask)
+
+
+    def aggregate(self, tensors, agr_key='mean', agr_dim=0):
+        try:
+            tensors = torch.stack(tensors)
+        except BaseException:
+            pass
+        if agr_key == 'median':
+            return torch.median(tensors, agr_dim)[0]
+        if agr_key == 'mean':
+            return torch.mean(tensors, agr_dim)
 
 
     def get_comp_weights(self, layers):
@@ -374,12 +399,12 @@ class SindyNetTCompEnsemble(nn.Module):
         return x_split
 
 
-    def sindy_predict(self, z, coeffs = [], mask = []):
+    def sindy_predict(self, z, coeffs = [], mask = [], encode_idx = 0):
         Theta = self.Theta(z)
         if not len(mask):
             mask = self.coefficient_mask
         if not len(coeffs):
-            coeffs = self.sindy_coeffs
+            coeffs = self.sindy_coeffs[encode_idx]
         return torch.matmul(Theta, mask * coeffs)
 
 
@@ -421,8 +446,8 @@ class SindyNetTCompEnsemble(nn.Module):
 
     def stacked_dx_loss(self, x_translate_stack, dx_stack_stack):
         dx_preds = []
-        for z in self.split(x_translate_stack):
-            dz_pred = self.sindy_predict(z)
+        for encode_idx,z in enumerate(self.split(x_translate_stack)):
+            dz_pred = self.sindy_predict(z, encode_idx = encode_idx)
             dx_preds.append(self.dx_decode(z, dz_pred))
 
         dx_pred_stack = torch.concat(dx_preds, dim = 1)
@@ -489,8 +514,9 @@ class SindyNetTCompEnsemble(nn.Module):
 
         agr_x_translate = self.collapse(x_translate_stack, agr_key=agr_key)
         agr_x_decomp_decode = self.params['stacked_decoder'](self.decompressor(agr_x_translate))
+        agr_coeffs = torch.mean(self.sindy_coeffs, dim = 0)
 
-        agr_dz_pred = self.sindy_predict(agr_x_translate)
+        agr_dz_pred = self.sindy_predict(agr_x_translate, coeffs=agr_coeffs)
         agr_dx_pred = self.dx_decode(agr_x_translate, agr_dz_pred)
 
         agr_decomp_loss = float(self.decode_loss(

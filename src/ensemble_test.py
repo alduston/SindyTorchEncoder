@@ -33,7 +33,7 @@ def ea_s1_test(model_params, training_data, validation_data, run  = 0):
                     'n_encoders': model_params['n_encoders'],'n_decoders': model_params['n_decoders']}
     train_params['nbags'] = 1 #max(train_params['n_encoders'], train_params['n_decoders'])
 
-    model_params['batch_size'] = min(l, 100000)
+    model_params['batch_size'] = min(l, 50000)
     model_params['run'] = run
     model_params['test_freq'] = model_params['test_freq']
     net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data)
@@ -51,7 +51,7 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
     train_params['nbags'] = train_params['n_encoders']
 
 
-    model_params['batch_size'] = min(l, 100000)
+    model_params['batch_size'] = min(l, 50000)
     model_params['run'] = run
     model_params['test_freq'] = model_params['test_freq']
     net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data)
@@ -313,9 +313,9 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
                          'n_encoders': 4, 'n_decoders': 4, 'criterion': 'avg', 's1_epochs': 1000,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
     else:
-        params, training_data, validation_data = get_lorenz_params(train_size=100, test_size=20)
+        params, training_data, validation_data = get_lorenz_params(train_size=200, test_size=20)
         params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                         'n_encoders': 30, 'n_decoders': 30, 'criterion': 'avg', 's1_epochs': 10000,
+                         'n_encoders': 40, 'n_decoders': 40, 'criterion': 'avg', 's1_epochs': 10000,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
@@ -325,13 +325,16 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
 
 
 def run():
-    #basic_test(model_save_name='small_model', small = True)
-    indep_model, bag_loader, test_loader = load_model('model2')
+    #basic_test(model_save_name = 'small_model', small = True)
+    indep_model, bag_loader, test_loader = load_model('model3')
     train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 10})
-    indep_model, bag_loader, test_loader = load_model('model2')
+    indep_model, bag_loader, test_loader = load_model('model3')
     print(' ')
 
     indep_model.params['coefficient_initialization'] = 'constant'
+    indep_model.params['criterion'] = 'stability'
+
+
     compressor_model = SindyNetTCompEnsemble(indep_model)
     model_params = compressor_model.params
     model_params['s2_epochs'] = 10000
@@ -344,7 +347,6 @@ def run():
     true_coeffs = compressor_model.true_coeffs
     true_coeffs = np.round(true_coeffs.detach().cpu().numpy(), 2)
     print(f'True coeffs were: \n {true_coeffs}')
-
 
 
 
