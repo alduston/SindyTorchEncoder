@@ -12,6 +12,7 @@ from data_utils import get_lorenz_params
 import matplotlib.pyplot as plt
 from copy import deepcopy
 from translator_model import SindyNetTCompEnsemble
+import shutil
 
 warnings.filterwarnings("ignore")
 
@@ -32,7 +33,7 @@ def ea_s1_test(model_params, training_data, validation_data, run  = 0):
                     'n_encoders': model_params['n_encoders'],'n_decoders': model_params['n_decoders']}
     train_params['nbags'] = 1 #max(train_params['n_encoders'], train_params['n_decoders'])
 
-    model_params['batch_size'] = l
+    model_params['batch_size'] = min(l, 100000)
     model_params['run'] = run
     model_params['test_freq'] = model_params['test_freq']
     net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data)
@@ -50,7 +51,7 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
     train_params['nbags'] = train_params['n_encoders']
 
 
-    model_params['batch_size'] = l//2
+    model_params['batch_size'] = min(l, 100000)
     model_params['run'] = run
     model_params['test_freq'] = model_params['test_freq']
     net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data)
@@ -282,7 +283,9 @@ def save_model(model, bag_loader, test_loader, save_dir = 'model'):
     try:
         os.mkdir(f'../data/models/{save_dir}')
     except OSError:
-        pass
+        shutil.rmtree(f'../data/models/{save_dir}')
+        os.mkdir(f'../data/models/{save_dir}')
+
     torch.save(model, f'../data/models/{save_dir}/model.pkl')
     torch.save(bag_loader, f'../data/models/{save_dir}/bag_loader.pkl')
     torch.save(test_loader, f'../data/models/{save_dir}/test_loader.pkl')
@@ -298,16 +301,22 @@ def load_model(save_dir = 'model'):
 
 #scp -r ald6fd@klone.hyak.uw.edu:/mmfs1/gscratch/dynamicsai/ald6fd/SindyTorchEncoder/data/stuff /Users/aloisduston/Desktop/Math/Research/Kutz/SindyEnsemble/data/
 
-def basic_test(exp_label = 'exp', model_save_name = 'model0'):
+def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
     try:
         os.mkdir(f'../data/{exp_label}')
     except OSError:
         pass
 
-    params, training_data, validation_data = get_lorenz_params(train_size=100, test_size=20)
-    params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                     'n_encoders': 30, 'n_decoders': 30, 'criterion': 'avg', 's1_epochs': 10000,
-                      'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
+    if small:
+        params, training_data, validation_data = get_lorenz_params(train_size=4, test_size=2)
+        params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
+                         'n_encoders': 4, 'n_decoders': 4, 'criterion': 'avg', 's1_epochs': 1000,
+                         'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
+    else:
+        params, training_data, validation_data = get_lorenz_params(train_size=100, test_size=20)
+        params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
+                         'n_encoders': 30, 'n_decoders': 30, 'criterion': 'avg', 's1_epochs': 10000,
+                         'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
     model1, Loss_dict, bag_loader, test_loader = ea_s1_test(params, training_data, validation_data)
@@ -316,16 +325,16 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0'):
 
 
 def run():
-    #basic_test(model_save_name='model1')
-    indep_model, bag_loader, test_loader = load_model('model0')
+    #basic_test(model_save_name='small_model', small = True)
+    indep_model, bag_loader, test_loader = load_model('model2')
     train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 10})
-    indep_model, bag_loader, test_loader = load_model('model0')
+    indep_model, bag_loader, test_loader = load_model('model2')
     print(' ')
 
     indep_model.params['coefficient_initialization'] = 'constant'
     compressor_model = SindyNetTCompEnsemble(indep_model)
     model_params = compressor_model.params
-    model_params['s2_epochs'] = 12000
+    model_params['s2_epochs'] = 10000
     train_step2(compressor_model, bag_loader, test_loader, compressor_model.params)
 
     final_coeffs = compressor_model.sindy_coeffs * compressor_model.coefficient_mask
@@ -339,6 +348,6 @@ def run():
 
 
 
-
+#TEST: Epoch: 10000, E_Decoder: 5.42653E-05, E_Sindy_x: 6.50386E-05 E_agr_Decoder: 5.18338E-05, E_agr_Sindy_x: 6.61942E-05
 if __name__=='__main__':
     run()

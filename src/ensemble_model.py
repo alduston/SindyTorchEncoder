@@ -84,6 +84,7 @@ class SindyNetEnsemble(nn.Module):
         self.iter_count = torch.tensor(0, device = device)
         self.epoch = torch.tensor(0, device = device)
         self.stage = 1
+        self.refresh_val_dict = True
 
         self.exp_label = params['exp_label']
         try:
@@ -499,6 +500,18 @@ class SindyNetEnsemble(nn.Module):
         return self.params['loss_weight_decoder'] * criterion(agr_x_decode, x)
 
 
+    def val_test(self, x, dx):
+        if self.refresh_val_dict:
+            self.val_dict = {'E_Decoder': [],  'E_Sindy_x': []}
+        print(self.val_dict.keys())
+
+        agr_decoder_loss = self.agr_decode_loss(x).detach().cpu()
+        agr_dx_loss = self.agr_dx_loss(x, dx).detach().cpu()
+        self.val_dict['E_Decoder'].append(agr_decoder_loss)
+        self.val_dict['E_Sindy_x'].append(agr_dx_loss)
+        self.refresh_val_dict = False
+        return True
+
     def s1_Loss(self, x, dx):
         losses = []
         loss_dicts = []
@@ -514,10 +527,7 @@ class SindyNetEnsemble(nn.Module):
                 self.update_item_losses(loss_dict, encode_idx, decode_idx)
 
         if self.params['cp_batch']:
-            agr_decoder_loss = self.agr_decode_loss(x).detach().cpu()
-            agr_x_loss = self.agr_dx_loss(x, dx).detach().cpu()
-            print(f'TEST: Epoch {self.epoch}, Indep_E_Decoder: {format(agr_decoder_loss)}'
-                  f', Indep_E_Sindy_x: {format(agr_x_loss)}')
+            self.val_test(x, dx)
 
         loss_dict = dict_mean(loss_dicts)
         loss = torch.mean(torch.stack(losses))

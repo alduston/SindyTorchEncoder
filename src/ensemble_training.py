@@ -10,6 +10,20 @@ import os
 import pandas as pd
 
 
+def format(n, n_digits = 6):
+    try:
+        n = float(n)
+        if n > 1e-4:
+            return round(n,n_digits)
+        a = '%E' % n
+        str =  a.split('E')[0].rstrip('0').rstrip('.') + 'E' + a.split('E')[1]
+        scale = str[-5:]
+        digits = str[:-5]
+        return digits[:min(len(digits),n_digits)] + scale
+    except IndexError:
+        return float(n)
+
+
 def col_permutations(M):
     M_permutes = []
     columns = list(range(M.shape[1]))
@@ -174,6 +188,16 @@ def print_keyval(key,val_list):
     return ''
 
 
+def print_val_losses1(net):
+    val_dict = net.val_dict
+    epoch = net.epoch
+    E_Decoder = format(np.mean(np.asarray(val_dict['E_Decoder'])))
+    E_Sindy_x = format(np.mean(np.asarray(val_dict['E_Sindy_x'])))
+
+    print(f'TEST: Epoch: {epoch}, E_Decoder: {E_Decoder}, E_Sindy_x: {E_Sindy_x}')
+    net.refresh_val_dict = True
+    return True
+
 def train_eas_1(net, bag_loader, test_loader, model_params):
     Loss_dict = {'epoch': [], 'decoder': [], 'sindy_x': [], 'sindy_z': [], 'reg': [],
                  'active_coeffs': [], 'coeff': [0.0]}
@@ -187,6 +211,7 @@ def train_eas_1(net, bag_loader, test_loader, model_params):
             net.params['cp_batch'] = True
             net, Loss_dict = validate_epoch(net, test_loader, Loss_dict, true_coeffs)
             print(f'{str_list_sum(["TEST: "] + [print_keyval(key, val) for key, val in Loss_dict.items()])}')
+            print_val_losses1(net)
         train_epoch(net, bag_loader, optimizer)
         if epoch > pretrain_epocs and not (epoch % cross_val_freq):
             net = indep_crossval(net)
@@ -194,6 +219,19 @@ def train_eas_1(net, bag_loader, test_loader, model_params):
     net, Loss_dict = validate_epoch(net, test_loader, Loss_dict)
     return net, Loss_dict
 
+
+def print_val_losses2(net):
+    val_dict = net.val_dict
+    epoch = net.epoch
+    E_Decoder = format(np.mean(np.asarray(val_dict['E_Decoder'])))
+    E_Sindy_x = format(np.mean(np.asarray(val_dict['E_Sindy_x'])))
+    E_agr_Decoder = format(np.mean(np.asarray(val_dict['E_agr_Decoder'])))
+    E_agr_Sindy_x =  format(np.mean(np.asarray(val_dict['E_agr_Sindy_x'])))
+
+    print(f'TEST: Epoch: {epoch}, E_Decoder: {E_Decoder}, E_Sindy_x: {E_Sindy_x}'
+          f' E_agr_Decoder: {E_agr_Decoder}, E_agr_Sindy_x: {E_agr_Sindy_x}')
+    net.refresh_val_dict = True
+    return True
 
 
 def train_step2(net, bag_loader, test_loader, model_params):
@@ -210,7 +248,7 @@ def train_step2(net, bag_loader, test_loader, model_params):
         if  (not epoch % test_freq):
             net, Loss_dict = validate_epoch(net, test_loader, Loss_dict, true_coeffs)
             print(f'{str_list_sum(["TEST: "] + [print_keyval(key, val) for key, val in Loss_dict.items()])}')
-            print(' ')
+            print_val_losses2(net)
         train_epoch(net, bag_loader, optimizer)
         if epoch > pretrain_epocs and not (epoch % cross_val_freq):
             net = cross_val(net)

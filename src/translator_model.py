@@ -148,6 +148,7 @@ class SindyNetTCompEnsemble(nn.Module):
         self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad=True)
         self.coefficient_mask = torch.tensor(deepcopy(self.params['coefficient_mask']),dtype=self.dtype, device=self.device)
         self.epoch = 0
+        self.refresh_val_dict = True
 
 
     def Stacked_encoder(self, params):
@@ -481,6 +482,9 @@ class SindyNetTCompEnsemble(nn.Module):
         return stacked_dx_decode
 
     def val_test(self, x, dx, x_translate_stack, x_decomp_decode_stack, dx_pred_stack, agr_key = 'mean'):
+        if self.refresh_val_dict:
+            self.val_dict = {'E_Decoder': [],  'E_Sindy_x': [], 'E_agr_Decoder': [], 'E_agr_Sindy_x': []}
+
         criterion = nn.MSELoss()
 
         agr_x_translate = self.collapse(x_translate_stack, agr_key=agr_key)
@@ -499,8 +503,14 @@ class SindyNetTCompEnsemble(nn.Module):
         agr_dx_decode_loss2 = criterion(self.collapse(
             agr_dx_pred, agr_key=agr_key), dx).detach().cpu() * self.params['loss_weight_sindy_x']
 
-        print(f'TEST: Epoch: {self.epoch}, E_Decoder: {format(agr_decomp_loss)}, E_Sindy_x: {format(agr_dx_decomp_loss)}'
-              f' E_agr_Decoder: {format(agr_decomp_loss2)}, E_agr_Sindy_x: {format(agr_dx_decode_loss2)}')
+        self.val_dict['E_Decoder'].append(agr_decomp_loss)
+        self.val_dict['E_Sindy_x'].append(agr_dx_decomp_loss)
+        self.val_dict['E_agr_Decoder'].append(agr_decomp_loss2)
+        self.val_dict['E_agr_Sindy_x'].append(agr_dx_decode_loss2)
+
+        self.refresh_val_dict = False
+        return True
+
 
     def Loss(self, x, dx):
         x_decomp_decode_stack, x_translate_stack = self.stack_forward(x)
