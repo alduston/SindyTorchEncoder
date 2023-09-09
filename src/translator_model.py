@@ -128,18 +128,20 @@ class SindyNetTCompEnsemble(nn.Module):
                 self.device = 'cpu'
         self.dtype = indep_models.dtype
         params = indep_models.params
-
         self.params = params
+        self.true_coeffs = indep_models.true_coeffs
+
         self.params['indep_models'] = indep_models
         self.params['loss_weight_sindy_z'] = 0
         self.params['loss_weight_corr'] = 1e-3
         self.params['indep_models'] = indep_models
+
         self.activation_f = indep_models.activation_f
         self.criterion_f = indep_models.criterion_f
 
         self.translators = self.init_translators()
         self.decompressor, self.decompressor_layers = self.Residual_Decompressor(self.params)
-        self.decoder, self.decoder_layers = indep_models.Decoder(params)
+
         self.params['stacked_decoder'], self.params['stacked_decoder_layers'] = self.Stacked_decoder(self.params)
         self.params['stacked_encoder'], self.params['stacked_encoder_layers'] = self.Stacked_encoder(self.params)
 

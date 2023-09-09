@@ -59,7 +59,19 @@ def validate_step(model, data):
     return loss, losses
 
 
-def validate_epoch(model, data_loader, Loss_dict):
+def get_coeff_loss(model,true_coeffs):
+    try:
+        coeff_loss_val = coeff_pattern_loss(model.coefficient_mask, true_coeffs)
+    except BaseException:
+        coeff_loss_val = 0
+        for mask in model.coefficient_masks:
+            pred_coeffs = mask
+            coeff_loss_val += coeff_pattern_loss(pred_coeffs, true_coeffs)
+        coeff_loss_val /= len(model.coefficient_masks)
+    return coeff_loss_val
+
+
+def validate_epoch(model, data_loader, Loss_dict,  true_coeffs = None):
     model.params['eval'] = True
     model.eval()
     total_loss = 0
@@ -80,6 +92,9 @@ def validate_epoch(model, data_loader, Loss_dict):
 
     Loss_dict['epoch'].append(int(model.epoch))
     Loss_dict['active_coeffs'].append(int(model.num_active_coeffs()))
+
+    if true_coeffs != None:
+        Loss_dict['coeff'].append(get_coeff_loss(model,true_coeffs))
 
     for key, val in total_loss_dict.items():
         Loss_dict[key].append(float(val.detach().cpu()))
@@ -160,16 +175,17 @@ def print_keyval(key,val_list):
 
 
 def train_eas_1(net, bag_loader, test_loader, model_params):
-    Loss_dict = {'epoch': [], 'decoder': [], 'sindy_x': [], 'sindy_z': [], 'reg': [], 'active_coeffs': []}
+    Loss_dict = {'epoch': [], 'decoder': [], 'sindy_x': [], 'sindy_z': [], 'reg': [],
+                 'active_coeffs': [], 'coeff': [0.0]}
     test_freq = net.params['test_freq']
     cross_val_freq =  net.params['crossval_freq']
     optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'])
     pretrain_epocs = net.params['pretrain_epochs']
-
+    true_coeffs = net.true_coeffs
     for epoch in range(model_params['s1_epochs']):
         if (not epoch % test_freq):
             net.params['cp_batch'] = True
-            net, Loss_dict = validate_epoch(net, test_loader, Loss_dict)
+            net, Loss_dict = validate_epoch(net, test_loader, Loss_dict, true_coeffs)
             print(f'{str_list_sum(["TEST: "] + [print_keyval(key, val) for key, val in Loss_dict.items()])}')
         train_epoch(net, bag_loader, optimizer)
         if epoch > pretrain_epocs and not (epoch % cross_val_freq):
@@ -183,15 +199,16 @@ def train_eas_1(net, bag_loader, test_loader, model_params):
 def train_step2(net, bag_loader, test_loader, model_params):
     net.params['stage'] = 2
     test_freq = net.params['test_freq']
-    Loss_dict = {'epoch': [], 'decoder': [], 'sindy_x': [], 'sindy_z': [], 'reg': [], 'active_coeffs': []}
-    #print(len([paramter for paramter in net.parameters()]))
+    Loss_dict = {'epoch': [], 'decoder': [], 'sindy_x': [], 'sindy_z': [], 'reg': [],
+                 'active_coeffs': [],'coeff': [0.0]}
     optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'])
     pretrain_epocs = net.params['pretrain_epochs']
     cross_val_freq = net.params['crossval_freq']
     net.to(net.device)
+    true_coeffs = net.true_coeffs
     for epoch in range(model_params['s2_epochs']):
         if  (not epoch % test_freq):
-            net, Loss_dict = validate_epoch(net, test_loader, Loss_dict)
+            net, Loss_dict = validate_epoch(net, test_loader, Loss_dict, true_coeffs)
             print(f'{str_list_sum(["TEST: "] + [print_keyval(key, val) for key, val in Loss_dict.items()])}')
             print(' ')
         train_epoch(net, bag_loader, optimizer)

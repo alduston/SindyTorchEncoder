@@ -11,10 +11,7 @@ import warnings
 from data_utils import get_lorenz_params
 import matplotlib.pyplot as plt
 from copy import deepcopy
-from compressor_model import SindyNetCompEnsemble
 from translator_model import SindyNetTCompEnsemble
-import dill
-import pickle
 
 warnings.filterwarnings("ignore")
 
@@ -38,7 +35,7 @@ def ea_s1_test(model_params, training_data, validation_data, run  = 0):
     model_params['batch_size'] = l
     model_params['run'] = run
     model_params['test_freq'] = model_params['test_freq']
-    net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data, two_stage=False)
+    net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data)
     return net, Loss_dict, bag_loader, test_loader
 
 
@@ -301,21 +298,16 @@ def load_model(save_dir = 'model'):
 
 #scp -r ald6fd@klone.hyak.uw.edu:/mmfs1/gscratch/dynamicsai/ald6fd/SindyTorchEncoder/data/stuff /Users/aloisduston/Desktop/Math/Research/Kutz/SindyEnsemble/data/
 
-def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0'):
+def basic_test(exp_label = 'exp', model_save_name = 'model0'):
     try:
         os.mkdir(f'../data/{exp_label}')
     except OSError:
         pass
 
-    params, training_data, validation_data = get_lorenz_params(train_size=10, test_size=5)
-    #params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                     #'n_encoders': 5, 'n_decoders': 5, 'criterion': 'avg', 's1_epochs':5000,
-                     #'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
-
-    params, training_data, validation_data = get_lorenz_params(train_size=30, test_size=15)
+    params, training_data, validation_data = get_lorenz_params(train_size=100, test_size=20)
     params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                     'n_encoders': 10, 'n_decoders': 10, 'criterion': 'avg', 's1_epochs': 10000,
-                      'test_freq': 100, 'exp_label': 'two_step', 's2_epochs': 0, 'crossval_freq': 100}
+                     'n_encoders': 30, 'n_decoders': 30, 'criterion': 'avg', 's1_epochs': 10000,
+                      'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
     model1, Loss_dict, bag_loader, test_loader = ea_s1_test(params, training_data, validation_data)
@@ -324,9 +316,10 @@ def basic_test(exp_label = 'indep_model_train_medium', model_save_name = 'model0
 
 
 def run():
-    indep_model, bag_loader, test_loader = load_model('model0')
+    #basic_test(model_save_name='model1')
+    indep_model, bag_loader, test_loader = load_model('model1')
     train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 10})
-    indep_model, bag_loader, test_loader = load_model('model0')
+    indep_model, bag_loader, test_loader = load_model('model1')
     print(' ')
 
     indep_model.params['coefficient_initialization'] = 'constant'
