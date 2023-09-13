@@ -383,7 +383,7 @@ def get_step1_min_losses(item_loss_dict):
 
 def run():
     basic_test(exp_label='plot_exp_med', model_save_name='model4', small = False)
-    indep_model, bag_loader, test_loader = load_model('plot_exp_med')
+    indep_model, bag_loader, test_loader = load_model('model4')
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
     item_loss_dict = net.item_loss_dict
     min_losses = get_step1_min_losses(item_loss_dict)
@@ -391,7 +391,7 @@ def run():
                   'E_agr_Sindy_x': min_losses['E_agr_Sindy_x'][-1],
                   'active_coeffs': Loss_dict['active_coeffs'][-1]}
 
-    indep_model, bag_loader, test_loader = load_model('plot_exp_med')
+    indep_model, bag_loader, test_loader = load_model('model4')
 
     indep_model.params['coefficient_initialization'] = 'constant'
     indep_model.params['criterion'] = 'avg'
