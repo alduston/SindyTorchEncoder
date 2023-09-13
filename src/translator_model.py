@@ -545,8 +545,9 @@ class SindyNetTCompEnsemble(nn.Module):
         x_stack = self.expand(x)
         x_stack_stack = self.expand(x_stack)
 
-        print(f'x_stack has shape {x_stack.shape}')
-        print(f'x_stack_stack has shape {x_stack_stack.shape}')
+        free_mem, total_mem = torch.cuda.mem_get_info()
+        mem_str = f'x_stack_stack has shape {x_stack_stack.shape}, Using {round(100 * (1 - (free_mem / total_mem)), 2)}% GPU mem'
+        print(mem_str)
 
         dx_stack = self.expand(dx)
         dx_stack_stack = self.expand(dx_stack)
