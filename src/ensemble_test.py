@@ -29,7 +29,7 @@ def ea_s1_test(model_params, training_data, validation_data, run  = 0):
     model_params['add_noise'] = False
 
     l = len(training_data['x'])
-    train_params = {'s1_epochs': model_params['s1_epochs'],'bag_size': l, 'refinement_epochs': 0,
+    train_params = {'s1_epochs': model_params['s1_epochs'],'bag_size': min(l, 10000), 'refinement_epochs': 0,
                     'n_encoders': model_params['n_encoders'],'n_decoders': model_params['n_decoders']}
     train_params['nbags'] = 1 #max(train_params['n_encoders'], train_params['n_decoders'])
 
@@ -46,7 +46,7 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
     model_params['add_noise'] = False
 
     l = len(training_data['x'])
-    train_params = {'s1_epochs': model_params['s1_epochs'],'bag_size': l, 'refinement_epochs': 0,
+    train_params = {'s1_epochs': model_params['s1_epochs'],'bag_size': min(l, 10000), 'refinement_epochs': 0,
                     'n_encoders': model_params['n_encoders'],'n_decoders': model_params['n_decoders']}
     train_params['nbags'] = train_params['n_encoders']
 

@@ -228,7 +228,7 @@ def get_bag_loader(data, train_params, model_params,  workers = 0,
     train_params['augment'] = augment
     train_params['replacement'] = replacement
     data_class = model_data(data, model_params, device, bag_params = train_params)
-    return DataLoader(data_class, batch_size=train_params['batch_size'], num_workers=workers, shuffle=False)
+    return DataLoader(data_class, batch_size=train_params['bag_size'], num_workers=workers, shuffle=False)
 
 
 def run():
