@@ -8,6 +8,11 @@ from copy import deepcopy
 from datetime import datetime as dt
 
 
+def dict_mean(dicts):
+    mean_dict = {key: torch.mean(torch.stack([sub_dict[key] for sub_dict in dicts])) for key in dicts[0].keys()}
+    return mean_dict
+
+
 def format(n, n_digits = 6):
     try:
         n = float(n)
@@ -445,6 +450,16 @@ class SindyNetTCompEnsemble(nn.Module):
         return dx_decode
 
 
+    def sub_dx_loss(self, x_translate, dx):
+        dz_pred = self.sindy_predict(x_translate)
+        dx_pred = self.dx_decode(x_translate, dz_pred)
+        criterion = nn.MSELoss()
+        loss = self.params['loss_weight_sindy_x'] * (criterion(dx_stack_stack, dx_pred_stack))
+        return loss, dx_pred
+
+
+
+
     def stacked_dx_loss(self, x_translate_stack, dx_stack_stack):
         dx_preds = []
         for z in self.split(x_translate_stack):
@@ -507,7 +522,9 @@ class SindyNetTCompEnsemble(nn.Module):
                                          decoder_biases, activation=activation).T
         return stacked_dx_decode
 
-    def val_test(self, x, dx, x_translate_stack, x_decomp_decode_stack, dx_pred_stack, agr_key = 'mean'):
+    #def val_test(self, x, dx, x_translate_stack, x_decomp_decode_stack, dx_pred_stack, agr_key = 'mean'):
+
+    def val_test(self, x, dx, x_translate_stack, agr_key='mean'):
         if self.refresh_val_dict:
             self.val_dict = {'E_Decoder': [],  'E_Sindy_x': [], 'E_agr_Decoder': [], 'E_agr_Sindy_x': []}
 
@@ -519,18 +536,12 @@ class SindyNetTCompEnsemble(nn.Module):
         agr_dz_pred = self.sindy_predict(agr_x_translate)
         agr_dx_pred = self.dx_decode(agr_x_translate, agr_dz_pred)
 
-        agr_decomp_loss = float(self.decode_loss(
-            self.collapse(x_decomp_decode_stack, agr_key=agr_key, double=True), x).detach().cpu())
         agr_decomp_loss2 = float(self.decode_loss(
             self.collapse(agr_x_decomp_decode, agr_key=agr_key), x).detach().cpu())
 
-        agr_dx_decomp_loss = criterion(self.collapse(
-            dx_pred_stack, agr_key=agr_key, double=True), dx).detach().cpu() * self.params['loss_weight_sindy_x']
         agr_dx_decode_loss2 = criterion(self.collapse(
             agr_dx_pred, agr_key=agr_key), dx).detach().cpu() * self.params['loss_weight_sindy_x']
 
-        self.val_dict['E_Decoder'].append(agr_decomp_loss)
-        self.val_dict['E_Sindy_x'].append(agr_dx_decomp_loss)
         self.val_dict['E_agr_Decoder'].append(agr_decomp_loss2)
         self.val_dict['E_agr_Sindy_x'].append(agr_dx_decode_loss2)
 
@@ -538,25 +549,31 @@ class SindyNetTCompEnsemble(nn.Module):
         return True
 
 
+    def sub_loss(self, x, dx, x_stack, encode_idx):
+        x_translate,x_decomp_decode = self.sub_forward(x, encode_idx)
+        decoder_loss = self.decode_loss(x_decomp_decode, x_stack)
+        sindy_x_loss, dx_pred = self.sub_dx_loss(x_translate, dx)
+        loss_dict = {'decoder': decoder_loss, 'sindy_x': sindy_x_loss}
+        return loss_dict, x_translate
+
+
+
     def Loss(self, x, dx):
-        x_decomp_decode_stack, x_translate_stack = self.stack_forward(x)
-
         x_stack = self.expand(x)
-        x_stack_stack = self.expand(x_stack)
+        sub_loss_dicts = []
+        x_translates = []
+        for encode_idx in range(self.params['n_encoders']):
+            sub_loss_dict, x_translate, dx_pred = self.sub_loss(x, dx, x_stack, encode_idx)
+            sub_loss_dicts.append(sub_loss_dict)
+            x_translates.append(x_translate)
 
-        dx_stack = self.expand(dx)
-        dx_stack_stack = self.expand(dx_stack)
-
-        decoder_loss = self.decode_loss(x_decomp_decode_stack, x_stack_stack)
-        reg_loss = self.reg_loss()
-        sindy_x_loss, dx_pred_stack = self.stacked_dx_loss(x_translate_stack,dx_stack_stack)
-        corr_loss = self.corr_loss(x_translate_stack)
-
-        loss = decoder_loss + sindy_x_loss + corr_loss + reg_loss
-        loss_dict = {'decoder': decoder_loss, 'sindy_x': sindy_x_loss, 'sindy_z': corr_loss, 'reg': reg_loss}
-
+        loss_dict = dict_mean(sub_loss_dicts)
+        x_translate_stack = torch.concat(x_translates, dim = 1)
+        loss_dict['reg'] = self.reg_loss()
+        loss_dict['sindy_z'] = self.corr_loss(x_translate_stack)
+        loss =  loss_dict['decoder'] + loss_dict['sindy_x'] + loss_dict['reg'] + loss_dict['sindy_z']
         if self.params['eval']:
-            self.val_test(x, dx, x_translate_stack, x_decomp_decode_stack, dx_pred_stack)
+            self.val_test(x, dx)
         return loss, loss_dict
 
 

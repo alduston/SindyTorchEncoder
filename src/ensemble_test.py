@@ -390,6 +390,7 @@ def run():
     s_1_losses = {'E_agr_Decoder': min_losses['E_agr_Decoder'][-1],
                   'E_agr_Sindy_x': min_losses['E_agr_Sindy_x'][-1],
                   'active_coeffs': Loss_dict['active_coeffs'][-1]}
+    print(s_1_losses)
 
     indep_model, bag_loader, test_loader = load_model('model4')
 

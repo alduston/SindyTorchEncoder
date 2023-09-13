@@ -240,17 +240,14 @@ def train_eas_1(net, bag_loader, test_loader, model_params):
 def print_val_losses2(net):
     val_dict = net.val_dict
     epoch = net.epoch
-    E_Decoder = format(np.mean(np.asarray(val_dict['E_Decoder'])))
-    E_Sindy_x = format(np.mean(np.asarray(val_dict['E_Sindy_x'])))
     E_agr_Decoder = format(np.mean(np.asarray(val_dict['E_agr_Decoder'])))
     E_agr_Sindy_x =  format(np.mean(np.asarray(val_dict['E_agr_Sindy_x'])))
 
-    print(f'TEST: Epoch: {epoch}, E_Decoder: {E_Decoder}, E_Sindy_x: {E_Sindy_x}'
-          f' E_agr_Decoder: {E_agr_Decoder}, E_agr_Sindy_x: {E_agr_Sindy_x}')
+    print(f'TEST: Epoch: {epoch}, E_agr_Decoder: {E_agr_Decoder}, E_agr_Sindy_x: {E_agr_Sindy_x}')
 
     net.refresh_val_dict = True
 
-    return {'Epoch': epoch, 'E_agr_Decoder': E_Decoder, 'E_agr_Sindy_x': E_Sindy_x,
+    return {'Epoch': epoch, 'E_agr_Decoder':  E_agr_Decoder, 'E_agr_Sindy_x': E_agr_Sindy_x,
             'active_coeffs': net.num_active_coeffs().detach().cpu()}
 
 
