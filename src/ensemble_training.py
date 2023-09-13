@@ -239,7 +239,7 @@ def train_eas_1(net, bag_loader, test_loader, model_params):
 
 def print_val_losses2(net):
     val_dict = net.val_dict
-    epoch = net.epoch.detach().cpu()
+    epoch = net.epoch
     E_Decoder = format(np.mean(np.asarray(val_dict['E_Decoder'])))
     E_Sindy_x = format(np.mean(np.asarray(val_dict['E_Sindy_x'])))
     E_agr_Decoder = format(np.mean(np.asarray(val_dict['E_agr_Decoder'])))

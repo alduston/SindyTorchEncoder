@@ -396,7 +396,6 @@ def run():
     indep_model.params['coefficient_initialization'] = 'constant'
     indep_model.params['criterion'] = 'avg'
 
-
     E_loss_dicts = []
     n_trials = 2
     for i in range(n_trials):
