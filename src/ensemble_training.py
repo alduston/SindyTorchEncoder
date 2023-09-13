@@ -251,7 +251,7 @@ def print_val_losses2(net):
     net.refresh_val_dict = True
 
     return {'Epoch': epoch, 'E_agr_Decoder': E_Decoder, 'E_agr_Sindy_x': E_Sindy_x,
-            'active_coeffs': net.num_active_coeffs()}
+            'active_coeffs': net.num_active_coeffs().detach().cpu()}
 
 
 def train_step2(net, bag_loader, test_loader, model_params):
