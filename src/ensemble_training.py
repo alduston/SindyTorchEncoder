@@ -59,6 +59,7 @@ def coeff_pattern_loss(pred_coeffs, true_coeffs, binary = True):
 def train_step(model, data, optimizer):
     optimizer.zero_grad()
     loss, losses = model.Loss(x=data['x_bag'].to(model.device), dx=data['dx_bag'].to(model.device))
+
     loss.backward()
     optimizer.step()
     return loss, losses
@@ -228,6 +229,7 @@ def train_eas_1(net, bag_loader, test_loader, model_params):
             E_loss_dict = update_list_dict(E_loss_dict, e_loss_dict)
 
         train_epoch(net, bag_loader, optimizer)
+
         if epoch > pretrain_epocs and not (epoch % cross_val_freq):
             net = indep_crossval(net)
 
@@ -271,9 +273,7 @@ def train_step2(net, bag_loader, test_loader, model_params):
             e_loss_dict = print_val_losses2(net)
             E_loss_dict = update_list_dict(E_loss_dict, e_loss_dict)
 
-        start = dt.now()
         train_epoch(net, bag_loader, optimizer)
-        print(f'Epoch took {(dt.now()-start).total_seconds()} seconds')
         if epoch > pretrain_epocs and not (epoch % cross_val_freq):
             net = cross_val(net)
 
