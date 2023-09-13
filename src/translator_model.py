@@ -145,10 +145,10 @@ class SindyNetTCompEnsemble(nn.Module):
         self.params['stacked_decoder'], self.params['stacked_decoder_layers'] = self.Stacked_decoder(self.params)
         self.params['stacked_encoder'], self.params['stacked_encoder_layers'] = self.Stacked_encoder(self.params)
 
-        self.sindy_coeffs = [self.init_sindy_coefficients() for i in range(self.params['n_encoders'])]
-        self.sindy_coeffs = torch.nn.Parameter(torch.stack(self.sindy_coeffs), requires_grad=True)
+        #self.sindy_coeffs = [self.init_sindy_coefficients() for i in range(self.params['n_encoders'])]
+        #self.sindy_coeffs = torch.nn.Parameter(torch.stack(self.sindy_coeffs), requires_grad=True)
 
-        #self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad=True)
+        self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad=True)
         self.coefficient_mask = torch.tensor(deepcopy(self.params['coefficient_mask']),dtype=self.dtype, device=self.device)
         self.epoch = 0
         self.refresh_val_dict = True
@@ -405,7 +405,8 @@ class SindyNetTCompEnsemble(nn.Module):
         if not len(mask):
             mask = self.coefficient_mask
         if not len(coeffs):
-            coeffs = self.sindy_coeffs[encode_idx]
+            #coeffs = self.sindy_coeffs[encode_idx]
+            coeffs = self.sindy_coeffs
         return torch.matmul(Theta, mask * coeffs)
 
 
@@ -545,9 +546,6 @@ class SindyNetTCompEnsemble(nn.Module):
         x_stack = self.expand(x)
         x_stack_stack = self.expand(x_stack)
 
-        free_mem, total_mem = torch.cuda.mem_get_info()
-        mem_str = f'x_stack_stack has shape {x_stack_stack.shape}, Using {round(100 * (1 - (free_mem / total_mem)), 2)}% GPU mem'
-        print(mem_str)
 
         dx_stack = self.expand(dx)
         dx_stack_stack = self.expand(dx_stack)

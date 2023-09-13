@@ -278,9 +278,6 @@ def train_step2(net, bag_loader, test_loader, model_params):
     return net, Loss_dict, E_loss_dict, bag_loader, test_loader
 
 
-
-
-
 def train_eas(model_params, train_params, training_data, validation_data):
     if torch.cuda.is_available():
         device = 'cuda:0'
