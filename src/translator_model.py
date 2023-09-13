@@ -545,7 +545,6 @@ class SindyNetTCompEnsemble(nn.Module):
         x_stack = self.expand(x)
         x_stack_stack = self.expand(x_stack)
 
-
         dx_stack = self.expand(dx)
         dx_stack_stack = self.expand(dx_stack)
 

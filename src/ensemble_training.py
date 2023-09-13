@@ -8,6 +8,7 @@ from itertools import permutations
 import matplotlib.pyplot as plt
 import os
 import pandas as pd
+from datetime import datetime as dt
 
 def update_list_dict(list_dict, update_dict):
     for key in list_dict.keys():
@@ -270,7 +271,9 @@ def train_step2(net, bag_loader, test_loader, model_params):
             e_loss_dict = print_val_losses2(net)
             E_loss_dict = update_list_dict(E_loss_dict, e_loss_dict)
 
+        start = dt.now()
         train_epoch(net, bag_loader, optimizer)
+        print(f'Epoch took {(dt.now()-start).total_seconds()} seconds')
         if epoch > pretrain_epocs and not (epoch % cross_val_freq):
             net = cross_val(net)
 
