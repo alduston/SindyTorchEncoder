@@ -59,6 +59,7 @@ def expand_tensor(tensor, expansion_factor):
     expanded_tensor = torch.stack([tensor for i in range(expansion_factor)]).reshape(tensor_shape[0] * expansion_factor, *tensor_shape[1:])
     return expanded_tensor
 
+
 class model_data(Dataset):
     def __init__(self, data={}, params = {}, device = None, bag_params ={}, expand_factor = None):
         super().__init__()
@@ -94,7 +95,6 @@ class model_data(Dataset):
     def __getitem__(self, index):
         if self.bag_params:
             return {'x_bag': self.x_bags[index], 'dx_bag': self.dx_bags[index]}
-            #return {'x': self.x_bags[index], 'dx': self.dx_bags[index]}
         else:
             if self.params['model_order'] == 2:
                 return {'x': self.x[index], 'dx': self.dx[index], 'dxx': self.dxx[index]}
@@ -228,7 +228,7 @@ def get_bag_loader(data, train_params, model_params,  workers = 0,
     train_params['augment'] = augment
     train_params['replacement'] = replacement
     data_class = model_data(data, model_params, device, bag_params = train_params)
-    return DataLoader(data_class, batch_size=train_params['bag_size'], num_workers=workers, shuffle=False)
+    return DataLoader(data_class, batch_size=train_params['batch_size'], num_workers=workers, shuffle=False)
 
 
 def run():

@@ -369,11 +369,11 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
 def run():
     basic_test(exp_label='plot_exp', model_save_name='model4', small=False)
     indep_model, bag_loader, test_loader = load_model('model4')
-    net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 10})
+    net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
     s_1_losses = {'E_agr_Decoder': Loss_dict['decoder'][-1],
                   'E_agr_Sindy_x': Loss_dict['sindy_x'][-1],
                   'active_coeffs': Loss_dict['active_coeffs'][-1]}
-    indep_model, bag_loader, test_loader = load_model('small_model')
+    indep_model, bag_loader, test_loader = load_model('model4')
 
     indep_model.params['coefficient_initialization'] = 'constant'
     indep_model.params['criterion'] = 'stability'
