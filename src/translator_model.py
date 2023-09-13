@@ -545,6 +545,9 @@ class SindyNetTCompEnsemble(nn.Module):
         x_stack = self.expand(x)
         x_stack_stack = self.expand(x_stack)
 
+        print(f'x_stack has shape {x_stack.shape}')
+        print(f'x_stack_stack has shape {x_stack_stack.shape}')
+
         dx_stack = self.expand(dx)
         dx_stack_stack = self.expand(dx_stack)
 

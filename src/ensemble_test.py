@@ -51,7 +51,7 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
     train_params['nbags'] = train_params['n_encoders']
 
 
-    model_params['batch_size'] = min(l, 10000)
+    model_params['batch_size'] = min(l, 20000)
     model_params['run'] = run
     model_params['test_freq'] = model_params['test_freq']
     net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data)
