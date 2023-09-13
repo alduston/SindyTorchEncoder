@@ -152,6 +152,7 @@ class SindyNetTCompEnsemble(nn.Module):
         self.coefficient_mask = torch.tensor(deepcopy(self.params['coefficient_mask']),dtype=self.dtype, device=self.device)
         self.epoch = 0
         self.refresh_val_dict = True
+        self.stage = 2
 
 
     def Stacked_encoder(self, params):

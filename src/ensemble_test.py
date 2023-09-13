@@ -393,18 +393,5 @@ def run():
     step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label='plot_exp')
 
 
-    '''
-    final_coeffs = torch.mean(compressor_model.sindy_coeffs, dim = 0) * compressor_model.coefficient_mask
-    final_coeffs = np.round(final_coeffs.detach().cpu().numpy(), 2)
-    print(f'Final coeffs were: \n {final_coeffs}')
-
-    true_coeffs = compressor_model.true_coeffs
-    true_coeffs = np.round(true_coeffs.detach().cpu().numpy(), 2)
-    print(f'True coeffs were: \n {true_coeffs}')
-    '''
-
-
-
-#TEST: Epoch: 10000, E_Decoder: 5.42653E-05, E_Sindy_x: 6.50386E-05 E_agr_Decoder: 5.18338E-05, E_agr_Sindy_x: 6.61942E-05
 if __name__=='__main__':
     run()
