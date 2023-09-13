@@ -33,7 +33,7 @@ def ea_s1_test(model_params, training_data, validation_data, run  = 0):
                     'n_encoders': model_params['n_encoders'],'n_decoders': model_params['n_decoders']}
     train_params['nbags'] = 1 #max(train_params['n_encoders'], train_params['n_decoders'])
 
-    model_params['batch_size'] = min(l, 50000)
+    model_params['batch_size'] = min(l, 10000)
     model_params['run'] = run
     model_params['test_freq'] = model_params['test_freq']
     net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data)
@@ -51,7 +51,7 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
     train_params['nbags'] = train_params['n_encoders']
 
 
-    model_params['batch_size'] = min(l, 50000)
+    model_params['batch_size'] = min(l, 10000)
     model_params['run'] = run
     model_params['test_freq'] = model_params['test_freq']
     net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data)
@@ -353,9 +353,9 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
                          'n_encoders': 4, 'n_decoders': 4, 'criterion': 'avg', 's1_epochs': 1000,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
     else:
-        params, training_data, validation_data = get_lorenz_params(train_size=50, test_size=20)
+        params, training_data, validation_data = get_lorenz_params(train_size=100, test_size=20)
         params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                         'n_encoders': 10, 'n_decoders': 10, 'criterion': 'avg', 's1_epochs': 7500,
+                         'n_encoders': 30, 'n_decoders': 30, 'criterion': 'avg', 's1_epochs': 201,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
@@ -384,7 +384,7 @@ def run():
     for i in range(n_trials):
         compressor_model = SindyNetTCompEnsemble(indep_model)
         model_params = compressor_model.params
-        model_params['s2_epochs'] = 7500
+        model_params['s2_epochs'] = 200
 
         net, Loss_dict, E_loss_dict1, bag_loader, test_loader = train_step2(compressor_model, bag_loader,
                                                                        test_loader, compressor_model.params)
