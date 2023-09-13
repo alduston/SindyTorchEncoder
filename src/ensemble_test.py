@@ -356,7 +356,7 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
     else:
         params, training_data, validation_data = get_lorenz_params(train_size=40, test_size=20)
         params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                         'n_encoders': 30, 'n_decoders': 30, 'criterion': 'avg', 's1_epochs': 200,
+                         'n_encoders': 30, 'n_decoders': 30, 'criterion': 'avg', 's1_epochs': 201,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
@@ -403,14 +403,13 @@ def run():
     for i in range(n_trials):
         compressor_model = SindyNetTCompEnsemble(indep_model)
         model_params = compressor_model.params
-        model_params['s2_epochs'] = 7000
+        model_params['s2_epochs'] = 201
 
         net, Loss_dict, E_loss_dict1, bag_loader, test_loader = train_step2(compressor_model, bag_loader,
                                                                        test_loader, compressor_model.params)
         E_loss_dicts.append(E_loss_dict1)
 
     step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label='plot_exp_med')
-    '''
 
 
 if __name__=='__main__':

@@ -517,7 +517,7 @@ class SindyNetTCompEnsemble(nn.Module):
         agr_x_translate = self.collapse(x_translate_stack, agr_key=agr_key)
         agr_x_decomp_decode = self.params['stacked_decoder'](self.decompressor(agr_x_translate))
 
-        agr_dz_pred = self.sindy_predict(agr_x_translate, coeffs=agr_coeffs)
+        agr_dz_pred = self.sindy_predict(agr_x_translate, coeffs=self.sindy_coeffs)
         agr_dx_pred = self.dx_decode(agr_x_translate, agr_dz_pred)
 
         agr_decomp_loss = float(self.decode_loss(
