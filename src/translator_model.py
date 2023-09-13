@@ -449,7 +449,7 @@ class SindyNetTCompEnsemble(nn.Module):
     def stacked_dx_loss(self, x_translate_stack, dx_stack_stack):
         dx_preds = []
         for encode_idx,z in enumerate(self.split(x_translate_stack)):
-            dz_pred = self.sindy_predict(z, encode_idx = encode_idx)
+            dz_pred = self.sindy_predict(z)#, encode_idx = encode_idx)
             dx_preds.append(self.dx_decode(z, dz_pred))
 
         dx_pred_stack = torch.concat(dx_preds, dim = 1)
@@ -540,7 +540,6 @@ class SindyNetTCompEnsemble(nn.Module):
 
 
     def Loss(self, x, dx):
-        start = dt.now()
         x_decomp_decode_stack, x_translate_stack = self.stack_forward(x)
 
         x_stack = self.expand(x)
@@ -550,14 +549,9 @@ class SindyNetTCompEnsemble(nn.Module):
         dx_stack_stack = self.expand(dx_stack)
         decoder_loss = self.decode_loss(x_decomp_decode_stack, x_stack_stack)
 
-
-        start = dt.now()
         reg_loss = self.reg_loss()
 
-        start = dt.now()
         sindy_x_loss, dx_pred_stack = self.stacked_dx_loss(x_translate_stack,dx_stack_stack)
-
-        start = dt.now()
         corr_loss = self.corr_loss(x_translate_stack)
 
         loss = decoder_loss + sindy_x_loss + corr_loss + reg_loss
