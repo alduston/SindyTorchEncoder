@@ -279,28 +279,41 @@ def update_df_cols(df, update_num):
     return df.rename(columns=rename_dict)
 
 
-def step_2_plots(E_loss_dicts, step_1_losses, exp_label = 'exp'):
+def step_2_plots(E_loss_dicts2, E_loss_dict1, Indep_loss_dict1, exp_label = 'exp'):
     try:
         os.mkdir(f'../data/{exp_label}')
     except OSError:
         pass
     save_dir = f'../data/{exp_label}'
     keys = ['E_agr_Decoder', 'E_agr_Sindy_x','active_coeffs']
-    x = E_loss_dicts[0]['Epoch']
+    x = E_loss_dicts2[0]['Epoch']
+
+    plot_labels = {'E_agr_Decoder': 'Log decode loss',
+                   'E_agr_Sindy_x': 'Log sindy_x loss',
+                   'active_coeffs': 'active_coeffs'}
     for key in keys:
-        step_1_loss = step_1_losses[key][-1]
+
+        step_1_eloss = E_loss_dict1[key]
+        step_1_eloss_vec = [step_1_eloss for i in range(len(x))]
+
+        step_1_loss = Indep_loss_dict1[key]
         step_1_loss_vec = [step_1_loss for i in range(len(x))]
         if key in ['E_agr_Decoder', 'E_agr_Sindy_x']:
+            step_1_eloss_vec = np.log(np.asarray(step_1_eloss_vec))
             step_1_loss_vec = np.log(np.asarray(step_1_loss_vec))
+            plt.plot(x, step_1_eloss_vec, linestyle='dashed', label='step 1 essemble error')
 
-        plt.plot(x, step_1_loss_vec, linestyle='dashed', label = 'step 1 essemble error')
-        for dict in E_loss_dicts:
+        plt.plot(x, step_1_loss_vec, linestyle='dashed', label='step 1 average error')
+
+        for dict in E_loss_dicts2:
             plot_vec = dict[key][:len(x)]
             if key in ['E_agr_Decoder', 'E_agr_Sindy_x']:
                 plot_vec = np.log(np.asarray(plot_vec))
             plt.plot(x,plot_vec)
         plt.xlabel('Epoch')
-        plt.ylabel(f'Log {key} loss')
+        plt.ylabel(plot_labels[key])
+        plt.xlim(0, x[-1])
+        plt.legend()
         plt.savefig(f'{save_dir}/{key}_plot.png')
         clear_plt()
     return True
@@ -340,9 +353,9 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
                          'n_encoders': 4, 'n_decoders': 4, 'criterion': 'avg', 's1_epochs': 1000,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
     else:
-        params, training_data, validation_data = get_lorenz_params(train_size=60, test_size=20)
+        params, training_data, validation_data = get_lorenz_params(train_size=50, test_size=20)
         params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                         'n_encoders': 12, 'n_decoders': 12, 'criterion': 'avg', 's1_epochs': 12000,
+                         'n_encoders': 10, 'n_decoders': 10, 'criterion': 'avg', 's1_epochs': 7500,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
@@ -357,24 +370,27 @@ def run():
     basic_test(exp_label='plot_exp', model_save_name='model4', small=False)
     indep_model, bag_loader, test_loader = load_model('model4')
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 10})
-    indep_model, bag_loader, test_loader = load_model('model4')
+    s_1_losses = {'E_agr_Decoder': Loss_dict['decoder'][-1],
+                  'E_agr_Sindy_x': Loss_dict['sindy_x'][-1],
+                  'active_coeffs': Loss_dict['active_coeffs'][-1]}
+    indep_model, bag_loader, test_loader = load_model('small_model')
 
     indep_model.params['coefficient_initialization'] = 'constant'
     indep_model.params['criterion'] = 'stability'
 
 
     E_loss_dicts = []
-    n_trials = 10
+    n_trials = 5
     for i in range(n_trials):
         compressor_model = SindyNetTCompEnsemble(indep_model)
         model_params = compressor_model.params
-        model_params['s2_epochs'] = 12000
+        model_params['s2_epochs'] = 7500
 
         net, Loss_dict, E_loss_dict1, bag_loader, test_loader = train_step2(compressor_model, bag_loader,
                                                                        test_loader, compressor_model.params)
         E_loss_dicts.append(E_loss_dict1)
 
-    step_2_plots(E_loss_dicts,E_loss_dict0, exp_label='plot_exp')
+    step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label='plot_exp')
 
 
     '''

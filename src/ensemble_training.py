@@ -292,6 +292,6 @@ def train_eas(model_params, train_params, training_data, validation_data):
     test_loader = get_loader(validation_data, model_params, device=device)
 
     net = SindyNetEnsemble(model_params).to(device)
-    net, Loss_dict, E_loss_dict = train_eas_1(net, bag_loader, test_loader, model_params)[:2]
+    net, Loss_dict, E_loss_dict = train_eas_1(net, bag_loader, test_loader, model_params)
     return net, Loss_dict, bag_loader, test_loader
 
