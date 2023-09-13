@@ -450,11 +450,11 @@ class SindyNetTCompEnsemble(nn.Module):
         return dx_decode
 
 
-    def sub_dx_loss(self, x_translate, dx):
+    def sub_dx_loss(self, x_translate, dx_stack):
         dz_pred = self.sindy_predict(x_translate)
         dx_pred = self.dx_decode(x_translate, dz_pred)
         criterion = nn.MSELoss()
-        loss = self.params['loss_weight_sindy_x'] * (criterion(dx_stack_stack, dx_pred_stack))
+        loss = self.params['loss_weight_sindy_x'] * (criterion(dx_pred, dx_stack))
         return loss, dx_pred
 
 
@@ -522,7 +522,6 @@ class SindyNetTCompEnsemble(nn.Module):
                                          decoder_biases, activation=activation).T
         return stacked_dx_decode
 
-    #def val_test(self, x, dx, x_translate_stack, x_decomp_decode_stack, dx_pred_stack, agr_key = 'mean'):
 
     def val_test(self, x, dx, x_translate_stack, agr_key='mean'):
         if self.refresh_val_dict:
@@ -549,21 +548,21 @@ class SindyNetTCompEnsemble(nn.Module):
         return True
 
 
-    def sub_loss(self, x, dx, x_stack, encode_idx):
+    def sub_loss(self, x, dx, x_stack, dx_stack, encode_idx):
         x_translate,x_decomp_decode = self.sub_forward(x, encode_idx)
         decoder_loss = self.decode_loss(x_decomp_decode, x_stack)
-        sindy_x_loss, dx_pred = self.sub_dx_loss(x_translate, dx)
+        sindy_x_loss, dx_pred = self.sub_dx_loss(x_translate, dx_stack)
         loss_dict = {'decoder': decoder_loss, 'sindy_x': sindy_x_loss}
         return loss_dict, x_translate
 
 
-
     def Loss(self, x, dx):
         x_stack = self.expand(x)
+        dx_stack = self.expand(dx)
         sub_loss_dicts = []
         x_translates = []
         for encode_idx in range(self.params['n_encoders']):
-            sub_loss_dict, x_translate, dx_pred = self.sub_loss(x, dx, x_stack, encode_idx)
+            sub_loss_dict, x_translate = self.sub_loss(x, dx, x_stack, dx_stack, encode_idx)
             sub_loss_dicts.append(sub_loss_dict)
             x_translates.append(x_translate)
 
@@ -573,7 +572,7 @@ class SindyNetTCompEnsemble(nn.Module):
         loss_dict['sindy_z'] = self.corr_loss(x_translate_stack)
         loss =  loss_dict['decoder'] + loss_dict['sindy_x'] + loss_dict['reg'] + loss_dict['sindy_z']
         if self.params['eval']:
-            self.val_test(x, dx)
+            self.val_test(x, dx, x_translate_stack)
         return loss, loss_dict
 
 
