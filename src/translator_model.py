@@ -400,12 +400,11 @@ class SindyNetTCompEnsemble(nn.Module):
         return x_split
 
 
-    def sindy_predict(self, z, coeffs = [], mask = [], encode_idx = 0):
+    def sindy_predict(self, z, coeffs = [], mask = []):
         Theta = self.Theta(z)
         if not len(mask):
             mask = self.coefficient_mask
         if not len(coeffs):
-            #coeffs = self.sindy_coeffs[encode_idx]
             coeffs = self.sindy_coeffs
         return torch.matmul(Theta, mask * coeffs)
 
@@ -448,8 +447,8 @@ class SindyNetTCompEnsemble(nn.Module):
 
     def stacked_dx_loss(self, x_translate_stack, dx_stack_stack):
         dx_preds = []
-        for encode_idx,z in enumerate(self.split(x_translate_stack)):
-            dz_pred = self.sindy_predict(z)#, encode_idx = encode_idx)
+        for z in self.split(x_translate_stack):
+            dz_pred = self.sindy_predict(z)
             dx_preds.append(self.dx_decode(z, dz_pred))
 
         dx_pred_stack = torch.concat(dx_preds, dim = 1)
@@ -517,7 +516,7 @@ class SindyNetTCompEnsemble(nn.Module):
         agr_x_translate = self.collapse(x_translate_stack, agr_key=agr_key)
         agr_x_decomp_decode = self.params['stacked_decoder'](self.decompressor(agr_x_translate))
 
-        agr_dz_pred = self.sindy_predict(agr_x_translate, coeffs=self.sindy_coeffs)
+        agr_dz_pred = self.sindy_predict(agr_x_translate)
         agr_dx_pred = self.dx_decode(agr_x_translate, agr_dz_pred)
 
         agr_decomp_loss = float(self.decode_loss(
@@ -547,10 +546,9 @@ class SindyNetTCompEnsemble(nn.Module):
 
         dx_stack = self.expand(dx)
         dx_stack_stack = self.expand(dx_stack)
+
         decoder_loss = self.decode_loss(x_decomp_decode_stack, x_stack_stack)
-
         reg_loss = self.reg_loss()
-
         sindy_x_loss, dx_pred_stack = self.stacked_dx_loss(x_translate_stack,dx_stack_stack)
         corr_loss = self.corr_loss(x_translate_stack)
 
