@@ -29,11 +29,11 @@ def ea_s1_test(model_params, training_data, validation_data, run  = 0):
     model_params['add_noise'] = False
 
     l = len(training_data['x'])
-    train_params = {'s1_epochs': model_params['s1_epochs'],'bag_size': min(l, 10000), 'refinement_epochs': 0,
+    train_params = {'s1_epochs': model_params['s1_epochs'],'bag_size': min(l, 5000), 'refinement_epochs': 0,
                     'n_encoders': model_params['n_encoders'],'n_decoders': model_params['n_decoders']}
     train_params['nbags'] = 1 #max(train_params['n_encoders'], train_params['n_decoders'])
 
-    model_params['batch_size'] = min(l, 10000)
+    model_params['batch_size'] = min(l, 5000)
     model_params['run'] = run
     model_params['test_freq'] = model_params['test_freq']
     net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data)
@@ -46,12 +46,12 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
     model_params['add_noise'] = False
 
     l = len(training_data['x'])
-    train_params = {'s1_epochs': model_params['s1_epochs'],'bag_size': min(l, 20000), 'refinement_epochs': 0,
+    train_params = {'s1_epochs': model_params['s1_epochs'],'bag_size': min(l, 5000), 'refinement_epochs': 0,
                     'n_encoders': model_params['n_encoders'],'n_decoders': model_params['n_decoders']}
     train_params['nbags'] = train_params['n_encoders']
 
 
-    model_params['batch_size'] = min(l, 20000)
+    model_params['batch_size'] = min(l, 5000)
     model_params['run'] = run
     model_params['test_freq'] = model_params['test_freq']
     net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data)
@@ -191,7 +191,7 @@ def list_in(str, str_list):
     return False
 
 
-def agg_comparison_plots(model, exp_label = 'exp', loss_keys = ['decoder', 'sindy_x', 'sindy_z']):
+def agg_comparison_plots(model, exp_label = 'exp', loss_keys = ['decoder', 'sindy_x']):
     save_dir = f'../data/{exp_label}/'
     try:
         os.mkdir(save_dir)
@@ -203,7 +203,8 @@ def agg_comparison_plots(model, exp_label = 'exp', loss_keys = ['decoder', 'sind
         for (key, losses) in item_loss_dict.items():
             if key.startswith(loss_key):
                 if key.endswith('agg'):
-                    plt.plot(np.log(np.asarray(losses)), label='agg', marker='x', markevery=marker_freq)
+                    plt.plot(np.log(np.asarray(losses)), label='agg', linestyle = 'dashed',
+                             marker='x', markevery=marker_freq)
                 else:
                     plt.plot(np.log(np.asarray(losses)))
         plt.ylabel(loss_key)
@@ -348,20 +349,20 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
         pass
 
     if small:
-        params, training_data, validation_data = get_lorenz_params(train_size=4, test_size=2)
+        params, training_data, validation_data = get_lorenz_params(train_size=2, test_size=2)
         params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                         'n_encoders': 4, 'n_decoders': 4, 'criterion': 'avg', 's1_epochs': 1000,
+                         'n_encoders': 4, 'n_decoders': 4, 'criterion': 'avg', 's1_epochs': 200,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
     else:
         params, training_data, validation_data = get_lorenz_params(train_size=40, test_size=20)
         params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                         'n_encoders': 15, 'n_decoders': 15, 'criterion': 'avg', 's1_epochs': 7000,
+                         'n_encoders': 30, 'n_decoders': 30, 'criterion': 'avg', 's1_epochs': 200,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
     model1, Loss_dict, bag_loader, test_loader = ea_s1_test(params, training_data, validation_data)
+    agg_comparison_plots(model1, exp_label)
     save_model(model1, bag_loader, test_loader, save_dir = model_save_name)
-    agg_comparison_plots(model1,exp_label)
 
 
 def get_step1_min_losses(item_loss_dict):
@@ -381,7 +382,7 @@ def get_step1_min_losses(item_loss_dict):
 
 
 def run():
-    basic_test(exp_label='plot_exp_med', model_save_name='model4', small=False)
+    basic_test(exp_label='model4', model_save_name='model4', small=True)
     indep_model, bag_loader, test_loader = load_model('model4')
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
     item_loss_dict = net.item_loss_dict
@@ -389,6 +390,7 @@ def run():
     s_1_losses = {'E_agr_Decoder': min_losses['E_agr_Decoder'][-1],
                   'E_agr_Sindy_x': min_losses['E_agr_Sindy_x'][-1],
                   'active_coeffs': Loss_dict['active_coeffs'][-1]}
+    print(s_1_losses)
 
     indep_model, bag_loader, test_loader = load_model('model4')
 
@@ -408,6 +410,7 @@ def run():
         E_loss_dicts.append(E_loss_dict1)
 
     step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label='plot_exp_med')
+    '''
 
 
 if __name__=='__main__':

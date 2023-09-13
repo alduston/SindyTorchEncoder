@@ -431,7 +431,7 @@ class SindyNetEnsemble(nn.Module):
 
 
     def update_item_losses(self, loss_dict, encode_idx, decode_idx, agg = False):
-        for loss_key in ['decoder', 'sindy_x', 'sindy_z']:
+        for loss_key in ['decoder', 'sindy_x']:
             if agg:
                 key = f'{loss_key}_agg'
             else:
@@ -517,6 +517,10 @@ class SindyNetEnsemble(nn.Module):
 
         if self.params['cp_batch']:
             self.val_test(x, dx)
+            agr_loss_vals = {'decoder': self.val_dict['E_Decoder'][-1],
+                             'sindy_x':  self.val_dict['E_Sindy_x'][-1]}
+            self.update_item_losses(agr_loss_vals, 0, 0, agg = True)
+
 
         loss_dict = dict_mean(loss_dicts)
         loss = torch.mean(torch.stack(losses))
