@@ -9,6 +9,11 @@ import matplotlib.pyplot as plt
 import os
 import pandas as pd
 
+def update_list_dict(list_dict, update_dict):
+    for key in list_dict.keys():
+        list_dict[key].append(update_dict[key])
+    return list_dict
+
 
 def format(n, n_digits = 6):
     try:
@@ -199,7 +204,9 @@ def print_val_losses1(net):
 
     print(f'TEST: Epoch: {epoch}, E_Decoder: {E_Decoder}, E_Sindy_x: {E_Sindy_x}')
     net.refresh_val_dict = True
-    return True
+
+    return {'Epoch': epoch, 'E_agr_Decoder': E_Decoder, 'E_agr_Sindy_x': E_Sindy_x,
+            'active_coeffs': net.num_active_coeffs()}
 
 
 def train_eas_1(net, bag_loader, test_loader, model_params):
@@ -210,18 +217,21 @@ def train_eas_1(net, bag_loader, test_loader, model_params):
     optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'])
     pretrain_epocs = net.params['pretrain_epochs']
     true_coeffs = net.true_coeffs
+    E_loss_dict = {'Epoch': [], 'E_agr_Decoder': [], 'E_agr_Sindy_x': [], 'active_coeffs': []}
     for epoch in range(model_params['s1_epochs']):
         if (not epoch % test_freq):
             net.params['cp_batch'] = True
             net, Loss_dict = validate_epoch(net, test_loader, Loss_dict, true_coeffs)
             print(f'{str_list_sum(["TEST: "] + [print_keyval(key, val) for key, val in Loss_dict.items()])}')
-            print_val_losses1(net)
+            e_loss_dict = print_val_losses1(net)
+            E_loss_dict = update_list_dict(E_loss_dict, e_loss_dict)
+
         train_epoch(net, bag_loader, optimizer)
         if epoch > pretrain_epocs and not (epoch % cross_val_freq):
             net = indep_crossval(net)
 
     net, Loss_dict = validate_epoch(net, test_loader, Loss_dict)
-    return net, Loss_dict
+    return net, Loss_dict, E_loss_dict
 
 
 def print_val_losses2(net):
@@ -234,8 +244,11 @@ def print_val_losses2(net):
 
     print(f'TEST: Epoch: {epoch}, E_Decoder: {E_Decoder}, E_Sindy_x: {E_Sindy_x}'
           f' E_agr_Decoder: {E_agr_Decoder}, E_agr_Sindy_x: {E_agr_Sindy_x}')
+
     net.refresh_val_dict = True
-    return True
+
+    return {'Epoch': epoch, 'E_agr_Decoder': E_Decoder, 'E_agr_Sindy_x': E_Sindy_x,
+            'active_coeffs': net.num_active_coeffs()}
 
 
 def train_step2(net, bag_loader, test_loader, model_params):
@@ -248,17 +261,22 @@ def train_step2(net, bag_loader, test_loader, model_params):
     cross_val_freq = net.params['crossval_freq']
     net.to(net.device)
     true_coeffs = net.true_coeffs
+    E_loss_dict = {'Epoch': [], 'E_agr_Decoder': [], 'E_agr_Sindy_x': [], 'active_coeffs': []}
+
     for epoch in range(model_params['s2_epochs']):
         if  (not epoch % test_freq):
             net, Loss_dict = validate_epoch(net, test_loader, Loss_dict, true_coeffs)
             print(f'{str_list_sum(["TEST: "] + [print_keyval(key, val) for key, val in Loss_dict.items()])}')
-            print_val_losses2(net)
+            e_loss_dict = print_val_losses2(net)
+            E_loss_dict = update_list_dict(E_loss_dict, e_loss_dict)
+
         train_epoch(net, bag_loader, optimizer)
         if epoch > pretrain_epocs and not (epoch % cross_val_freq):
             net = cross_val(net)
 
     net, Loss_dict = validate_epoch(net, test_loader, Loss_dict)
-    return net, Loss_dict, bag_loader, test_loader
+    return net, Loss_dict, E_loss_dict, bag_loader, test_loader
+
 
 
 
@@ -274,6 +292,6 @@ def train_eas(model_params, train_params, training_data, validation_data):
     test_loader = get_loader(validation_data, model_params, device=device)
 
     net = SindyNetEnsemble(model_params).to(device)
-    net, Loss_dict = train_eas_1(net, bag_loader, test_loader, model_params)[:2]
+    net, Loss_dict, E_loss_dict = train_eas_1(net, bag_loader, test_loader, model_params)[:2]
     return net, Loss_dict, bag_loader, test_loader
 

@@ -279,6 +279,34 @@ def update_df_cols(df, update_num):
     return df.rename(columns=rename_dict)
 
 
+def step_2_plots(E_loss_dicts, step_1_losses, exp_label = 'exp'):
+    try:
+        os.mkdir(f'../data/{exp_label}')
+    except OSError:
+        pass
+    save_dir = f'../data/{exp_label}'
+    keys = ['E_agr_Decoder', 'E_agr_Sindy_x','active_coeffs']
+    x = E_loss_dicts[0]['Epoch']
+    for key in keys:
+        step_1_loss = step_1_losses[key][-1]
+        step_1_loss_vec = [step_1_loss for i in range(len(x))]
+        if key in ['E_agr_Decoder', 'E_agr_Sindy_x']:
+            step_1_loss_vec = np.log(np.asarray(step_1_loss_vec))
+
+        plt.plot(x, step_1_loss_vec, linestyle='dashed', label = 'step 1 essemble error')
+        for dict in E_loss_dicts:
+            plot_vec = dict[key][:len(x)]
+            if key in ['E_agr_Decoder', 'E_agr_Sindy_x']:
+                plot_vec = np.log(np.asarray(plot_vec))
+            plt.plot(x,plot_vec)
+        plt.xlabel('Epoch')
+        plt.ylabel(f'Log {key} loss')
+        plt.savefig(f'{save_dir}/{key}_plot.png')
+        clear_plt()
+    return True
+
+
+
 def save_model(model, bag_loader, test_loader, save_dir = 'model'):
     try:
         os.mkdir(f'../data/models/{save_dir}')
@@ -298,7 +326,6 @@ def load_model(save_dir = 'model'):
     test_loader = torch.load(f'../data/models/{save_dir}/test_loader.pkl')
     return model,bag_loader, test_loader
 
-
 #scp -r ald6fd@klone.hyak.uw.edu:/mmfs1/gscratch/dynamicsai/ald6fd/SindyTorchEncoder/data/stuff /Users/aloisduston/Desktop/Math/Research/Kutz/SindyEnsemble/data/
 
 def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
@@ -313,40 +340,52 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
                          'n_encoders': 4, 'n_decoders': 4, 'criterion': 'avg', 's1_epochs': 1000,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
     else:
-        params, training_data, validation_data = get_lorenz_params(train_size=200, test_size=20)
+        params, training_data, validation_data = get_lorenz_params(train_size=60, test_size=20)
         params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                         'n_encoders': 40, 'n_decoders': 40, 'criterion': 'avg', 's1_epochs': 10000,
+                         'n_encoders': 12, 'n_decoders': 12, 'criterion': 'avg', 's1_epochs': 12000,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
     model1, Loss_dict, bag_loader, test_loader = ea_s1_test(params, training_data, validation_data)
     save_model(model1, bag_loader, test_loader, save_dir = model_save_name)
-    agg_comparison_plots(model1,exp_label )
+    agg_comparison_plots(model1,exp_label)
+
+
 
 
 def run():
-    #basic_test(model_save_name = 'small_model', small = True)
-    indep_model, bag_loader, test_loader = load_model('model3')
-    train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 10})
-    indep_model, bag_loader, test_loader = load_model('model3')
-    print(' ')
+    basic_test(exp_label='plot_exp', model_save_name='model5', small=False)
+    indep_model, bag_loader, test_loader = load_model('model4')
+    net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 10})
+    indep_model, bag_loader, test_loader = load_model('model4')
 
     indep_model.params['coefficient_initialization'] = 'constant'
     indep_model.params['criterion'] = 'stability'
 
 
-    compressor_model = SindyNetTCompEnsemble(indep_model)
-    model_params = compressor_model.params
-    model_params['s2_epochs'] = 10000
-    train_step2(compressor_model, bag_loader, test_loader, compressor_model.params)
+    E_loss_dicts = []
+    n_trials = 10
+    for i in range(n_trials):
+        compressor_model = SindyNetTCompEnsemble(indep_model)
+        model_params = compressor_model.params
+        model_params['s2_epochs'] = 12000
 
-    final_coeffs = compressor_model.sindy_coeffs * compressor_model.coefficient_mask
+        net, Loss_dict, E_loss_dict1, bag_loader, test_loader = train_step2(compressor_model, bag_loader,
+                                                                       test_loader, compressor_model.params)
+        E_loss_dicts.append(E_loss_dict1)
+
+    step_2_plots(E_loss_dicts,E_loss_dict0, exp_label='plot_exp')
+
+
+    '''
+    final_coeffs = torch.mean(compressor_model.sindy_coeffs, dim = 0) * compressor_model.coefficient_mask
     final_coeffs = np.round(final_coeffs.detach().cpu().numpy(), 2)
     print(f'Final coeffs were: \n {final_coeffs}')
 
     true_coeffs = compressor_model.true_coeffs
     true_coeffs = np.round(true_coeffs.detach().cpu().numpy(), 2)
     print(f'True coeffs were: \n {true_coeffs}')
+    '''
 
 
 
