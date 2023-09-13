@@ -4,6 +4,7 @@ from sindy_utils import z_derivative, get_initialized_weights, sindy_library_tor
 from copy import copy, deepcopy
 import matplotlib.pyplot as plt
 import numpy as np
+from datetime import datetime as dt
 
 
 def format(n, n_digits = 6):

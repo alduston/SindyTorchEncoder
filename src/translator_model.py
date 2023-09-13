@@ -5,7 +5,7 @@ from copy import copy, deepcopy
 import matplotlib.pyplot as plt
 import numpy as np
 from copy import deepcopy
-from scipy.spatial.transform import Rotation as R
+from datetime import datetime as dt
 
 
 def format(n, n_digits = 6):
@@ -548,9 +548,14 @@ class SindyNetTCompEnsemble(nn.Module):
         dx_stack = self.expand(dx)
         dx_stack_stack = self.expand(dx_stack)
 
+        start = dt.now()
         decoder_loss = self.decode_loss(x_decomp_decode_stack, x_stack_stack)
+        print(f'decode loss eval  took {(dt.now() - start).total_seconds()} seconds')
+
         reg_loss = self.reg_loss()
+        start = dt.now()
         sindy_x_loss, dx_pred_stack = self.stacked_dx_loss(x_translate_stack,dx_stack_stack)
+        print(f'sindy loss eval  took {(dt.now() - start).total_seconds()} seconds')
         corr_loss = self.corr_loss(x_translate_stack)
 
         loss = decoder_loss + sindy_x_loss + corr_loss + reg_loss
