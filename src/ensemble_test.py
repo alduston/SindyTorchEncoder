@@ -46,7 +46,7 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
     model_params['add_noise'] = False
 
     l = len(training_data['x'])
-    train_params = {'s1_epochs': model_params['s1_epochs'],'bag_size': min(l, 10000), 'refinement_epochs': 0,
+    train_params = {'s1_epochs': model_params['s1_epochs'],'bag_size': min(l, 20000), 'refinement_epochs': 0,
                     'n_encoders': model_params['n_encoders'],'n_decoders': model_params['n_decoders']}
     train_params['nbags'] = train_params['n_encoders']
 
@@ -355,7 +355,7 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
     else:
         params, training_data, validation_data = get_lorenz_params(train_size=100, test_size=20)
         params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                         'n_encoders': 30, 'n_decoders': 30, 'criterion': 'avg', 's1_epochs': 201,
+                         'n_encoders': 15, 'n_decoders': 15, 'criterion': 'avg', 's1_epochs': 201,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
