@@ -365,7 +365,7 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
     save_model(model1, bag_loader, test_loader, save_dir = model_save_name)
 
 
-def get_step1_min_losses(item_loss_dict):
+def get_step1_med_losses(item_loss_dict):
     loss_keys = ['decoder', 'sindy_x']
     med_loss_dict = {'decoder': [], 'sindy_x': []}
 
@@ -383,16 +383,16 @@ def get_step1_min_losses(item_loss_dict):
 
 def run():
     #basic_test(exp_label='model4', model_save_name='model_exp_med', small = False)
-    indep_model, bag_loader, test_loader = load_model('small_model')
+    indep_model, bag_loader, test_loader = load_model('model4')
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
     item_loss_dict = net.item_loss_dict
-    min_losses = get_step1_min_losses(item_loss_dict)
-    s_1_losses = {'E_agr_Decoder': min_losses['E_agr_Decoder'][-1],
-                  'E_agr_Sindy_x': min_losses['E_agr_Sindy_x'][-1],
+    med_losses = get_step1_med_losses(item_loss_dict)
+    s_1_losses = {'E_agr_Decoder': med_losses['E_agr_Decoder'][-1],
+                  'E_agr_Sindy_x': med_losses['E_agr_Sindy_x'][-1],
                   'active_coeffs': Loss_dict['active_coeffs'][-1]}
     print(s_1_losses)
 
-    indep_model, bag_loader, test_loader = load_model('small_model')
+    indep_model, bag_loader, test_loader = load_model('model4')
 
     indep_model.params['coefficient_initialization'] = 'constant'
     indep_model.params['criterion'] = 'avg'
@@ -402,7 +402,7 @@ def run():
     for i in range(n_trials):
         compressor_model = SindyNetTCompEnsemble(indep_model)
         model_params = compressor_model.params
-        model_params['s2_epochs'] = 200
+        model_params['s2_epochs'] = 6000
 
         net, Loss_dict, E_loss_dict1, bag_loader, test_loader = train_step2(compressor_model, bag_loader,
                                                                        test_loader, compressor_model.params)
