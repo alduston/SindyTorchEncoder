@@ -301,7 +301,7 @@ def step_2_plots(E_loss_dicts2, E_loss_dict1, Indep_loss_dict1, exp_label = 'exp
         step_1_loss_vec = [step_1_loss for i in range(len(x))]
         if key in ['E_agr_Decoder', 'E_agr_Sindy_x']:
             step_1_eloss_vec = np.log(np.asarray(step_1_eloss_vec))
-            step_1_loss_vec = np.log(np.asarray(step_1_loss_vec))
+            step_1_loss_vec = np.log(1e-15 + np.abs(np.asarray(step_1_loss_vec, dtype=float)))
             plt.plot(x, step_1_eloss_vec, linestyle='dashed', label='step 1 essemble error')
 
         plt.plot(x, step_1_loss_vec, linestyle='dashed', label='step 1 min error')
@@ -309,7 +309,7 @@ def step_2_plots(E_loss_dicts2, E_loss_dict1, Indep_loss_dict1, exp_label = 'exp
         for dict in E_loss_dicts2:
             plot_vec = dict[key][:len(x)]
             if key in ['E_agr_Decoder', 'E_agr_Sindy_x']:
-                plot_vec = np.log(np.asarray(plot_vec))
+                plot_vec = np.log(1e-15 + np.abs(np.asarray(plot_vec),dtype=float))
             plt.plot(x,plot_vec)
         plt.xlabel('Epoch')
         plt.ylabel(plot_labels[key])
@@ -354,9 +354,9 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
                          'n_encoders': 25, 'n_decoders': 25, 'criterion': 'avg', 's1_epochs': 201,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
     else:
-        params, training_data, validation_data = get_lorenz_params(train_size=30, test_size=15)
+        params, training_data, validation_data = get_lorenz_params(train_size=100, test_size=100)
         params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                         'n_encoders': 7, 'n_decoders': 7, 'criterion': 'avg', 's1_epochs': 5000,
+                         'n_encoders': 25, 'n_decoders': 25, 'criterion': 'avg', 's1_epochs': 15000,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
@@ -382,8 +382,8 @@ def get_step1_med_losses(item_loss_dict):
 
 
 def run():
-    #basic_test(exp_label='model4', model_save_name='model_exp_med', small = False)
-    indep_model, bag_loader, test_loader = load_model('model4')
+    basic_test(exp_label='model5', model_save_name='plot_exp_big', small = False)
+    indep_model, bag_loader, test_loader = load_model('model5')
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
     item_loss_dict = net.item_loss_dict
     med_losses = get_step1_med_losses(item_loss_dict)
@@ -392,23 +392,23 @@ def run():
                   'active_coeffs': Loss_dict['active_coeffs'][-1]}
     print(s_1_losses)
 
-    indep_model, bag_loader, test_loader = load_model('model4')
+    indep_model, bag_loader, test_loader = load_model('model5')
 
     indep_model.params['coefficient_initialization'] = 'constant'
     indep_model.params['criterion'] = 'avg'
 
     E_loss_dicts = []
-    n_trials = 1
+    n_trials = 5
     for i in range(n_trials):
         compressor_model = SindyNetTCompEnsemble(indep_model)
         model_params = compressor_model.params
-        model_params['s2_epochs'] = 6000
+        model_params['s2_epochs'] = 16000
 
         net, Loss_dict, E_loss_dict1, bag_loader, test_loader = train_step2(compressor_model, bag_loader,
                                                                        test_loader, compressor_model.params)
         E_loss_dicts.append(E_loss_dict1)
 
-    step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label='plot_exp_med')
+    step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label='plot_exp_big')
 
 
 if __name__=='__main__':
