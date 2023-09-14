@@ -145,13 +145,10 @@ class SindyNetTCompEnsemble(nn.Module):
         self.criterion_f = self.criterion_function
 
         self.translators = self.init_translators()
-        self.decompressor, self.decompressor_layers = self.Residual_Decompressor(self.params)
+        self.detranslators = self.init_detranslators()
 
         self.params['stacked_decoder'], self.params['stacked_decoder_layers'] = self.Stacked_decoder(self.params)
         self.params['stacked_encoder'], self.params['stacked_encoder_layers'] = self.Stacked_encoder(self.params)
-
-        #self.sindy_coeffs = [self.init_sindy_coefficients() for i in range(self.params['n_encoders'])]
-        #self.sindy_coeffs = torch.nn.Parameter(torch.stack(self.sindy_coeffs), requires_grad=True)
 
         self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad=True)
         self.coefficient_mask = torch.tensor(deepcopy(self.params['coefficient_mask']),dtype=self.dtype, device=self.device)
@@ -256,10 +253,20 @@ class SindyNetTCompEnsemble(nn.Module):
         translators = []
         for i in range(self.params['n_encoders']):
             translator, translator_layers = self.Residual_Translator(self.params)
-            translators.append({'translator': translator, 'encoder_layers': translator_layers})
+            translators.append({'translator': translator, 'translator_layers': translator_layers})
             for j, tensor in enumerate(translator.parameters()):
-                self.register_parameter(name=f'{"encoder"}{i}{j}', param=tensor)
+                self.register_parameter(name=f'{"translator"}{i}{j}', param=tensor)
         return translators
+
+
+    def init_detranslators(self):
+        detranslators = []
+        for i in range(self.params['n_encoders']):
+            detranslator, detranslator_layers = self.Residual_Translator(self.params)
+            detranslators.append({'detranslator': detranslator, 'detranslator_layers': detranslator_layers})
+            for j, tensor in enumerate(detranslator.parameters()):
+                self.register_parameter(name=f'{"detranslator"}{i}{j}', param=tensor)
+        return detranslators
 
 
     def Residual_Translator(self, params):
@@ -392,47 +399,38 @@ class SindyNetTCompEnsemble(nn.Module):
         return torch.matmul(Theta, mask * coeffs)
 
 
-    def sub_forward(self, x, encode_idx):
+    def sub_forward(self, x, encode_idx, decode_idx):
         encoder = self.params['indep_models'].Encoders[encode_idx]['encoder']
-        stacked_decoder = self.params['stacked_decoder']
+        decoder = self.params['indep_models'].Decoders[decode_idx]['decoder']
         translator = self.translators[encode_idx]['translator']
+        detranslator = self.detranslators[decode_idx]['detranslator']
 
         x_encode = encoder(x)
         x_translate = translator(x_encode)
-        x_decomp = self.decompressor(x_translate)
-        x_decomp_decode = stacked_decoder(x_decomp)
+        x_decomp = detranslator(x_translate)
+        x_decomp_decode = decoder(x_decomp)
         return x_translate, x_decomp_decode
 
 
-    def stack_forward(self,  x):
-        x_decomp_decodes = []
-        x_translates = []
-        for encode_idx in range(len(self.translators)):
-            x_translate, x_decomp_decode = self.sub_forward(x, encode_idx)
-            x_decomp_decodes.append(x_decomp_decode)
-            x_translates.append(x_translate)
+    def dx_decode(self, z, dz, decode_idx):
+        detranslator = self.detranslators[decode_idx]
+        decoder_weights, decoder_biases = self.get_weights(
+            self.params['indep_models'].Decoders[decode_idx]['decoder_layers'])
 
-        x_decomp_decode_stack = torch.concat(x_decomp_decodes, dim = 1)
-        x_translate_stack = torch.concat(x_translates, dim=1)
-        return x_decomp_decode_stack, x_translate_stack
-
-
-    def dx_decode(self, z, dz):
-        decoder_weights, decoder_biases = self.get_weights(self.params['stacked_decoder_layers'])
-        decompressor_weights, decompressor_biases = self.get_comp_weights(self.decompressor_layers)
+        detranslator_weights, detranslator_biases = self.get_comp_weights(detranslator['detranslator_layers'])
         activation = self.params['activation']
 
-        dz_g = residual_z_derivative(z, dz, decompressor_weights, decompressor_biases, activation).T
-        z_g = self.decompressor(z)
+        dz_g = residual_z_derivative(z, dz, detranslator_weights, detranslator_biases, activation).T
+        z_g = detranslator['detranslator'](z)
         dx_decode = z_derivative(z_g, dz_g, decoder_weights, decoder_biases, activation).T
         return dx_decode
 
 
-    def sub_dx_loss(self, x_translate, dx_stack):
+    def sub_dx_loss(self, x_translate, dx, decode_idx):
         dz_pred = self.sindy_predict(x_translate)
-        dx_pred = self.dx_decode(x_translate, dz_pred)
+        dx_pred = self.dx_decode(x_translate, dz_pred,  decode_idx)
         criterion = nn.MSELoss()
-        loss = self.params['loss_weight_sindy_x'] * (criterion(dx_pred, dx_stack))
+        loss = self.params['loss_weight_sindy_x'] * (criterion(dx_pred, dx))
         return loss, dx_pred
 
 
@@ -471,7 +469,6 @@ class SindyNetTCompEnsemble(nn.Module):
         return corr_loss/len(self.translators)
 
 
-
     def val_test(self, x, dx, x_translate_stack, agr_key='mean'):
         if self.refresh_val_dict:
             self.val_dict = {'E_Decoder': [],  'E_Sindy_x': [], 'E_agr_Decoder': [], 'E_agr_Sindy_x': []}
@@ -479,10 +476,13 @@ class SindyNetTCompEnsemble(nn.Module):
         criterion = nn.MSELoss()
 
         agr_x_translate = self.collapse(x_translate_stack, agr_key=agr_key)
-        agr_x_decomp_decode = self.params['stacked_decoder'](self.decompressor(agr_x_translate))
+        agr_x_translate_stack = torch.concat([detranslator['detranslator'](agr_x_translate)
+                                              for detranslator in self.detranslators], dim = 1)
+        agr_x_decomp_decode = self.params['stacked_decoder'](agr_x_translate_stack)
 
         agr_dz_pred = self.sindy_predict(agr_x_translate)
-        agr_dx_pred = self.dx_decode(agr_x_translate, agr_dz_pred)
+        agr_dx_pred  = torch.concat([self.dx_decode(agr_x_translate, agr_dz_pred, decode_idx) for decode_idx
+                        in range(len(self.translators))], dim = 1)
 
         agr_decomp_loss2 = float(self.decode_loss(
             self.collapse(agr_x_decomp_decode, agr_key=agr_key), x).detach().cpu())
@@ -497,21 +497,19 @@ class SindyNetTCompEnsemble(nn.Module):
         return True
 
 
-    def sub_loss(self, x, dx, x_stack, dx_stack, encode_idx):
-        x_translate,x_decomp_decode = self.sub_forward(x, encode_idx)
-        decoder_loss = self.decode_loss(x_decomp_decode, x_stack)
-        sindy_x_loss, dx_pred = self.sub_dx_loss(x_translate, dx_stack)
+    def sub_loss(self, x, dx, encode_idx, decode_idx):
+        x_translate, x_decomp_decode = self.sub_forward(x, encode_idx, encode_idx)
+        decoder_loss = self.decode_loss(x_decomp_decode, x)
+        sindy_x_loss, dx_pred = self.sub_dx_loss(x_translate, dx, decode_idx)
         loss_dict = {'decoder': decoder_loss, 'sindy_x': sindy_x_loss}
         return loss_dict, x_translate
 
 
     def Loss(self, x, dx):
-        x_stack = self.expand(x)
-        dx_stack = self.expand(dx)
         sub_loss_dicts = []
         x_translates = []
         for encode_idx in range(self.params['n_encoders']):
-            sub_loss_dict, x_translate = self.sub_loss(x, dx, x_stack, dx_stack, encode_idx)
+            sub_loss_dict, x_translate = self.sub_loss(x, dx, encode_idx, encode_idx)
             sub_loss_dicts.append(sub_loss_dict)
             x_translates.append(x_translate)
 

@@ -11,7 +11,7 @@ import warnings
 from data_utils import get_lorenz_params
 import matplotlib.pyplot as plt
 from copy import deepcopy
-from translator_model import SindyNetTCompEnsemble
+from translator_model2 import SindyNetTCompEnsemble
 import shutil
 
 warnings.filterwarnings("ignore")
@@ -29,11 +29,11 @@ def ea_s1_test(model_params, training_data, validation_data, run  = 0):
     model_params['add_noise'] = False
 
     l = len(training_data['x'])
-    train_params = {'s1_epochs': model_params['s1_epochs'],'bag_size': min(l, 20000), 'refinement_epochs': 0,
+    train_params = {'s1_epochs': model_params['s1_epochs'],'bag_size': min(l, 5000), 'refinement_epochs': 0,
                     'n_encoders': model_params['n_encoders'],'n_decoders': model_params['n_decoders']}
     train_params['nbags'] = 1 #max(train_params['n_encoders'], train_params['n_decoders'])
 
-    model_params['batch_size'] = min(l, 20000)
+    model_params['batch_size'] = min(l, 5000)
     model_params['run'] = run
     model_params['test_freq'] = model_params['test_freq']
     net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data)
@@ -383,7 +383,7 @@ def get_step1_min_losses(item_loss_dict):
 
 def run():
     #basic_test(exp_label='model4', model_save_name='model_exp_med', small = False)
-    indep_model, bag_loader, test_loader = load_model('model4')
+    indep_model, bag_loader, test_loader = load_model('small_model')
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
     item_loss_dict = net.item_loss_dict
     min_losses = get_step1_min_losses(item_loss_dict)
@@ -392,7 +392,7 @@ def run():
                   'active_coeffs': Loss_dict['active_coeffs'][-1]}
     print(s_1_losses)
 
-    indep_model, bag_loader, test_loader = load_model('model4')
+    indep_model, bag_loader, test_loader = load_model('small_model')
 
     indep_model.params['coefficient_initialization'] = 'constant'
     indep_model.params['criterion'] = 'avg'
@@ -408,7 +408,7 @@ def run():
                                                                        test_loader, compressor_model.params)
         E_loss_dicts.append(E_loss_dict1)
 
-    step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label='plot_exp_med')
+    step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label='plot_exp_small')
 
 
 if __name__=='__main__':
