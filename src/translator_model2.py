@@ -501,10 +501,10 @@ class SindyNetTCompEnsemble(nn.Module):
             loss_dicts.append({'decoder': decoder_loss, 'sindy_x': sindy_x_loss})
         return dict_mean(loss_dicts), x_translate
 
-    def rand_decode_indexes(self, k = 4):
+    def rand_decode_indexes(self, k = 2):
         candidate_indexes = list(range(self.params['n_encoders']))
         decode_indexes = random.choices(candidate_indexes, k = k)
-        return decode_indexes
+        return decode_indexes[0]
 
 
     def Loss(self, x, dx):
