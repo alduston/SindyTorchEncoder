@@ -300,11 +300,11 @@ def step_2_plots(E_loss_dicts2, E_loss_dict1, Indep_loss_dict1, exp_label = 'exp
         step_1_loss = Indep_loss_dict1[key]
         step_1_loss_vec = [step_1_loss for i in range(len(x))]
         if key in ['E_agr_Decoder', 'E_agr_Sindy_x']:
-            step_1_eloss_vec = np.log(np.asarray(step_1_eloss_vec))
+            step_1_eloss_vec = np.log(1e-15 + np.abs(np.asarray(step_1_eloss_vec,dtype=float)))
             step_1_loss_vec = np.log(1e-15 + np.abs(np.asarray(step_1_loss_vec, dtype=float)))
             plt.plot(x, step_1_eloss_vec, linestyle='dashed', label='step 1 essemble error')
 
-        plt.plot(x, step_1_loss_vec, linestyle='dashed', label='step 1 min error')
+        plt.plot(x, step_1_loss_vec, linestyle='dashed', label='step 1 median error')
 
         for dict in E_loss_dicts2:
             plot_vec = dict[key][:len(x)]
