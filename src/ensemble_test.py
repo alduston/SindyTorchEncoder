@@ -367,23 +367,23 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
 
 def get_step1_min_losses(item_loss_dict):
     loss_keys = ['decoder', 'sindy_x']
-    min_loss_dict = {'decoder': [], 'sindy_x': []}
+    med_loss_dict = {'decoder': [], 'sindy_x': []}
 
     item_loss_dict = {key:val for key,val in item_loss_dict.items() if len(val)}
 
     for loss_key in loss_keys:
-        min_losses = []
+        med_losses = []
         for epoch in range(len(list(item_loss_dict.values())[0])):
             loss_vals = [item_loss_dict[key][epoch] for key in item_loss_dict.keys() if key.startswith(loss_key)]
-            min_losses.append(float(np.min(np.asfarray(loss_vals))))
-        min_loss_dict[loss_key] = min_losses
-    return {'E_agr_Decoder': min_loss_dict['decoder'], 'E_agr_Sindy_x':  min_loss_dict['sindy_x']}
+            med_losses.append(float(np.min(np.asfarray(loss_vals))))
+        med_loss_dict[loss_key] = med_losses
+    return {'E_agr_Decoder': med_loss_dict['decoder'], 'E_agr_Sindy_x':  med_loss_dict['sindy_x']}
 
 
 
 def run():
     #basic_test(exp_label='model4', model_save_name='model_exp_med', small = False)
-    indep_model, bag_loader, test_loader = load_model('model4')
+    indep_model, bag_loader, test_loader = load_model('small_model')
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
     item_loss_dict = net.item_loss_dict
     min_losses = get_step1_min_losses(item_loss_dict)
@@ -392,7 +392,7 @@ def run():
                   'active_coeffs': Loss_dict['active_coeffs'][-1]}
     print(s_1_losses)
 
-    indep_model, bag_loader, test_loader = load_model('model4')
+    indep_model, bag_loader, test_loader = load_model('small_model')
 
     indep_model.params['coefficient_initialization'] = 'constant'
     indep_model.params['criterion'] = 'avg'

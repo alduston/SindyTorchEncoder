@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from copy import deepcopy
 from datetime import datetime as dt
+import random
 
 
 def dict_mean(dicts):
@@ -399,19 +400,6 @@ class SindyNetTCompEnsemble(nn.Module):
         return torch.matmul(Theta, mask * coeffs)
 
 
-    def sub_forward(self, x, encode_idx, decode_idx):
-        encoder = self.params['indep_models'].Encoders[encode_idx]['encoder']
-        decoder = self.params['indep_models'].Decoders[decode_idx]['decoder']
-        translator = self.translators[encode_idx]['translator']
-        detranslator = self.detranslators[decode_idx]['detranslator']
-
-        x_encode = encoder(x)
-        x_translate = translator(x_encode)
-        x_decomp = detranslator(x_translate)
-        x_decomp_decode = decoder(x_decomp)
-        return x_translate, x_decomp_decode
-
-
     def dx_decode(self, z, dz, decode_idx):
         detranslator = self.detranslators[decode_idx]
         decoder_weights, decoder_biases = self.get_weights(
@@ -431,7 +419,7 @@ class SindyNetTCompEnsemble(nn.Module):
         dx_pred = self.dx_decode(x_translate, dz_pred,  decode_idx)
         criterion = nn.MSELoss()
         loss = self.params['loss_weight_sindy_x'] * (criterion(dx_pred, dx))
-        return loss, dx_pred
+        return loss
 
 
     def decode_loss(self, x, x_pred):
@@ -497,19 +485,34 @@ class SindyNetTCompEnsemble(nn.Module):
         return True
 
 
-    def sub_loss(self, x, dx, encode_idx, decode_idx):
-        x_translate, x_decomp_decode = self.sub_forward(x, encode_idx, encode_idx)
-        decoder_loss = self.decode_loss(x_decomp_decode, x)
-        sindy_x_loss, dx_pred = self.sub_dx_loss(x_translate, dx, decode_idx)
-        loss_dict = {'decoder': decoder_loss, 'sindy_x': sindy_x_loss}
-        return loss_dict, x_translate
+    def sub_loss(self, x, dx, encode_idx, decode_indexes):
+        encoder = self.params['indep_models'].Encoders[encode_idx]['encoder']
+        translator = self.translators[encode_idx]['translator']
+        x_translate = translator(encoder(x))
+        loss_dicts = []
+        for decode_idx in decode_indexes:
+            decoder = self.params['indep_models'].Decoders[decode_idx]['decoder']
+            detranslator = self.detranslators[decode_idx]['detranslator']
+            x_decomp = detranslator(x_translate)
+            x_decomp_decode = decoder(x_decomp)
+
+            decoder_loss = self.decode_loss(x_decomp_decode, x)
+            sindy_x_loss = self.sub_dx_loss(x_translate, dx, decode_idx)
+            loss_dicts.append({'decoder': decoder_loss, 'sindy_x': sindy_x_loss})
+        return dict_mean(loss_dicts), x_translate
+
+    def rand_decode_indexes(self, k = 4):
+        candidate_indexes = list(range(self.params['n_encoders']))
+        decode_indexes = random.choices(candidate_indexes, k = k)
+        return decode_indexes
 
 
     def Loss(self, x, dx):
         sub_loss_dicts = []
         x_translates = []
         for encode_idx in range(self.params['n_encoders']):
-            sub_loss_dict, x_translate = self.sub_loss(x, dx, encode_idx, encode_idx)
+            decode_indexes = [encode_idx]+  [self.rand_decode_indexes()]
+            sub_loss_dict, x_translate = self.sub_loss(x, dx, encode_idx, decode_indexes)
             sub_loss_dicts.append(sub_loss_dict)
             x_translates.append(x_translate)
 
