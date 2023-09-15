@@ -511,7 +511,7 @@ class SindyNetTCompEnsemble(nn.Module):
         sub_loss_dicts = []
         x_translates = []
         for encode_idx in range(self.params['n_encoders']):
-            decode_indexes = [0, encode_idx]+  [self.rand_decode_indexes()]
+            decode_indexes = [0, encode_idx]
             sub_loss_dict, x_translate = self.sub_loss(x, dx, encode_idx, decode_indexes)
             sub_loss_dicts.append(sub_loss_dict)
             x_translates.append(x_translate)

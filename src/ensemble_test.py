@@ -382,7 +382,7 @@ def get_step1_med_losses(item_loss_dict):
 
 
 def run():
-    basic_test(exp_label='small_model2', model_save_name='plot_exp_small2', small = True)
+    basic_test(exp_label='plot_exp_small2', model_save_name='small_model2', small = True)
     indep_model, bag_loader, test_loader = load_model('small_model2')
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
     item_loss_dict = net.item_loss_dict
@@ -402,7 +402,7 @@ def run():
     for i in range(n_trials):
         compressor_model = SindyNetTCompEnsemble(indep_model)
         model_params = compressor_model.params
-        model_params['s2_epochs'] = 5000
+        model_params['s2_epochs'] = 15000
 
         net, Loss_dict, E_loss_dict1, bag_loader, test_loader = train_step2(compressor_model, bag_loader,
                                                                        test_loader, compressor_model.params)
