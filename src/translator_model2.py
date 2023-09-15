@@ -390,6 +390,19 @@ class SindyNetTCompEnsemble(nn.Module):
         x_split = x_stack.permute(1,0,2)
         return x_split
 
+    def sub_dz(self, x, dx, encode_idx):
+        translator = self.translators[encode_idx]
+        encoder = self.params['indep_models'].Encoders[encode_idx]
+        encoder_weights, encoder_biases = self.get_weights(encoder['encoder_layers'])
+        translator_weights, translator_biases = self.get_comp_weights(translator['detranslator_layers'])
+        activation = self.params['activation']
+
+        zi = encoder['encoder'](x)
+        dzi = z_derivative(x, dx, encoder_weights, encoder_biases, activation).T
+
+        dz = residual_z_derivative(zi, dzi, translator_weights, translator_biases, activation).T
+        return dz
+
 
     def sindy_predict(self, z, coeffs = [], mask = []):
         Theta = self.Theta(z)
@@ -414,8 +427,7 @@ class SindyNetTCompEnsemble(nn.Module):
         return dx_decode
 
 
-    def sub_dx_loss(self, x_translate, dx, decode_idx):
-        dz_pred = self.sindy_predict(x_translate)
+    def sub_dx_loss(self, x_translate, dx, dz_pred, decode_idx):
         dx_pred = self.dx_decode(x_translate, dz_pred,  decode_idx)
         criterion = nn.MSELoss()
         loss = self.params['loss_weight_sindy_x'] * (criterion(dx_pred, dx))
@@ -490,6 +502,8 @@ class SindyNetTCompEnsemble(nn.Module):
         translator = self.translators[encode_idx]['translator']
         x_translate = translator(encoder(x))
         loss_dicts = []
+        dz = self.sub_dz(x, dx, encode_idx)
+        dz_pred = self.sindy_predict(x_translate)
         for decode_idx in decode_indexes:
             decoder = self.params['indep_models'].Decoders[decode_idx]['decoder']
             detranslator = self.detranslators[decode_idx]['detranslator']
@@ -497,9 +511,10 @@ class SindyNetTCompEnsemble(nn.Module):
             x_decomp_decode = decoder(x_decomp)
 
             decoder_loss = self.decode_loss(x_decomp_decode, x)
-            sindy_x_loss, dz_pred = self.sub_dx_loss(x_translate, dx, decode_idx)
+            sindy_x_loss = self.sub_dx_loss(x_translate, dx, dz_pred, decode_idx)
             loss_dicts.append({'decoder': decoder_loss, 'sindy_x': sindy_x_loss})
-        return dict_mean(loss_dicts), x_translate, dz_pred
+        return dict_mean(loss_dicts), x_translate, dz_pred, dz
+
 
     def rand_decode_indexes(self, k = 2):
         candidate_indexes = list(range(self.params['n_encoders']))
@@ -511,17 +526,19 @@ class SindyNetTCompEnsemble(nn.Module):
         sub_loss_dicts = []
         x_translates = []
         dz_preds = []
+        dzs = []
         for encode_idx in range(self.params['n_encoders']):
             decode_indexes = [0, encode_idx]
-            sub_loss_dict, x_translate, dz_pred = self.sub_loss(x, dx, encode_idx, decode_indexes)
+            sub_loss_dict, x_translate,dz_pred, dz = self.sub_loss(x, dx, encode_idx, decode_indexes)
             sub_loss_dicts.append(sub_loss_dict)
             x_translates.append(x_translate)
             dz_preds.append(dz_pred)
+            dzs.append(dz)
 
         loss_dict = dict_mean(sub_loss_dicts)
         x_translate_stack = torch.concat(x_translates, dim = 1)
-        dz_pred_stack =  torch.concat(dz_preds, dim = 1)
-        corr_loss =  self.corr_loss(x_translate_stack) + self.corr_loss(dz_pred_stack)
+        dz_stack =  torch.concat(dzs, dim = 1)
+        corr_loss =  .5 * (self.corr_loss(x_translate_stack) + self.corr_loss(dz_stack))
         loss_dict['reg'] = self.reg_loss()
         loss_dict['sindy_z'] = corr_loss
         loss =  loss_dict['decoder'] + loss_dict['sindy_x'] + loss_dict['reg'] + loss_dict['sindy_z']
