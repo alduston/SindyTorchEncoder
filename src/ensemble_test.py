@@ -375,14 +375,14 @@ def get_step1_med_losses(item_loss_dict):
         med_losses = []
         for epoch in range(len(list(item_loss_dict.values())[0])):
             loss_vals = [item_loss_dict[key][epoch] for key in item_loss_dict.keys() if key.startswith(loss_key)]
-            med_losses.append(float(np.min(np.asfarray(loss_vals))))
+            med_losses.append(float(np.median(np.asfarray(loss_vals))))
         med_loss_dict[loss_key] = med_losses
     return {'E_agr_Decoder': med_loss_dict['decoder'], 'E_agr_Sindy_x':  med_loss_dict['sindy_x']}
 
 
 
 def run():
-    basic_test(exp_label='model5', model_save_name='plot_exp_big', small = False)
+    #basic_test(exp_label='model5', model_save_name='plot_exp_big', small = False)
     indep_model, bag_loader, test_loader = load_model('model5')
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
     item_loss_dict = net.item_loss_dict
@@ -402,7 +402,7 @@ def run():
     for i in range(n_trials):
         compressor_model = SindyNetTCompEnsemble(indep_model)
         model_params = compressor_model.params
-        model_params['s2_epochs'] = 16000
+        model_params['s2_epochs'] = 20000
 
         net, Loss_dict, E_loss_dict1, bag_loader, test_loader = train_step2(compressor_model, bag_loader,
                                                                        test_loader, compressor_model.params)
