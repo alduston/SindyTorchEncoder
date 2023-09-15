@@ -351,7 +351,7 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
     if small:
         params, training_data, validation_data = get_lorenz_params(train_size=20, test_size=10)
         params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                         'n_encoders': 5, 'n_decoders': 5, 'criterion': 'avg', 's1_epochs': 5001,
+                         'n_encoders': 5, 'n_decoders': 5, 'criterion': 'avg', 's1_epochs': 7501,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
     else:
         params, training_data, validation_data = get_lorenz_params(train_size=100, test_size=100)
