@@ -398,7 +398,7 @@ def run():
     indep_model.params['criterion'] = 'avg'
 
     E_loss_dicts = []
-    n_trials = 3
+    n_trials = 1
     for i in range(n_trials):
         compressor_model = SindyNetTCompEnsemble(indep_model)
         model_params = compressor_model.params
