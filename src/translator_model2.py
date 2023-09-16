@@ -275,7 +275,7 @@ class SindyNetTCompEnsemble(nn.Module):
     def init_sindy_coeff_stack(self):
         n = self.params['n_encoders']**2
         coeff_stack = torch.stack([self.init_sindy_coefficients() for i in range(n)])
-        return torch.nn.parameter(coeff_stack, requires_grad=True)
+        return torch.nn.Parameter(coeff_stack, requires_grad=True)
 
 
 
@@ -425,7 +425,7 @@ class SindyNetTCompEnsemble(nn.Module):
         Theta = self.Theta(z)
         mask = self.coefficient_mask
         if not len(coeffs):
-            coeffs = self.sindy_coeffs[encode_idx * (self.params['n_encoders']) + decode_idx]
+            coeffs = self.sindy_coeff_stack[encode_idx * (self.params['n_encoders']) + decode_idx]
         return torch.matmul(Theta, mask * coeffs)
 
 
@@ -457,7 +457,7 @@ class SindyNetTCompEnsemble(nn.Module):
 
 
     def reg_loss(self):
-        return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(self.sindy_coeffs))
+        return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(self.sindy_coeff_stack))
 
 
     def sub_corr_loss(self, Z, encode_idx):
@@ -530,6 +530,7 @@ class SindyNetTCompEnsemble(nn.Module):
             decoder_loss = self.decode_loss(x_decomp_decode, x)
             sindy_x_loss = self.sub_dx_loss(x_translate, dx, dz_pred, decode_idx)
             loss_dicts.append({'decoder': decoder_loss, 'sindy_x': sindy_x_loss})
+        print(loss_dicts)
         return dict_mean(loss_dicts), x_translate
 
 
@@ -543,8 +544,8 @@ class SindyNetTCompEnsemble(nn.Module):
         sub_loss_dicts = []
         x_translates = []
         for encode_idx in range(self.params['n_encoders']):
-            decode_indexes = range(0, encode_idx)
-            sub_loss_dict, x_translate,dz_pred, dz = self.sub_loss(x, dx, encode_idx, decode_indexes)
+            decode_indexes = range(0, self.params['n_encoders'])
+            sub_loss_dict, x_translate = self.sub_loss(x, dx, encode_idx, decode_indexes)
             sub_loss_dicts.append(sub_loss_dict)
             x_translates.append(x_translate)
 
