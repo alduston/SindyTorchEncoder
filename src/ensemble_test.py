@@ -393,7 +393,7 @@ def get_step1_med_losses(item_loss_dict):
 
 
 def run():
-    basic_test(exp_label='show_exp', model_save_name='show_exp', small = False)
+    basic_test(exp_label='show_exp', model_save_name='show_model', small = False)
 
     indep_model, bag_loader, test_loader = load_model('show_model')
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
