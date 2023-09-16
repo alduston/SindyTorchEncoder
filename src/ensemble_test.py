@@ -191,27 +191,34 @@ def list_in(str, str_list):
     return False
 
 
-def agg_comparison_plots(model, exp_label = 'exp', loss_keys = ['decoder', 'sindy_x']):
+def agg_comparison_plots(model, exp_label = 'exp', loss_keys = ['decoder', 'sindy_x', 'active_coeffs']):
     save_dir = f'../data/{exp_label}/'
     try:
         os.mkdir(save_dir)
     except OSError:
         pass
+    log_keys = ['decoder', 'sindy_x']
     marker_freq = max(1, len(list(model.item_loss_dict.values())[0])//40)
     item_loss_dict = model.item_loss_dict
+    item_loss_dict = {key:val for key,val in item_loss_dict.items() if len(val) > 0}
+    epochs = np.linspace(0, int(model.epoch.detach()), len(list(item_loss_dict.values())[0])).astype(int)
     for loss_key in loss_keys:
         for (key, losses) in item_loss_dict.items():
             if key.startswith(loss_key):
+                if key in log_keys:
+                    plot_losses = np.log(np.asarray(losses))
+                else:
+                    plot_losses = np.asarray(losses)
                 if key.endswith('agg'):
-                    plt.plot(np.log(np.asarray(losses)), label='agg', linestyle = 'dashed',
+                    plt.plot(epochs, plot_losses, label='agg', linestyle = 'dashed',
                              marker='x', markevery=marker_freq)
                 else:
-                    plt.plot(np.log(np.asarray(losses)))
+                    plt.plot(epochs, plot_losses)
         plt.ylabel(loss_key)
         plt.xlabel('epoch')
         plt.legend()
-        plt.title(f'Agg v Submodel {loss_key} log loss')
-        plt.savefig(f'{save_dir}{loss_key}_agg_v_sub.png')
+        plt.title(f'Ensemble v Submodel {loss_key} Log Loss')
+        plt.savefig(f'{save_dir}{loss_key}_ensemble_v_sub.png')
         clear_plt()
     return True
 
@@ -331,6 +338,10 @@ def save_model(model, bag_loader, test_loader, save_dir = 'model'):
     torch.save(model, f'../data/models/{save_dir}/model.pkl')
     torch.save(bag_loader, f'../data/models/{save_dir}/bag_loader.pkl')
     torch.save(test_loader, f'../data/models/{save_dir}/test_loader.pkl')
+    param_str = f'encoders = {model.params["n_encoders"]}, ' \
+                f'epochs = {float(model.epoch.detach())}, ' \
+                f'data size = {sum([int(max(bag["x_bag"].shape)) for bag in bag_loader])}'
+    os.system(f'echo {param_str} > ../data/models/{save_dir}/model_params.txt')
     return True
 
 
@@ -349,14 +360,14 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
         pass
 
     if small:
-        params, training_data, validation_data = get_lorenz_params(train_size=20, test_size=10)
+        params, training_data, validation_data = get_lorenz_params(train_size=5, test_size=5)
         params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                         'n_encoders': 5, 'n_decoders': 5, 'criterion': 'avg', 's1_epochs': 7501,
+                         'n_encoders': 5, 'n_decoders': 5, 'criterion': 'avg', 's1_epochs': 201,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
     else:
-        params, training_data, validation_data = get_lorenz_params(train_size=100, test_size=100)
+        params, training_data, validation_data = get_lorenz_params(train_size=50, test_size=50)
         params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                         'n_encoders': 25, 'n_decoders': 25, 'criterion': 'avg', 's1_epochs': 15000,
+                         'n_encoders': 10, 'n_decoders': 10, 'criterion': 'avg', 's1_epochs': 15000,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
@@ -382,33 +393,33 @@ def get_step1_med_losses(item_loss_dict):
 
 
 def run():
-    #basic_test(exp_label='plot_exp_small2', model_save_name='small_model2', small = True)
-    indep_model, bag_loader, test_loader = load_model('model6')
+    basic_test(exp_label='show_exp', model_save_name='show_exp', small = False)
+
+    indep_model, bag_loader, test_loader = load_model('show_model')
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
     item_loss_dict = net.item_loss_dict
     med_losses = get_step1_med_losses(item_loss_dict)
     s_1_losses = {'E_agr_Decoder': med_losses['E_agr_Decoder'][-1],
                   'E_agr_Sindy_x': med_losses['E_agr_Sindy_x'][-1],
                   'active_coeffs': Loss_dict['active_coeffs'][-1]}
-    print(s_1_losses)
 
-    indep_model, bag_loader, test_loader = load_model('model6')
+    indep_model, bag_loader, test_loader = load_model('show_model')
 
     indep_model.params['coefficient_initialization'] = 'constant'
     indep_model.params['criterion'] = 'stability'
 
     E_loss_dicts = []
-    n_trials = 1
+    n_trials = 4
     for i in range(n_trials):
         compressor_model = SindyNetTCompEnsemble(indep_model)
         model_params = compressor_model.params
-        model_params['s2_epochs'] = 15000
+        model_params['s2_epochs'] = 18000
 
         net, Loss_dict, E_loss_dict1, bag_loader, test_loader = train_step2(compressor_model, bag_loader,
                                                                        test_loader, compressor_model.params)
         E_loss_dicts.append(E_loss_dict1)
 
-    step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label='plot_exp_med3')
+    step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label='exp')
 
 
 if __name__=='__main__':

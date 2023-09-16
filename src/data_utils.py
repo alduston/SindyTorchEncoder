@@ -161,7 +161,7 @@ def get_lorenz_params(train_size = 100, max_data = 100000, noise = 1e-6, test_si
     params['train_print_freq'] = np.inf
     params['update_freq'] = 50
     params['zero_threshold'] = .1
-    params['accept_threshold'] = .8
+    params['accept_threshold'] = .85
 
     try:
         params['true_coeffs'] = training_data['sindy_coefficients']

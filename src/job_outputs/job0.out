@@ -1,0 +1,42 @@
+TEST: Epoch: 0, Decoder: 0.018000925, Sindy_x: 0.000652099, Sindy_z: -0.000248996, Reg: 1e-05, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 0, E_agr_Decoder: 0.014767, E_agr_Sindy_x: 0.000527
+TEST: Epoch: 0, Decoder: 0.017880045, Sindy_x: 0.000707478, Sindy_z: -0.000243625, Reg: 1e-05, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 0, E_agr_Decoder: 0.014367, E_agr_Sindy_x: 0.000527
+TEST: Epoch: 0, Decoder: 0.110919319, Sindy_x: 0.001918403, Sindy_z: -0.00048254, Reg: 1e-05, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 0, E_agr_Decoder: 0.103089, E_agr_Sindy_x: 0.001133
+TEST: Epoch: 0, Decoder: 0.118330739, Sindy_x: 0.001354383, Sindy_z: -0.000498446, Reg: 1e-05, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 0, E_agr_Decoder: 0.110006, E_agr_Sindy_x: 0.001134
+TEST: Epoch: 100, Decoder: 0.089501701, Sindy_x: 0.001726422, Sindy_z: -0.000496709, Reg: 9.76e-06, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 100, E_agr_Decoder: 0.082461, E_agr_Sindy_x: 0.001241
+TEST: Epoch: 200, Decoder: 0.059379973, Sindy_x: 0.00207408, Sindy_z: -0.000515858, Reg: 9.265e-06, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 200, E_agr_Decoder: 0.052644, E_agr_Sindy_x: 0.001997
+TEST: Epoch: 300, Decoder: 0.052530415, Sindy_x: 0.001743609, Sindy_z: -0.00058895, Reg: 8.69e-06, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 300, E_agr_Decoder: 0.046551, E_agr_Sindy_x: 0.001902
+TEST: Epoch: 400, Decoder: 0.050726485, Sindy_x: 0.001513671, Sindy_z: -0.00064129, Reg: 8.215e-06, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 400, E_agr_Decoder: 0.04499, E_agr_Sindy_x: 0.001696
+TEST: Epoch: 0, Decoder: 0.110473678, Sindy_x: 0.001420475, Sindy_z: -0.000452908, Reg: 1e-05, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 0, E_agr_Decoder: 0.106279, E_agr_Sindy_x: 0.001133
+TEST: Epoch: 100, Decoder: 0.078049913, Sindy_x: 0.002104541, Sindy_z: -0.000616547, Reg: 9.617e-06, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 100, E_agr_Decoder: 0.0715, E_agr_Sindy_x: 0.001408
+TEST: Epoch: 200, Decoder: 0.05695077, Sindy_x: 0.002199756, Sindy_z: -0.00078798, Reg: 8.931e-06, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 200, E_agr_Decoder: 0.05051, E_agr_Sindy_x: 0.001903
+TEST: Epoch: 300, Decoder: 0.052499812, Sindy_x: 0.001779821, Sindy_z: -0.000858714, Reg: 8.252e-06, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 300, E_agr_Decoder: 0.046577, E_agr_Sindy_x: 0.001747
+TEST: Epoch: 400, Decoder: 0.050876278, Sindy_x: 0.001515835, Sindy_z: -0.000891672, Reg: 7.655e-06, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 400, E_agr_Decoder: 0.045122, E_agr_Sindy_x: 0.001566
+TEST: Epoch: 500, Decoder: 0.049948446, Sindy_x: 0.001368871, Sindy_z: -0.00091077, Reg: 7.104e-06, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 500, E_agr_Decoder: 0.044225, E_agr_Sindy_x: 0.001434
+TEST: Epoch: 600, Decoder: 0.049298495, Sindy_x: 0.001284629, Sindy_z: -0.000924483, Reg: 6.575e-06, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 600, E_agr_Decoder: 0.043538, E_agr_Sindy_x: 0.001339
+TEST: Epoch: 700, Decoder: 0.048795696, Sindy_x: 0.00123206, Sindy_z: -0.000935579, Reg: 6.061e-06, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 700, E_agr_Decoder: 0.042961, E_agr_Sindy_x: 0.001268
+TEST: Epoch: 800, Decoder: 0.048379708, Sindy_x: 0.00119766, Sindy_z: -0.000944575, Reg: 5.573e-06, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 800, E_agr_Decoder: 0.04245, E_agr_Sindy_x: 0.001216
+TEST: Epoch: 900, Decoder: 0.048013218, Sindy_x: 0.001163116, Sindy_z: -0.000952032, Reg: 5.199e-06, Active_coeffs: 54, Coeff: 0.0
+TEST: Epoch: 900, E_agr_Decoder: 0.041984, E_agr_Sindy_x: 0.001163
+TEST: Epoch: 1000, Decoder: 0.047674697, Sindy_x: 0.001148972, Sindy_z: -0.000957435, Reg: 4.956e-06, Active_coeffs: 46, Coeff: 0.0
+TEST: Epoch: 1000, E_agr_Decoder: 0.041551, E_agr_Sindy_x: 0.001142
+TEST: Epoch: 0, Decoder: 0.106776379, Sindy_x: 0.001855243, Sindy_z: -0.000379472, Reg: 1e-05, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 0, E_agr_Decoder: 0.103846, E_agr_Sindy_x: 0.001833
+TEST: Epoch: 0, Decoder: 0.109762371, Sindy_x: 0.001278873, Sindy_z: -0.000349972, Reg: 1e-05, Active_coeffs: 60, Coeff: 0.0
+TEST: Epoch: 0, E_agr_Decoder: 0.104221, E_agr_Sindy_x: 0.001157

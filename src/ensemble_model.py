@@ -104,7 +104,7 @@ class SindyNetEnsemble(nn.Module):
 
 
     def get_item_loss_dict(self):
-        loss_keys = ['decoder', 'sindy_x', 'sindy_z']
+        loss_keys = ['decoder', 'sindy_x', 'sindy_z', 'active_coeffs']
         item_loss_dict = {}
         for loss_key in loss_keys:
             item_loss_dict[f'{loss_key}_agg'] = []
@@ -403,7 +403,7 @@ class SindyNetEnsemble(nn.Module):
         dz_predict = self.sub_sindy_predict(z, coeffs, mask)
         dx_decode = torch.transpose(self.sub_dx_decode(z, dz_predict, decode_idx), 0, 1)
 
-        sub_items = {'x': xed, 'dx': dxed, 'z': z, 'x_decode': x_decode, 'dz': dz,
+        sub_items = {'x': xed, 'dx': dxed, 'z': z, 'x_decode': x_decode, 'dz': dz, 'mask': mask,
                      'dz_predict':dz_predict, 'dx_decode':  dx_decode, 'coeffs': coeffs}
         return sub_items
 
@@ -432,13 +432,14 @@ class SindyNetEnsemble(nn.Module):
 
 
     def update_item_losses(self, loss_dict, encode_idx, decode_idx, agg = False):
-        for loss_key in ['decoder', 'sindy_x']:
+        for loss_key in ['decoder', 'sindy_x', 'active_coeffs']:
             if agg:
                 key = f'{loss_key}_agg'
             else:
                 key = f'{loss_key}_{encode_idx}_{decode_idx}'
             val = loss_dict[loss_key].detach().cpu().numpy()
             self.item_loss_dict[key].append(val)
+
         return True
 
 
@@ -514,12 +515,14 @@ class SindyNetEnsemble(nn.Module):
             losses.append(loss)
             loss_dicts.append(loss_dict)
             if self.params['cp_batch']:
+                loss_dict['active_coeffs'] = torch.sum(torch.abs(s1_items['mask']))
                 self.update_item_losses(loss_dict, encode_idx, decode_idx)
 
         if self.params['cp_batch']:
             self.val_test(x, dx)
             agr_loss_vals = {'decoder': self.val_dict['E_Decoder'][-1],
-                             'sindy_x':  self.val_dict['E_Sindy_x'][-1]}
+                             'sindy_x':  self.val_dict['E_Sindy_x'][-1],
+                             'active_coeffs': self.num_active_coeffs()}
             self.update_item_losses(agr_loss_vals, 0, 0, agg = True)
 
 

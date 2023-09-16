@@ -242,8 +242,9 @@ def print_val_losses2(net):
     epoch = net.epoch
     E_agr_Decoder = format(np.mean(np.asarray(val_dict['E_agr_Decoder'])))
     E_agr_Sindy_x =  format(np.mean(np.asarray(val_dict['E_agr_Sindy_x'])))
-
-    print(f'TEST: Epoch: {epoch}, E_agr_Decoder: {E_agr_Decoder}, E_agr_Sindy_x: {E_agr_Sindy_x}')
+    print_str = f'TEST: Epoch: {epoch}, E_agr_Decoder: {E_agr_Decoder}, E_agr_Sindy_x: {E_agr_Sindy_x}'
+    print(print_str)
+    os.system(f'echo {print_str} >> ./job_outputs/job0.out')
 
     net.refresh_val_dict = True
 
@@ -266,7 +267,9 @@ def train_step2(net, bag_loader, test_loader, model_params):
     for epoch in range(model_params['s2_epochs']):
         if  (not epoch % test_freq):
             net, Loss_dict = validate_epoch(net, test_loader, Loss_dict, true_coeffs)
-            print(f'{str_list_sum(["TEST: "] + [print_keyval(key, val) for key, val in Loss_dict.items()])}')
+            print_str = str_list_sum(["TEST: "] + [print_keyval(key, val) for key, val in Loss_dict.items()])
+            print(print_str)
+            os.system(f'echo {print_str} >> ./job_outputs/job0.out')
             e_loss_dict = print_val_losses2(net)
             E_loss_dict = update_list_dict(E_loss_dict, e_loss_dict)
 
