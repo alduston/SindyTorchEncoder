@@ -530,7 +530,6 @@ class SindyNetTCompEnsemble(nn.Module):
             decoder_loss = self.decode_loss(x_decomp_decode, x)
             sindy_x_loss = self.sub_dx_loss(x_translate, dx, dz_pred, decode_idx)
             loss_dicts.append({'decoder': decoder_loss, 'sindy_x': sindy_x_loss})
-        print(loss_dicts)
         return dict_mean(loss_dicts), x_translate
 
 
