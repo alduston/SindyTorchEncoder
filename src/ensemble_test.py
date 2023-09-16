@@ -383,7 +383,7 @@ def get_step1_med_losses(item_loss_dict):
 
 def run():
     #basic_test(exp_label='plot_exp_small2', model_save_name='small_model2', small = True)
-    indep_model, bag_loader, test_loader = load_model('small_model2')
+    indep_model, bag_loader, test_loader = load_model('model6')
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
     item_loss_dict = net.item_loss_dict
     med_losses = get_step1_med_losses(item_loss_dict)
@@ -392,10 +392,10 @@ def run():
                   'active_coeffs': Loss_dict['active_coeffs'][-1]}
     print(s_1_losses)
 
-    indep_model, bag_loader, test_loader = load_model('small_model2')
+    indep_model, bag_loader, test_loader = load_model('model6')
 
     indep_model.params['coefficient_initialization'] = 'constant'
-    indep_model.params['criterion'] = 'avg'
+    indep_model.params['criterion'] = 'stability'
 
     E_loss_dicts = []
     n_trials = 1
@@ -408,7 +408,7 @@ def run():
                                                                        test_loader, compressor_model.params)
         E_loss_dicts.append(E_loss_dict1)
 
-    step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label='plot_exp_small3')
+    step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label='plot_exp_med3')
 
 
 if __name__=='__main__':

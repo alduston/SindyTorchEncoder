@@ -151,7 +151,9 @@ class SindyNetTCompEnsemble(nn.Module):
         self.params['stacked_decoder'], self.params['stacked_decoder_layers'] = self.Stacked_decoder(self.params)
         self.params['stacked_encoder'], self.params['stacked_encoder_layers'] = self.Stacked_encoder(self.params)
 
-        self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad=True)
+        #self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad=True)
+        self.sindy_coeff_stack = self.init_sindy_coeff_stack()
+
         self.coefficient_mask = torch.tensor(deepcopy(self.params['coefficient_mask']),dtype=self.dtype, device=self.device)
         self.epoch = 0
         self.refresh_val_dict = True
@@ -269,6 +271,20 @@ class SindyNetTCompEnsemble(nn.Module):
                 self.register_parameter(name=f'{"detranslator"}{i}{j}', param=tensor)
         return detranslators
 
+
+    def init_sindy_coeff_stack(self):
+        n = self.params['n_encoders']**2
+        coeff_stack = torch.stack([self.init_sindy_coefficients() for i in range(n)])
+        return torch.nn.parameter(torch.stack(coeff_stack), requires_grad=True)
+
+
+
+    def init_sindy_coefficients(self):
+        library_dim = self.params['library_dim']
+        latent_dim = self.params['latent_dim']
+        initializer, init_param = self.initializer()
+        return get_initialized_weights([library_dim, latent_dim], initializer,
+                                       init_param = init_param, device = self.device)
 
     def Residual_Translator(self, params):
         activation_function = self.activation_f
@@ -394,7 +410,7 @@ class SindyNetTCompEnsemble(nn.Module):
         translator = self.translators[encode_idx]
         encoder = self.params['indep_models'].Encoders[encode_idx]
         encoder_weights, encoder_biases = self.get_weights(encoder['encoder_layers'])
-        translator_weights, translator_biases = self.get_comp_weights(translator['detranslator_layers'])
+        translator_weights, translator_biases = self.get_comp_weights(translator['translator_layers'])
         activation = self.params['activation']
 
         zi = encoder['encoder'](x)
@@ -404,12 +420,11 @@ class SindyNetTCompEnsemble(nn.Module):
         return dz
 
 
-    def sindy_predict(self, z, coeffs = [], mask = []):
+    def sindy_predict(self, z, coeffs = [], encode_idx = None, decode_idx= None):
         Theta = self.Theta(z)
-        if not len(mask):
-            mask = self.coefficient_mask
+        mask = self.coefficient_mask
         if not len(coeffs):
-            coeffs = self.sindy_coeffs
+            coeffs = self.sindy_coeffs[encode_idx * (self.params['n_encoders']) + decode_idx]
         return torch.matmul(Theta, mask * coeffs)
 
 
@@ -431,7 +446,7 @@ class SindyNetTCompEnsemble(nn.Module):
         dx_pred = self.dx_decode(x_translate, dz_pred,  decode_idx)
         criterion = nn.MSELoss()
         loss = self.params['loss_weight_sindy_x'] * (criterion(dx_pred, dx))
-        return loss, dz_pred
+        return loss
 
 
     def decode_loss(self, x, x_pred):
@@ -480,7 +495,8 @@ class SindyNetTCompEnsemble(nn.Module):
                                               for detranslator in self.detranslators], dim = 1)
         agr_x_decomp_decode = self.params['stacked_decoder'](agr_x_translate_stack)
 
-        agr_dz_pred = self.sindy_predict(agr_x_translate)
+        agr_coeffs = torch.mean(self.sindy_coeff_stack, dim = 0)
+        agr_dz_pred = self.sindy_predict(agr_x_translate, coeffs=agr_coeffs)
         agr_dx_pred  = torch.concat([self.dx_decode(agr_x_translate, agr_dz_pred, decode_idx) for decode_idx
                         in range(len(self.translators))], dim = 1)
 
@@ -528,7 +544,7 @@ class SindyNetTCompEnsemble(nn.Module):
         dz_preds = []
         dzs = []
         for encode_idx in range(self.params['n_encoders']):
-            decode_indexes = [0, encode_idx]
+            decode_indexes = range(0, encode_idx)
             sub_loss_dict, x_translate,dz_pred, dz = self.sub_loss(x, dx, encode_idx, decode_indexes)
             sub_loss_dicts.append(sub_loss_dict)
             x_translates.append(x_translate)
