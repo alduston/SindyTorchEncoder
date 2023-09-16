@@ -275,7 +275,7 @@ class SindyNetTCompEnsemble(nn.Module):
     def init_sindy_coeff_stack(self):
         n = self.params['n_encoders']**2
         coeff_stack = torch.stack([self.init_sindy_coefficients() for i in range(n)])
-        return torch.nn.parameter(torch.stack(coeff_stack), requires_grad=True)
+        return torch.nn.parameter(coeff_stack, requires_grad=True)
 
 
 
