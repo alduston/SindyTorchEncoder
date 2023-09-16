@@ -419,7 +419,7 @@ def run():
                                                                        test_loader, compressor_model.params)
         E_loss_dicts.append(E_loss_dict1)
 
-    step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label='exp')
+    step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label='show_exp')
 
 
 if __name__=='__main__':
