@@ -153,7 +153,7 @@ class SindyNetTCompEnsemble(nn.Module):
 
         #self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad=True)
         self.sindy_coeffs = self.init_sindy_coeff_stack()
-        print(self.sindy_coeffs.shape)
+        #(self.sindy_coeffs.shape)
 
         self.coefficient_mask = torch.tensor(deepcopy(self.params['coefficient_mask']),dtype=self.dtype, device=self.device)
         self.epoch = 0
@@ -474,7 +474,7 @@ class SindyNetTCompEnsemble(nn.Module):
 
             a = torch.trace(z_centered.T @ z_comp_centered)
             b = torch.trace(z_centered.T @ z_centered)
-            corr_sum  += (a/((b * c)**(1/2)))**2
+            corr_sum  += (a/((b * c)**(1/2)))
 
         return -self.params['loss_weight_corr'] * corr_sum * (1/len(zs))
 
@@ -498,7 +498,6 @@ class SindyNetTCompEnsemble(nn.Module):
         agr_x_decomp_decode = self.params['stacked_decoder'](agr_x_translate_stack)
 
         agr_coeffs = torch.mean(self.sindy_coeffs, dim = 0)
-        print(agr_coeffs.shape)
         agr_dz_pred = self.sindy_predict(agr_x_translate, coeffs=agr_coeffs)
         agr_dx_pred  = torch.concat([self.dx_decode(agr_x_translate, agr_dz_pred, decode_idx) for decode_idx
                         in range(len(self.translators))], dim = 1)
@@ -516,10 +515,12 @@ class SindyNetTCompEnsemble(nn.Module):
         return True
 
 
-    def sub_loss(self, x, dx, encode_idx, decode_indexes):
+    def sub_loss(self, x, dx, encode_idx, decode_indexes, x_translate = []): # new
+    #def sub_loss(self, x, dx, encode_idx, decode_indexes, x_translate=[]):
         encoder = self.params['indep_models'].Encoders[encode_idx]['encoder']
         translator = self.translators[encode_idx]['translator']
-        x_translate = translator(encoder(x))
+        if not len(x_translate):
+            x_translate = translator(encoder(x))
         loss_dicts = []
 
         for decode_idx in decode_indexes:
@@ -544,9 +545,11 @@ class SindyNetTCompEnsemble(nn.Module):
     def Loss(self, x, dx):
         sub_loss_dicts = []
         x_translates = []
+        agr_x_translate = self.get_agr_x_translate(x)  # new
         for encode_idx in range(self.params['n_encoders']):
             decode_indexes = range(0, self.params['n_encoders'])
-            sub_loss_dict, x_translate = self.sub_loss(x, dx, encode_idx, decode_indexes)
+            sub_loss_dict, x_translate = self.sub_loss(x, dx, encode_idx, decode_indexes, agr_x_translate) # new
+            #sub_loss_dict, x_translate = self.sub_loss(x, dx, encode_idx, decode_indexes)
             sub_loss_dicts.append(sub_loss_dict)
             x_translates.append(x_translate)
 
@@ -560,6 +563,17 @@ class SindyNetTCompEnsemble(nn.Module):
             self.val_test(x, dx, x_translate_stack)
         return loss, loss_dict
 
+    # new
+    def get_agr_x_translate(self, x):
+        x_translates = []
+        for encode_idx in range(self.params['n_encoders']):
+            encoder = self.params['indep_models'].Encoders[encode_idx]['encoder']
+            translator = self.translators[encode_idx]['translator']
+            x_translates.append(translator(encoder(x)))
+        x_translate_stack = torch.concat(x_translates, dim=1)
+        agr_x_translate = self.collapse(x_translate_stack, agr_key='median')
+        return agr_x_translate
+    # new
 
 
 

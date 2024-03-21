@@ -205,16 +205,20 @@ def agg_comparison_plots(model, exp_label = 'exp', loss_keys = ['decoder', 'sind
     for loss_key in loss_keys:
         for (key, losses) in item_loss_dict.items():
             if key.startswith(loss_key):
-                if key in log_keys:
+                if loss_key in log_keys:
                     plot_losses = np.log(np.asarray(losses))
                 else:
                     plot_losses = np.asarray(losses)
                 if key.endswith('agg'):
-                    plt.plot(epochs, plot_losses, label='agg', linestyle = 'dashed',
+                    plt.plot(epochs, plot_losses, label='ensemble', linestyle = 'dashed',
                              marker='x', markevery=marker_freq)
                 else:
                     plt.plot(epochs, plot_losses)
-        plt.ylabel(loss_key)
+
+        if key in log_keys:
+            plt.ylabel(f'Log {loss_key} loss')
+        else:
+            plt.ylabel(loss_key)
         plt.xlabel('epoch')
         plt.legend()
         plt.title(f'Ensemble v Submodel {loss_key} Log Loss')
@@ -361,9 +365,9 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
 
     if small:
         params, training_data, validation_data = get_lorenz_params(train_size=5, test_size=5)
-        params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                         'n_encoders': 5, 'n_decoders': 5, 'criterion': 'avg', 's1_epochs': 201,
-                         'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
+        params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 5,
+                         'n_encoders': 5, 'n_decoders': 5, 'criterion': 'avg', 's1_epochs': 2001,
+                         'test_freq': 10, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
     else:
         params, training_data, validation_data = get_lorenz_params(train_size=50, test_size=50)
         params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
@@ -393,8 +397,8 @@ def get_step1_med_losses(item_loss_dict):
 
 
 def run():
-    basic_test(exp_label='show_exp', model_save_name='show_model', small = False)
-
+    basic_test(exp_label='exp', model_save_name='small', small =True)
+    '''
     indep_model, bag_loader, test_loader = load_model('show_model')
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
     item_loss_dict = net.item_loss_dict
@@ -409,7 +413,7 @@ def run():
     indep_model.params['criterion'] = 'stability'
 
     E_loss_dicts = []
-    n_trials = 4
+    n_trials = 1
     for i in range(n_trials):
         compressor_model = SindyNetTCompEnsemble(indep_model)
         model_params = compressor_model.params
@@ -420,7 +424,15 @@ def run():
         E_loss_dicts.append(E_loss_dict1)
 
     step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label='show_exp')
-
+     '''
 
 if __name__=='__main__':
+    sindy_x_range = [-6.57, -8.71]
+    sindy_x_markers = [-6.75, -7, -7.25, -7.5, -7.75, -8.0, -8.25, -8.5]
+
+    decoder_range = [-1.083, -7.76]
+    decoder_markets = [-2, -3, -4, -5, -6, -7]
+
+    coeff_range = [13.5, 62.1]
+    coeff_markers = [20,30,40,50,60]
     run()

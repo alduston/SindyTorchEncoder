@@ -109,7 +109,10 @@ def validate_epoch(model, data_loader, Loss_dict,  true_coeffs = None):
                     total_loss_dict[key] += losses[key]/l
             else:
                 for key, val in losses.items():
-                    total_loss_dict[key] = val/l
+                    if key == 'active_coeffs':
+                        pass
+                    else:
+                        total_loss_dict[key] = val/l
 
     Loss_dict['epoch'].append(int(model.epoch))
     Loss_dict['active_coeffs'].append(int(model.num_active_coeffs()))
