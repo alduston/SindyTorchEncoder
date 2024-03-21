@@ -371,7 +371,7 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
     else:
         params, training_data, validation_data = get_lorenz_params(train_size=50, test_size=50)
         params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                         'n_encoders': 10, 'n_decoders': 10, 'criterion': 'avg', 's1_epochs': 15000,
+                         'n_encoders': 6, 'n_decoders': 6, 'criterion': 'avg', 's1_epochs': 15000,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
 
     params.update(params_update)
@@ -397,9 +397,8 @@ def get_step1_med_losses(item_loss_dict):
 
 
 def run():
-    basic_test(exp_label='exp', model_save_name='small', small =True)
-    '''
-    indep_model, bag_loader, test_loader = load_model('show_model')
+    basic_test(exp_label='exp', model_save_name='show_model2', small =False)
+    indep_model, bag_loader, test_loader = load_model('show_model2')
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
     item_loss_dict = net.item_loss_dict
     med_losses = get_step1_med_losses(item_loss_dict)
@@ -407,7 +406,7 @@ def run():
                   'E_agr_Sindy_x': med_losses['E_agr_Sindy_x'][-1],
                   'active_coeffs': Loss_dict['active_coeffs'][-1]}
 
-    indep_model, bag_loader, test_loader = load_model('show_model')
+    indep_model, bag_loader, test_loader = load_model('show_model2')
 
     indep_model.params['coefficient_initialization'] = 'constant'
     indep_model.params['criterion'] = 'stability'
@@ -423,8 +422,7 @@ def run():
                                                                        test_loader, compressor_model.params)
         E_loss_dicts.append(E_loss_dict1)
 
-    step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label='show_exp')
-     '''
+    step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label='show_exp2')
 
 if __name__=='__main__':
     sindy_x_range = [-6.57, -8.71]

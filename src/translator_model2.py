@@ -515,12 +515,11 @@ class SindyNetTCompEnsemble(nn.Module):
         return True
 
 
-    def sub_loss(self, x, dx, encode_idx, decode_indexes, x_translate = []): # new
-    #def sub_loss(self, x, dx, encode_idx, decode_indexes, x_translate=[]):
+
+    def sub_loss(self, x, dx, encode_idx, decode_indexes):
         encoder = self.params['indep_models'].Encoders[encode_idx]['encoder']
         translator = self.translators[encode_idx]['translator']
-        if not len(x_translate):
-            x_translate = translator(encoder(x))
+        x_translate = translator(encoder(x))
         loss_dicts = []
 
         for decode_idx in decode_indexes:
@@ -545,11 +544,9 @@ class SindyNetTCompEnsemble(nn.Module):
     def Loss(self, x, dx):
         sub_loss_dicts = []
         x_translates = []
-        agr_x_translate = self.get_agr_x_translate(x)  # new
         for encode_idx in range(self.params['n_encoders']):
             decode_indexes = range(0, self.params['n_encoders'])
-            sub_loss_dict, x_translate = self.sub_loss(x, dx, encode_idx, decode_indexes, agr_x_translate) # new
-            #sub_loss_dict, x_translate = self.sub_loss(x, dx, encode_idx, decode_indexes)
+            sub_loss_dict, x_translate = self.sub_loss(x, dx, encode_idx, decode_indexes)
             sub_loss_dicts.append(sub_loss_dict)
             x_translates.append(x_translate)
 
@@ -563,17 +560,6 @@ class SindyNetTCompEnsemble(nn.Module):
             self.val_test(x, dx, x_translate_stack)
         return loss, loss_dict
 
-    # new
-    def get_agr_x_translate(self, x):
-        x_translates = []
-        for encode_idx in range(self.params['n_encoders']):
-            encoder = self.params['indep_models'].Encoders[encode_idx]['encoder']
-            translator = self.translators[encode_idx]['translator']
-            x_translates.append(translator(encoder(x)))
-        x_translate_stack = torch.concat(x_translates, dim=1)
-        agr_x_translate = self.collapse(x_translate_stack, agr_key='median')
-        return agr_x_translate
-    # new
 
 
 
