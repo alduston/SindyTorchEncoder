@@ -150,10 +150,7 @@ class SindyNetTCompEnsemble(nn.Module):
 
         self.params['stacked_decoder'], self.params['stacked_decoder_layers'] = self.Stacked_decoder(self.params)
         self.params['stacked_encoder'], self.params['stacked_encoder_layers'] = self.Stacked_encoder(self.params)
-
-        #self.sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad=True)
         self.sindy_coeffs = self.init_sindy_coeff_stack()
-        #(self.sindy_coeffs.shape)
 
         self.coefficient_mask = torch.tensor(deepcopy(self.params['coefficient_mask']),dtype=self.dtype, device=self.device)
         self.epoch = 0
@@ -486,6 +483,15 @@ class SindyNetTCompEnsemble(nn.Module):
         return corr_loss/len(self.translators)
 
 
+    def var_loss(self):
+        var_loss = 0
+        sindy_coeffs = self.sindy_coeffs
+        for i in range(self.params['library_dim']):
+            for j in range(self.params['latent_dim']):
+                var_loss += torch.var(sindy_coeffs[:,i,j])
+        return var_loss
+
+
     def val_test(self, x, dx, x_translate_stack, agr_key='mean'):
         if self.refresh_val_dict:
             self.val_dict = {'E_Decoder': [],  'E_Sindy_x': [], 'E_agr_Decoder': [], 'E_agr_Sindy_x': []}
@@ -556,6 +562,7 @@ class SindyNetTCompEnsemble(nn.Module):
         loss_dict['reg'] = self.reg_loss()
         loss_dict['sindy_z'] = corr_loss
         loss =  loss_dict['decoder'] + loss_dict['sindy_x'] + loss_dict['reg'] + loss_dict['sindy_z']
+        loss += (1e-4 * self.var_loss())  # new
         if self.params['eval']:
             self.val_test(x, dx, x_translate_stack)
         return loss, loss_dict
