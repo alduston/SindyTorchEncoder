@@ -5,6 +5,48 @@ from copy import copy, deepcopy
 import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime as dt
+from itertools import permutations
+
+
+def col_permutations(M):
+    M_permutes = []
+    columns = list(range(M.shape[1]))
+    for perm in permutations(columns):
+        M_permuted = np.stack([M[:, idx] for idx in perm])
+        M_permutes.append(np.transpose(M_permuted))
+    return M_permutes
+
+
+def coeff_pattern_loss(pred_coeffs, true_coeffs, binary = True):
+    pred_coeffs = deepcopy(pred_coeffs).detach().cpu().numpy()
+    true_coeffs = deepcopy(true_coeffs).detach().cpu().numpy()
+    if binary:
+        pred_coeffs[np.where(np.abs(pred_coeffs) <.1)] = 0
+        pred_coeffs[np.where(np.abs(pred_coeffs) >= .1)] = 1
+        pred_coeffs = np.asarray((np.abs(pred_coeffs) ** 0.000000000001),int)
+        true_coeffs = np.asarray(np.abs(true_coeffs) ** 0.00000000001,int)
+
+    losses = []
+    for permutation in col_permutations(true_coeffs):
+        leq_M = pred_coeffs[np.where(pred_coeffs + .1 < permutation)]
+        L_minus = len(leq_M)
+        losses.append(L_minus)
+    return min(losses)/np.sum(true_coeffs > 0)
+
+
+def get_coeff_loss(model,true_coeffs, mask = []):
+    if len(mask):
+        return coeff_pattern_loss(mask, true_coeffs)
+    else:
+        try:
+            coeff_loss_val = coeff_pattern_loss(model.coefficient_mask, true_coeffs)
+        except BaseException:
+            coeff_loss_val = 0
+            for mask in model.coefficient_masks:
+                pred_coeffs = mask
+                coeff_loss_val += coeff_pattern_loss(pred_coeffs, true_coeffs)
+            coeff_loss_val /= len(model.coefficient_masks)
+    return coeff_loss_val
 
 
 def format(n, n_digits = 6):
@@ -104,7 +146,7 @@ class SindyNetEnsemble(nn.Module):
 
 
     def get_item_loss_dict(self):
-        loss_keys = ['decoder', 'sindy_x', 'sindy_z', 'active_coeffs']
+        loss_keys = ['decoder', 'sindy_x', 'sindy_z', 'active_coeffs', 'coeff']
         item_loss_dict = {}
         for loss_key in loss_keys:
             item_loss_dict[f'{loss_key}_agg'] = []
@@ -432,7 +474,7 @@ class SindyNetEnsemble(nn.Module):
 
 
     def update_item_losses(self, loss_dict, encode_idx, decode_idx, agg = False):
-        for loss_key in ['decoder', 'sindy_x', 'active_coeffs']:
+        for loss_key in ['decoder', 'sindy_x', 'active_coeffs', 'coeff']:
             if agg:
                 key = f'{loss_key}_agg'
             else:
@@ -516,13 +558,17 @@ class SindyNetEnsemble(nn.Module):
             loss_dicts.append(loss_dict)
             if self.params['cp_batch']:
                 loss_dict['active_coeffs'] = torch.sum(torch.abs(s1_items['mask']))
+                loss_dict['coeff'] = torch.tensor(get_coeff_loss(self, self.true_coeffs, s1_items['mask']),
+                                                  device = self.device, dtype = self.dtype)
                 self.update_item_losses(loss_dict, encode_idx, decode_idx)
 
         if self.params['cp_batch']:
             self.val_test(x, dx)
             agr_loss_vals = {'decoder': self.val_dict['E_Decoder'][-1],
                              'sindy_x':  self.val_dict['E_Sindy_x'][-1],
-                             'active_coeffs': self.num_active_coeffs()}
+                             'active_coeffs': self.num_active_coeffs(),
+                             'coeff': torch.tensor(get_coeff_loss(self, self.true_coeffs),
+                                                  device = self.device, dtype = self.dtype)}
             self.update_item_losses(agr_loss_vals, 0, 0, agg = True)
 
 

@@ -211,7 +211,7 @@ def print_val_losses1(net):
     net.refresh_val_dict = True
 
     return {'Epoch': epoch, 'E_agr_Decoder': E_Decoder, 'E_agr_Sindy_x': E_Sindy_x,
-            'active_coeffs': net.num_active_coeffs()}
+            'active_coeffs': net.num_active_coeffs(), 'coeff': get_coeff_loss(net, net.true_coeffs)}
 
 
 def train_eas_1(net, bag_loader, test_loader, model_params):
@@ -222,7 +222,7 @@ def train_eas_1(net, bag_loader, test_loader, model_params):
     optimizer = torch.optim.Adam(net.parameters(), lr=net.params['learning_rate'])
     pretrain_epocs = net.params['pretrain_epochs']
     true_coeffs = net.true_coeffs
-    E_loss_dict = {'Epoch': [], 'E_agr_Decoder': [], 'E_agr_Sindy_x': [], 'active_coeffs': []}
+    E_loss_dict = {'Epoch': [], 'E_agr_Decoder': [], 'E_agr_Sindy_x': [], 'active_coeffs': [], 'coeff': []}
     for epoch in range(model_params['s1_epochs']):
         if (not epoch % test_freq):
             net.params['cp_batch'] = True
@@ -252,7 +252,8 @@ def print_val_losses2(net):
     net.refresh_val_dict = True
 
     return {'Epoch': epoch, 'E_agr_Decoder':  E_agr_Decoder, 'E_agr_Sindy_x': E_agr_Sindy_x,
-            'active_coeffs': net.num_active_coeffs().detach().cpu()}
+            'active_coeffs': net.num_active_coeffs().detach().cpu(),
+            'coeff': get_coeff_loss(net, net.true_coeffs)}
 
 
 def train_step2(net, bag_loader, test_loader, model_params):
@@ -265,7 +266,7 @@ def train_step2(net, bag_loader, test_loader, model_params):
     cross_val_freq = net.params['crossval_freq']
     net.to(net.device)
     true_coeffs = net.true_coeffs
-    E_loss_dict = {'Epoch': [], 'E_agr_Decoder': [], 'E_agr_Sindy_x': [], 'active_coeffs': []}
+    E_loss_dict = {'Epoch': [], 'E_agr_Decoder': [], 'E_agr_Sindy_x': [], 'active_coeffs': [], 'coeff': []}
 
     for epoch in range(model_params['s2_epochs']):
         if  (not epoch % test_freq):

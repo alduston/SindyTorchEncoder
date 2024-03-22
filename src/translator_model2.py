@@ -492,7 +492,7 @@ class SindyNetTCompEnsemble(nn.Module):
         return var_loss
 
 
-    def val_test(self, x, dx, x_translate_stack, agr_key='mean'):
+    def val_test(self, x, dx, x_translate_stack, agr_key='median'):
         if self.refresh_val_dict:
             self.val_dict = {'E_Decoder': [],  'E_Sindy_x': [], 'E_agr_Decoder': [], 'E_agr_Sindy_x': []}
 
