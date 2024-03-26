@@ -7226,3 +7226,391 @@ TEST exp: Epoch: 790.0, Decoder: 0.008284, Sindy_x: 0.000575, Sindy_z: -1E-03, R
 TEST exp: Epoch: 790, E_agr_Decoder: 0.008284, E_agr_Sindy_x: 0.000575
 TEST exp: Epoch: 800.0, Decoder: 0.00827, Sindy_x: 0.000574, Sindy_z: -1E-03, Reg: 4.59319E-06, Active_coeffs: 49.0, Coeff: 0E+00
 TEST exp: Epoch: 800, E_agr_Decoder: 0.00827, E_agr_Sindy_x: 0.000574
+TEST exp: Epoch: 0E+00, Decoder: 0.930567, Sindy_x: 9.59005E-06, Sindy_z: -3.4794E-04, Reg: 1E-05, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 0, E_agr_Decoder: 0.603522, E_agr_Sindy_x: 1.25747E-06
+TEST exp: Epoch: 10.0, Decoder: 0.790792, Sindy_x: 7.00318E-06, Sindy_z: -3.4498E-04, Reg: 9.95177E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 10, E_agr_Decoder: 0.493635, E_agr_Sindy_x: 1.25173E-06
+TEST exp: Epoch: 20.0, Decoder: 0.666143, Sindy_x: 6.20905E-06, Sindy_z: -3.4253E-04, Reg: 9.90131E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 20, E_agr_Decoder: 0.404482, E_agr_Sindy_x: 1.25915E-06
+TEST exp: Epoch: 30.0, Decoder: 0.56233, Sindy_x: 6.29858E-06, Sindy_z: -3.4118E-04, Reg: 9.84934E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 30, E_agr_Decoder: 0.335689, E_agr_Sindy_x: 1.26872E-06
+TEST exp: Epoch: 40.0, Decoder: 0.478957, Sindy_x: 6.28409E-06, Sindy_z: -3.4161E-04, Reg: 9.79727E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 40, E_agr_Decoder: 0.284143, E_agr_Sindy_x: 1.27382E-06
+TEST exp: Epoch: 50.0, Decoder: 0.411828, Sindy_x: 5.85149E-06, Sindy_z: -3.4428E-04, Reg: 9.74565E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 50, E_agr_Decoder: 0.245173, E_agr_Sindy_x: 1.27491E-06
+TEST exp: Epoch: 60.0, Decoder: 0.356975, Sindy_x: 5.24443E-06, Sindy_z: -3.4824E-04, Reg: 9.69408E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 60, E_agr_Decoder: 0.215235, E_agr_Sindy_x: 1.27458E-06
+TEST exp: Epoch: 70.0, Decoder: 0.31154, Sindy_x: 4.69228E-06, Sindy_z: -3.5309E-04, Reg: 9.64219E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 70, E_agr_Decoder: 0.191639, E_agr_Sindy_x: 1.27416E-06
+TEST exp: Epoch: 80.0, Decoder: 0.273396, Sindy_x: 4.26556E-06, Sindy_z: -3.5853E-04, Reg: 9.58972E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 80, E_agr_Decoder: 0.172287, E_agr_Sindy_x: 1.27483E-06
+TEST exp: Epoch: 90.0, Decoder: 0.240927, Sindy_x: 3.95611E-06, Sindy_z: -3.6488E-04, Reg: 9.53661E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 90, E_agr_Decoder: 0.155744, E_agr_Sindy_x: 1.27678E-06
+TEST exp: Epoch: 100.0, Decoder: 0.21297, Sindy_x: 3.73422E-06, Sindy_z: -3.7235E-04, Reg: 9.48304E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 100, E_agr_Decoder: 0.141178, E_agr_Sindy_x: 1.28004E-06
+TEST exp: Epoch: 110.0, Decoder: 0.188774, Sindy_x: 3.57033E-06, Sindy_z: -3.8088E-04, Reg: 9.42894E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 110, E_agr_Decoder: 0.128177, E_agr_Sindy_x: 1.28448E-06
+TEST exp: Epoch: 120.0, Decoder: 0.167906, Sindy_x: 3.44184E-06, Sindy_z: -3.9059E-04, Reg: 9.37461E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 120, E_agr_Decoder: 0.116586, E_agr_Sindy_x: 1.28972E-06
+TEST exp: Epoch: 130.0, Decoder: 0.150111, Sindy_x: 3.33226E-06, Sindy_z: -4.0132E-04, Reg: 9.32039E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 130, E_agr_Decoder: 0.106374, E_agr_Sindy_x: 1.29585E-06
+TEST exp: Epoch: 140.0, Decoder: 0.135191, Sindy_x: 3.22962E-06, Sindy_z: -4.1299E-04, Reg: 9.26645E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 140, E_agr_Decoder: 0.097544, E_agr_Sindy_x: 1.30244E-06
+TEST exp: Epoch: 150.0, Decoder: 0.122908, Sindy_x: 3.12507E-06, Sindy_z: -4.2534E-04, Reg: 9.21298E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 150, E_agr_Decoder: 0.090069, E_agr_Sindy_x: 1.30922E-06
+TEST exp: Epoch: 160.0, Decoder: 0.112951, Sindy_x: 3.01438E-06, Sindy_z: -4.3826E-04, Reg: 9.15998E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 160, E_agr_Decoder: 0.083859, E_agr_Sindy_x: 1.31609E-06
+TEST exp: Epoch: 170.0, Decoder: 0.104958, Sindy_x: 2.90018E-06, Sindy_z: -4.5133E-04, Reg: 9.10712E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 170, E_agr_Decoder: 0.078763, E_agr_Sindy_x: 1.32269E-06
+TEST exp: Epoch: 180.0, Decoder: 0.098548, Sindy_x: 2.78937E-06, Sindy_z: -4.6455E-04, Reg: 9.05431E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 180, E_agr_Decoder: 0.074597, E_agr_Sindy_x: 1.32896E-06
+TEST exp: Epoch: 190.0, Decoder: 0.09337, Sindy_x: 2.68899E-06, Sindy_z: -4.7767E-04, Reg: 9.00115E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 190, E_agr_Decoder: 0.071169, E_agr_Sindy_x: 1.33496E-06
+TEST exp: Epoch: 200.0, Decoder: 0.089125, Sindy_x: 2.60265E-06, Sindy_z: -4.9066E-04, Reg: 8.94727E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 200, E_agr_Decoder: 0.068305, E_agr_Sindy_x: 1.34066E-06
+TEST exp: Epoch: 210.0, Decoder: 0.085572, Sindy_x: 2.53061E-06, Sindy_z: -5.0327E-04, Reg: 8.89264E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 210, E_agr_Decoder: 0.065856, E_agr_Sindy_x: 1.34613E-06
+TEST exp: Epoch: 220.0, Decoder: 0.082526, Sindy_x: 2.47083E-06, Sindy_z: -5.1572E-04, Reg: 8.83722E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 220, E_agr_Decoder: 0.063708, E_agr_Sindy_x: 1.35159E-06
+TEST exp: Epoch: 230.0, Decoder: 0.079849, Sindy_x: 2.42058E-06, Sindy_z: -5.2789E-04, Reg: 8.78129E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 230, E_agr_Decoder: 0.061772, E_agr_Sindy_x: 1.35671E-06
+TEST exp: Epoch: 240.0, Decoder: 0.077438, Sindy_x: 2.37752E-06, Sindy_z: -5.3974E-04, Reg: 8.72489E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 240, E_agr_Decoder: 0.059986, E_agr_Sindy_x: 1.36181E-06
+TEST exp: Epoch: 250.0, Decoder: 0.07522, Sindy_x: 2.34014E-06, Sindy_z: -5.5138E-04, Reg: 8.66815E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 250, E_agr_Decoder: 0.058301, E_agr_Sindy_x: 1.36664E-06
+TEST exp: Epoch: 260.0, Decoder: 0.073143, Sindy_x: 2.30717E-06, Sindy_z: -5.6266E-04, Reg: 8.61127E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 260, E_agr_Decoder: 0.056687, E_agr_Sindy_x: 1.37128E-06
+TEST exp: Epoch: 270.0, Decoder: 0.07117, Sindy_x: 2.27753E-06, Sindy_z: -5.7362E-04, Reg: 8.55425E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 270, E_agr_Decoder: 0.05512, E_agr_Sindy_x: 1.37557E-06
+TEST exp: Epoch: 280.0, Decoder: 0.069273, Sindy_x: 2.25074E-06, Sindy_z: -5.8444E-04, Reg: 8.49713E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 280, E_agr_Decoder: 0.053586, E_agr_Sindy_x: 1.37947E-06
+TEST exp: Epoch: 290.0, Decoder: 0.067437, Sindy_x: 2.22619E-06, Sindy_z: -5.9496E-04, Reg: 8.44002E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 290, E_agr_Decoder: 0.052075, E_agr_Sindy_x: 1.38319E-06
+TEST exp: Epoch: 300.0, Decoder: 0.065648, Sindy_x: 2.20326E-06, Sindy_z: -6.0518E-04, Reg: 8.38289E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 300, E_agr_Decoder: 0.050582, E_agr_Sindy_x: 1.38643E-06
+TEST exp: Epoch: 310.0, Decoder: 0.063898, Sindy_x: 2.18189E-06, Sindy_z: -6.1501E-04, Reg: 8.32568E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 310, E_agr_Decoder: 0.049102, E_agr_Sindy_x: 1.38949E-06
+TEST exp: Epoch: 320.0, Decoder: 0.062184, Sindy_x: 2.16141E-06, Sindy_z: -6.2473E-04, Reg: 8.26842E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 320, E_agr_Decoder: 0.047635, E_agr_Sindy_x: 1.39214E-06
+TEST exp: Epoch: 330.0, Decoder: 0.060501, Sindy_x: 2.14206E-06, Sindy_z: -6.3406E-04, Reg: 8.21128E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 330, E_agr_Decoder: 0.04618, E_agr_Sindy_x: 1.39443E-06
+TEST exp: Epoch: 340.0, Decoder: 0.058849, Sindy_x: 2.12333E-06, Sindy_z: -6.4303E-04, Reg: 8.15406E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 340, E_agr_Decoder: 0.044739, E_agr_Sindy_x: 1.39653E-06
+TEST exp: Epoch: 350.0, Decoder: 0.057228, Sindy_x: 2.10513E-06, Sindy_z: -6.5185E-04, Reg: 8.09681E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 350, E_agr_Decoder: 0.043313, E_agr_Sindy_x: 1.39837E-06
+TEST exp: Epoch: 360.0, Decoder: 0.055639, Sindy_x: 2.08741E-06, Sindy_z: -6.6024E-04, Reg: 8.03969E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 360, E_agr_Decoder: 0.041903, E_agr_Sindy_x: 1.39984E-06
+TEST exp: Epoch: 370.0, Decoder: 0.054082, Sindy_x: 2.07004E-06, Sindy_z: -6.6847E-04, Reg: 7.98255E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 370, E_agr_Decoder: 0.040514, E_agr_Sindy_x: 1.40103E-06
+TEST exp: Epoch: 380.0, Decoder: 0.052559, Sindy_x: 2.05292E-06, Sindy_z: -6.7627E-04, Reg: 7.92548E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 380, E_agr_Decoder: 0.039146, E_agr_Sindy_x: 1.40191E-06
+TEST exp: Epoch: 390.0, Decoder: 0.051071, Sindy_x: 2.03605E-06, Sindy_z: -6.8383E-04, Reg: 7.86848E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 390, E_agr_Decoder: 0.037804, E_agr_Sindy_x: 1.40241E-06
+TEST exp: Epoch: 400.0, Decoder: 0.04962, Sindy_x: 2.01927E-06, Sindy_z: -6.9102E-04, Reg: 7.81131E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 400, E_agr_Decoder: 0.036489, E_agr_Sindy_x: 1.40276E-06
+TEST exp: Epoch: 410.0, Decoder: 0.048207, Sindy_x: 2.00266E-06, Sindy_z: -6.9801E-04, Reg: 7.75438E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 410, E_agr_Decoder: 0.035204, E_agr_Sindy_x: 1.40267E-06
+TEST exp: Epoch: 420.0, Decoder: 0.046834, Sindy_x: 1.98591E-06, Sindy_z: -7.0473E-04, Reg: 7.69741E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 420, E_agr_Decoder: 0.033952, E_agr_Sindy_x: 1.40233E-06
+TEST exp: Epoch: 430.0, Decoder: 0.045502, Sindy_x: 1.96922E-06, Sindy_z: -7.1127E-04, Reg: 7.64059E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 430, E_agr_Decoder: 0.032735, E_agr_Sindy_x: 1.40155E-06
+TEST exp: Epoch: 440.0, Decoder: 0.044211, Sindy_x: 1.95249E-06, Sindy_z: -7.1733E-04, Reg: 7.58364E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 440, E_agr_Decoder: 0.031554, E_agr_Sindy_x: 1.40045E-06
+TEST exp: Epoch: 450.0, Decoder: 0.042963, Sindy_x: 1.93543E-06, Sindy_z: -7.2329E-04, Reg: 7.52671E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 450, E_agr_Decoder: 0.030413, E_agr_Sindy_x: 1.39905E-06
+TEST exp: Epoch: 460.0, Decoder: 0.041756, Sindy_x: 1.91821E-06, Sindy_z: -7.2888E-04, Reg: 7.46991E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 460, E_agr_Decoder: 0.029311, E_agr_Sindy_x: 1.39722E-06
+TEST exp: Epoch: 470.0, Decoder: 0.040592, Sindy_x: 1.90075E-06, Sindy_z: -7.3429E-04, Reg: 7.41317E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 470, E_agr_Decoder: 0.02825, E_agr_Sindy_x: 1.39507E-06
+TEST exp: Epoch: 480.0, Decoder: 0.03947, Sindy_x: 1.88302E-06, Sindy_z: -7.3944E-04, Reg: 7.35638E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 480, E_agr_Decoder: 0.027231, E_agr_Sindy_x: 1.39256E-06
+TEST exp: Epoch: 490.0, Decoder: 0.03839, Sindy_x: 1.86497E-06, Sindy_z: -7.4438E-04, Reg: 7.29969E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 490, E_agr_Decoder: 0.026254, E_agr_Sindy_x: 1.38968E-06
+TEST exp: Epoch: 500.0, Decoder: 0.037352, Sindy_x: 1.84656E-06, Sindy_z: -7.4905E-04, Reg: 7.24299E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 500, E_agr_Decoder: 0.02532, E_agr_Sindy_x: 1.38642E-06
+TEST exp: Epoch: 510.0, Decoder: 0.036353, Sindy_x: 1.82785E-06, Sindy_z: -7.5357E-04, Reg: 7.18615E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 510, E_agr_Decoder: 0.024427, E_agr_Sindy_x: 1.38292E-06
+TEST exp: Epoch: 520.0, Decoder: 0.035394, Sindy_x: 1.80891E-06, Sindy_z: -7.5775E-04, Reg: 7.12945E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 520, E_agr_Decoder: 0.023576, E_agr_Sindy_x: 1.37911E-06
+TEST exp: Epoch: 530.0, Decoder: 0.034474, Sindy_x: 1.78974E-06, Sindy_z: -7.6184E-04, Reg: 7.07263E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 530, E_agr_Decoder: 0.022766, E_agr_Sindy_x: 1.37507E-06
+TEST exp: Epoch: 540.0, Decoder: 0.033591, Sindy_x: 1.77034E-06, Sindy_z: -7.6571E-04, Reg: 7.01596E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 540, E_agr_Decoder: 0.021996, E_agr_Sindy_x: 1.37072E-06
+TEST exp: Epoch: 550.0, Decoder: 0.032744, Sindy_x: 1.75091E-06, Sindy_z: -7.6959E-04, Reg: 6.95906E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 550, E_agr_Decoder: 0.021265, E_agr_Sindy_x: 1.36632E-06
+TEST exp: Epoch: 560.0, Decoder: 0.031931, Sindy_x: 1.73152E-06, Sindy_z: -7.7305E-04, Reg: 6.90229E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 560, E_agr_Decoder: 0.020572, E_agr_Sindy_x: 1.36173E-06
+TEST exp: Epoch: 570.0, Decoder: 0.031153, Sindy_x: 1.71222E-06, Sindy_z: -7.7656E-04, Reg: 6.84536E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 570, E_agr_Decoder: 0.019915, E_agr_Sindy_x: 1.35694E-06
+TEST exp: Epoch: 580.0, Decoder: 0.030406, Sindy_x: 1.69315E-06, Sindy_z: -7.7976E-04, Reg: 6.78837E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 580, E_agr_Decoder: 0.019293, E_agr_Sindy_x: 1.35211E-06
+TEST exp: Epoch: 590.0, Decoder: 0.02969, Sindy_x: 1.67439E-06, Sindy_z: -7.8292E-04, Reg: 6.73129E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 590, E_agr_Decoder: 0.018706, E_agr_Sindy_x: 1.34736E-06
+TEST exp: Epoch: 600.0, Decoder: 0.029004, Sindy_x: 1.65581E-06, Sindy_z: -7.8598E-04, Reg: 6.67415E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 600, E_agr_Decoder: 0.01815, E_agr_Sindy_x: 1.34254E-06
+TEST exp: Epoch: 610.0, Decoder: 0.028345, Sindy_x: 1.63792E-06, Sindy_z: -7.8871E-04, Reg: 6.61695E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 610, E_agr_Decoder: 0.017626, E_agr_Sindy_x: 1.33762E-06
+TEST exp: Epoch: 620.0, Decoder: 0.027714, Sindy_x: 1.62048E-06, Sindy_z: -7.9159E-04, Reg: 6.55956E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 620, E_agr_Decoder: 0.01713, E_agr_Sindy_x: 1.33298E-06
+TEST exp: Epoch: 630.0, Decoder: 0.027108, Sindy_x: 1.60358E-06, Sindy_z: -7.9428E-04, Reg: 6.50212E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 630, E_agr_Decoder: 0.016663, E_agr_Sindy_x: 1.32822E-06
+TEST exp: Epoch: 640.0, Decoder: 0.026527, Sindy_x: 1.58723E-06, Sindy_z: -7.9679E-04, Reg: 6.44458E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 640, E_agr_Decoder: 0.016222, E_agr_Sindy_x: 1.32354E-06
+TEST exp: Epoch: 650.0, Decoder: 0.025968, Sindy_x: 1.57159E-06, Sindy_z: -7.9923E-04, Reg: 6.38689E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 650, E_agr_Decoder: 0.015806, E_agr_Sindy_x: 1.31908E-06
+TEST exp: Epoch: 660.0, Decoder: 0.025432, Sindy_x: 1.55654E-06, Sindy_z: -8.0152E-04, Reg: 6.32904E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 660, E_agr_Decoder: 0.015413, E_agr_Sindy_x: 1.31464E-06
+TEST exp: Epoch: 670.0, Decoder: 0.024916, Sindy_x: 1.54224E-06, Sindy_z: -8.0388E-04, Reg: 6.27106E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 670, E_agr_Decoder: 0.015042, E_agr_Sindy_x: 1.31031E-06
+TEST exp: Epoch: 680.0, Decoder: 0.02442, Sindy_x: 1.52858E-06, Sindy_z: -8.0608E-04, Reg: 6.21295E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 680, E_agr_Decoder: 0.014692, E_agr_Sindy_x: 1.30622E-06
+TEST exp: Epoch: 690.0, Decoder: 0.023943, Sindy_x: 1.51545E-06, Sindy_z: -8.0816E-04, Reg: 6.15478E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 690, E_agr_Decoder: 0.014362, E_agr_Sindy_x: 1.30221E-06
+TEST exp: Epoch: 700.0, Decoder: 0.023483, Sindy_x: 1.50307E-06, Sindy_z: -8.1026E-04, Reg: 6.09637E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 700, E_agr_Decoder: 0.01405, E_agr_Sindy_x: 1.29826E-06
+TEST exp: Epoch: 710.0, Decoder: 0.023041, Sindy_x: 1.49122E-06, Sindy_z: -8.1225E-04, Reg: 6.03789E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 710, E_agr_Decoder: 0.013755, E_agr_Sindy_x: 1.29456E-06
+TEST exp: Epoch: 720.0, Decoder: 0.022614, Sindy_x: 1.48007E-06, Sindy_z: -8.1411E-04, Reg: 5.97926E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 720, E_agr_Decoder: 0.013476, E_agr_Sindy_x: 1.29087E-06
+TEST exp: Epoch: 730.0, Decoder: 0.022202, Sindy_x: 1.46931E-06, Sindy_z: -8.1597E-04, Reg: 5.92049E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 730, E_agr_Decoder: 0.013212, E_agr_Sindy_x: 1.28734E-06
+TEST exp: Epoch: 740.0, Decoder: 0.021805, Sindy_x: 1.45932E-06, Sindy_z: -8.1777E-04, Reg: 5.86151E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 740, E_agr_Decoder: 0.012963, E_agr_Sindy_x: 1.28382E-06
+TEST exp: Epoch: 750.0, Decoder: 0.021421, Sindy_x: 1.44978E-06, Sindy_z: -8.1948E-04, Reg: 5.80253E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 750, E_agr_Decoder: 0.012726, E_agr_Sindy_x: 1.28055E-06
+TEST exp: Epoch: 760.0, Decoder: 0.021049, Sindy_x: 1.44076E-06, Sindy_z: -8.2118E-04, Reg: 5.74338E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 760, E_agr_Decoder: 0.012501, E_agr_Sindy_x: 1.27737E-06
+TEST exp: Epoch: 770.0, Decoder: 0.02069, Sindy_x: 1.43223E-06, Sindy_z: -8.2283E-04, Reg: 5.68418E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 770, E_agr_Decoder: 0.012288, E_agr_Sindy_x: 1.27411E-06
+TEST exp: Epoch: 780.0, Decoder: 0.020342, Sindy_x: 1.42416E-06, Sindy_z: -8.2431E-04, Reg: 5.62475E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 780, E_agr_Decoder: 0.012086, E_agr_Sindy_x: 1.27111E-06
+TEST exp: Epoch: 790.0, Decoder: 0.020005, Sindy_x: 1.41651E-06, Sindy_z: -8.2597E-04, Reg: 5.56514E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 790, E_agr_Decoder: 0.011893, E_agr_Sindy_x: 1.26812E-06
+TEST exp: Epoch: 800.0, Decoder: 0.019679, Sindy_x: 1.40936E-06, Sindy_z: -8.2744E-04, Reg: 5.50555E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 800, E_agr_Decoder: 0.01171, E_agr_Sindy_x: 1.26527E-06
+TEST exp: Epoch: 810.0, Decoder: 0.019362, Sindy_x: 1.40258E-06, Sindy_z: -8.2889E-04, Reg: 5.44573E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 810, E_agr_Decoder: 0.011535, E_agr_Sindy_x: 1.26242E-06
+TEST exp: Epoch: 820.0, Decoder: 0.019054, Sindy_x: 1.39604E-06, Sindy_z: -8.3034E-04, Reg: 5.38599E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 820, E_agr_Decoder: 0.011368, E_agr_Sindy_x: 1.25961E-06
+TEST exp: Epoch: 830.0, Decoder: 0.018755, Sindy_x: 1.39001E-06, Sindy_z: -8.3162E-04, Reg: 5.32597E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 830, E_agr_Decoder: 0.011209, E_agr_Sindy_x: 1.25691E-06
+TEST exp: Epoch: 840.0, Decoder: 0.018464, Sindy_x: 1.38429E-06, Sindy_z: -8.3302E-04, Reg: 5.26588E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 840, E_agr_Decoder: 0.011057, E_agr_Sindy_x: 1.25438E-06
+TEST exp: Epoch: 850.0, Decoder: 0.018182, Sindy_x: 1.37884E-06, Sindy_z: -8.3438E-04, Reg: 5.20566E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 850, E_agr_Decoder: 0.010912, E_agr_Sindy_x: 1.25178E-06
+TEST exp: Epoch: 860.0, Decoder: 0.017907, Sindy_x: 1.37367E-06, Sindy_z: -8.3562E-04, Reg: 5.14541E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 860, E_agr_Decoder: 0.010773, E_agr_Sindy_x: 1.24928E-06
+TEST exp: Epoch: 870.0, Decoder: 0.017639, Sindy_x: 1.36875E-06, Sindy_z: -8.3683E-04, Reg: 5.08507E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 870, E_agr_Decoder: 0.010639, E_agr_Sindy_x: 1.24677E-06
+TEST exp: Epoch: 880.0, Decoder: 0.017378, Sindy_x: 1.36411E-06, Sindy_z: -8.3802E-04, Reg: 5.02454E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 880, E_agr_Decoder: 0.010512, E_agr_Sindy_x: 1.24421E-06
+TEST exp: Epoch: 890.0, Decoder: 0.017124, Sindy_x: 1.35973E-06, Sindy_z: -8.3928E-04, Reg: 4.96396E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 890, E_agr_Decoder: 0.010389, E_agr_Sindy_x: 1.24188E-06
+TEST exp: Epoch: 900.0, Decoder: 0.016876, Sindy_x: 1.35546E-06, Sindy_z: -8.4045E-04, Reg: 4.90323E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 900, E_agr_Decoder: 0.010271, E_agr_Sindy_x: 1.23951E-06
+TEST exp: Epoch: 910.0, Decoder: 0.016635, Sindy_x: 1.35141E-06, Sindy_z: -8.4154E-04, Reg: 4.84257E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 910, E_agr_Decoder: 0.010158, E_agr_Sindy_x: 1.23724E-06
+TEST exp: Epoch: 920.0, Decoder: 0.016399, Sindy_x: 1.34763E-06, Sindy_z: -8.4265E-04, Reg: 4.78167E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 920, E_agr_Decoder: 0.010049, E_agr_Sindy_x: 1.23497E-06
+TEST exp: Epoch: 930.0, Decoder: 0.016169, Sindy_x: 1.34396E-06, Sindy_z: -8.4377E-04, Reg: 4.72073E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 930, E_agr_Decoder: 0.009944, E_agr_Sindy_x: 1.23269E-06
+TEST exp: Epoch: 940.0, Decoder: 0.015945, Sindy_x: 1.34048E-06, Sindy_z: -8.4479E-04, Reg: 4.65966E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 940, E_agr_Decoder: 0.009843, E_agr_Sindy_x: 1.23042E-06
+TEST exp: Epoch: 950.0, Decoder: 0.015727, Sindy_x: 1.33706E-06, Sindy_z: -8.4571E-04, Reg: 4.59853E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 950, E_agr_Decoder: 0.009746, E_agr_Sindy_x: 1.22833E-06
+TEST exp: Epoch: 960.0, Decoder: 0.015513, Sindy_x: 1.33378E-06, Sindy_z: -8.4688E-04, Reg: 4.53734E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 960, E_agr_Decoder: 0.009652, E_agr_Sindy_x: 1.22621E-06
+TEST exp: Epoch: 970.0, Decoder: 0.015305, Sindy_x: 1.33066E-06, Sindy_z: -8.4773E-04, Reg: 4.47609E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 970, E_agr_Decoder: 0.009562, E_agr_Sindy_x: 1.22417E-06
+TEST exp: Epoch: 980.0, Decoder: 0.015102, Sindy_x: 1.32759E-06, Sindy_z: -8.4873E-04, Reg: 4.41461E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 980, E_agr_Decoder: 0.009475, E_agr_Sindy_x: 1.22208E-06
+TEST exp: Epoch: 990.0, Decoder: 0.014904, Sindy_x: 1.32463E-06, Sindy_z: -8.4975E-04, Reg: 4.35321E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 990, E_agr_Decoder: 0.009391, E_agr_Sindy_x: 1.22007E-06
+TEST exp: Epoch: 1000.0, Decoder: 0.01471, Sindy_x: 1.32174E-06, Sindy_z: -8.5062E-04, Reg: 4.29169E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 1000, E_agr_Decoder: 0.00931, E_agr_Sindy_x: 1.21806E-06
+TEST exp: Epoch: 1010.0, Decoder: 0.014522, Sindy_x: 1.76699E-06, Sindy_z: -8.5151E-04, Reg: 4.23083E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1010, E_agr_Decoder: 0.009232, E_agr_Sindy_x: 1.18647E-06
+TEST exp: Epoch: 1020.0, Decoder: 0.014338, Sindy_x: 1.63171E-06, Sindy_z: -8.5244E-04, Reg: 4.17047E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1020, E_agr_Decoder: 0.009157, E_agr_Sindy_x: 1.18212E-06
+TEST exp: Epoch: 1030.0, Decoder: 0.014159, Sindy_x: 1.54096E-06, Sindy_z: -8.5333E-04, Reg: 4.1095E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1030, E_agr_Decoder: 0.009084, E_agr_Sindy_x: 1.17859E-06
+TEST exp: Epoch: 1040.0, Decoder: 0.013984, Sindy_x: 1.48362E-06, Sindy_z: -8.5416E-04, Reg: 4.04784E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1040, E_agr_Decoder: 0.009014, E_agr_Sindy_x: 1.17588E-06
+TEST exp: Epoch: 1050.0, Decoder: 0.013814, Sindy_x: 1.44367E-06, Sindy_z: -8.5491E-04, Reg: 3.98596E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1050, E_agr_Decoder: 0.008946, E_agr_Sindy_x: 1.17331E-06
+TEST exp: Epoch: 1060.0, Decoder: 0.013648, Sindy_x: 1.41105E-06, Sindy_z: -8.5586E-04, Reg: 3.92397E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1060, E_agr_Decoder: 0.008881, E_agr_Sindy_x: 1.17075E-06
+TEST exp: Epoch: 1070.0, Decoder: 0.013487, Sindy_x: 1.38346E-06, Sindy_z: -8.5664E-04, Reg: 3.86205E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1070, E_agr_Decoder: 0.008818, E_agr_Sindy_x: 1.16825E-06
+TEST exp: Epoch: 1080.0, Decoder: 0.013329, Sindy_x: 1.36002E-06, Sindy_z: -8.5746E-04, Reg: 3.80017E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1080, E_agr_Decoder: 0.008757, E_agr_Sindy_x: 1.16617E-06
+TEST exp: Epoch: 1090.0, Decoder: 0.013177, Sindy_x: 1.34029E-06, Sindy_z: -8.5812E-04, Reg: 3.73832E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1090, E_agr_Decoder: 0.008699, E_agr_Sindy_x: 1.16444E-06
+TEST exp: Epoch: 1100.0, Decoder: 0.013028, Sindy_x: 1.32347E-06, Sindy_z: -8.5898E-04, Reg: 3.67661E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1100, E_agr_Decoder: 0.008643, E_agr_Sindy_x: 1.16295E-06
+TEST exp: Epoch: 1110.0, Decoder: 0.012884, Sindy_x: 1.30912E-06, Sindy_z: -8.5978E-04, Reg: 3.61537E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1110, E_agr_Decoder: 0.008588, E_agr_Sindy_x: 1.16164E-06
+TEST exp: Epoch: 1120.0, Decoder: 0.012743, Sindy_x: 1.29705E-06, Sindy_z: -8.6045E-04, Reg: 3.55396E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1120, E_agr_Decoder: 0.008536, E_agr_Sindy_x: 1.16051E-06
+TEST exp: Epoch: 1130.0, Decoder: 0.012607, Sindy_x: 1.28664E-06, Sindy_z: -8.6113E-04, Reg: 3.49333E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1130, E_agr_Decoder: 0.008485, E_agr_Sindy_x: 1.15963E-06
+TEST exp: Epoch: 1140.0, Decoder: 0.012475, Sindy_x: 1.27798E-06, Sindy_z: -8.6189E-04, Reg: 3.43365E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1140, E_agr_Decoder: 0.008437, E_agr_Sindy_x: 1.15874E-06
+TEST exp: Epoch: 1150.0, Decoder: 0.012346, Sindy_x: 1.27046E-06, Sindy_z: -8.6255E-04, Reg: 3.37452E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1150, E_agr_Decoder: 0.00839, E_agr_Sindy_x: 1.15809E-06
+TEST exp: Epoch: 1160.0, Decoder: 0.012222, Sindy_x: 1.26395E-06, Sindy_z: -8.6327E-04, Reg: 3.31628E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1160, E_agr_Decoder: 0.008345, E_agr_Sindy_x: 1.15757E-06
+TEST exp: Epoch: 1170.0, Decoder: 0.012101, Sindy_x: 1.25855E-06, Sindy_z: -8.6398E-04, Reg: 3.25986E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1170, E_agr_Decoder: 0.008301, E_agr_Sindy_x: 1.15726E-06
+TEST exp: Epoch: 1180.0, Decoder: 0.011984, Sindy_x: 1.25417E-06, Sindy_z: -8.6452E-04, Reg: 3.20554E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1180, E_agr_Decoder: 0.008259, E_agr_Sindy_x: 1.15704E-06
+TEST exp: Epoch: 1190.0, Decoder: 0.011871, Sindy_x: 1.25034E-06, Sindy_z: -8.6524E-04, Reg: 3.15244E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1190, E_agr_Decoder: 0.008219, E_agr_Sindy_x: 1.15718E-06
+TEST exp: Epoch: 1200.0, Decoder: 0.011761, Sindy_x: 1.24692E-06, Sindy_z: -8.6588E-04, Reg: 3.10174E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1200, E_agr_Decoder: 0.00818, E_agr_Sindy_x: 1.15754E-06
+TEST exp: Epoch: 1210.0, Decoder: 0.011655, Sindy_x: 1.24416E-06, Sindy_z: -8.6656E-04, Reg: 3.05243E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1210, E_agr_Decoder: 0.008142, E_agr_Sindy_x: 1.15817E-06
+TEST exp: Epoch: 1220.0, Decoder: 0.011552, Sindy_x: 1.24172E-06, Sindy_z: -8.6713E-04, Reg: 3.00454E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1220, E_agr_Decoder: 0.008106, E_agr_Sindy_x: 1.15875E-06
+TEST exp: Epoch: 1230.0, Decoder: 0.011453, Sindy_x: 1.23961E-06, Sindy_z: -8.6772E-04, Reg: 2.95933E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1230, E_agr_Decoder: 0.008072, E_agr_Sindy_x: 1.15947E-06
+TEST exp: Epoch: 1240.0, Decoder: 0.011357, Sindy_x: 1.23763E-06, Sindy_z: -8.6838E-04, Reg: 2.91527E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1240, E_agr_Decoder: 0.008038, E_agr_Sindy_x: 1.16034E-06
+TEST exp: Epoch: 1250.0, Decoder: 0.011264, Sindy_x: 1.23607E-06, Sindy_z: -8.6893E-04, Reg: 2.87389E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1250, E_agr_Decoder: 0.008006, E_agr_Sindy_x: 1.16119E-06
+TEST exp: Epoch: 1260.0, Decoder: 0.011174, Sindy_x: 1.23456E-06, Sindy_z: -8.6953E-04, Reg: 2.83453E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1260, E_agr_Decoder: 0.007975, E_agr_Sindy_x: 1.16193E-06
+TEST exp: Epoch: 1270.0, Decoder: 0.011087, Sindy_x: 1.23321E-06, Sindy_z: -8.7017E-04, Reg: 2.79774E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1270, E_agr_Decoder: 0.007945, E_agr_Sindy_x: 1.16279E-06
+TEST exp: Epoch: 1280.0, Decoder: 0.011003, Sindy_x: 1.23218E-06, Sindy_z: -8.7075E-04, Reg: 2.76133E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1280, E_agr_Decoder: 0.007917, E_agr_Sindy_x: 1.16351E-06
+TEST exp: Epoch: 1290.0, Decoder: 0.010922, Sindy_x: 1.23106E-06, Sindy_z: -8.7135E-04, Reg: 2.72772E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1290, E_agr_Decoder: 0.007889, E_agr_Sindy_x: 1.16439E-06
+TEST exp: Epoch: 1300.0, Decoder: 0.010844, Sindy_x: 1.23006E-06, Sindy_z: -8.7186E-04, Reg: 2.69641E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1300, E_agr_Decoder: 0.007862, E_agr_Sindy_x: 1.16541E-06
+TEST exp: Epoch: 1310.0, Decoder: 0.010768, Sindy_x: 1.22923E-06, Sindy_z: -8.7244E-04, Reg: 2.66515E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1310, E_agr_Decoder: 0.007837, E_agr_Sindy_x: 1.16653E-06
+TEST exp: Epoch: 1320.0, Decoder: 0.010695, Sindy_x: 1.22846E-06, Sindy_z: -8.7302E-04, Reg: 2.63607E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1320, E_agr_Decoder: 0.007812, E_agr_Sindy_x: 1.16768E-06
+TEST exp: Epoch: 1330.0, Decoder: 0.010625, Sindy_x: 1.22769E-06, Sindy_z: -8.7352E-04, Reg: 2.60858E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1330, E_agr_Decoder: 0.007788, E_agr_Sindy_x: 1.1688E-06
+TEST exp: Epoch: 1340.0, Decoder: 0.010557, Sindy_x: 1.22698E-06, Sindy_z: -8.7409E-04, Reg: 2.58203E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1340, E_agr_Decoder: 0.007765, E_agr_Sindy_x: 1.17015E-06
+TEST exp: Epoch: 1350.0, Decoder: 0.010491, Sindy_x: 1.22631E-06, Sindy_z: -8.7463E-04, Reg: 2.55562E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1350, E_agr_Decoder: 0.007743, E_agr_Sindy_x: 1.17157E-06
+TEST exp: Epoch: 1360.0, Decoder: 0.010427, Sindy_x: 1.22568E-06, Sindy_z: -8.7512E-04, Reg: 2.53028E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1360, E_agr_Decoder: 0.007722, E_agr_Sindy_x: 1.17305E-06
+TEST exp: Epoch: 1370.0, Decoder: 0.010366, Sindy_x: 1.22507E-06, Sindy_z: -8.7563E-04, Reg: 2.50559E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1370, E_agr_Decoder: 0.007701, E_agr_Sindy_x: 1.17444E-06
+TEST exp: Epoch: 1380.0, Decoder: 0.010306, Sindy_x: 1.22458E-06, Sindy_z: -8.7627E-04, Reg: 2.48136E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1380, E_agr_Decoder: 0.007682, E_agr_Sindy_x: 1.17559E-06
+TEST exp: Epoch: 1390.0, Decoder: 0.010249, Sindy_x: 1.22394E-06, Sindy_z: -8.7676E-04, Reg: 2.45764E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1390, E_agr_Decoder: 0.007662, E_agr_Sindy_x: 1.17683E-06
+TEST exp: Epoch: 1400.0, Decoder: 0.010193, Sindy_x: 1.22348E-06, Sindy_z: -8.7729E-04, Reg: 2.43419E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1400, E_agr_Decoder: 0.007644, E_agr_Sindy_x: 1.17812E-06
+TEST exp: Epoch: 1410.0, Decoder: 0.01014, Sindy_x: 1.22297E-06, Sindy_z: -8.7772E-04, Reg: 2.41105E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1410, E_agr_Decoder: 0.007626, E_agr_Sindy_x: 1.17936E-06
+TEST exp: Epoch: 1420.0, Decoder: 0.010088, Sindy_x: 1.22243E-06, Sindy_z: -8.7827E-04, Reg: 2.38809E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1420, E_agr_Decoder: 0.007609, E_agr_Sindy_x: 1.18054E-06
+TEST exp: Epoch: 1430.0, Decoder: 0.010038, Sindy_x: 1.22197E-06, Sindy_z: -8.7878E-04, Reg: 2.36592E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1430, E_agr_Decoder: 0.007592, E_agr_Sindy_x: 1.18161E-06
+TEST exp: Epoch: 1440.0, Decoder: 0.00999, Sindy_x: 1.22156E-06, Sindy_z: -8.7927E-04, Reg: 2.34434E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1440, E_agr_Decoder: 0.007576, E_agr_Sindy_x: 1.18244E-06
+TEST exp: Epoch: 1450.0, Decoder: 0.009943, Sindy_x: 1.22117E-06, Sindy_z: -8.7978E-04, Reg: 2.32253E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1450, E_agr_Decoder: 0.007561, E_agr_Sindy_x: 1.18341E-06
+TEST exp: Epoch: 1460.0, Decoder: 0.009897, Sindy_x: 1.22085E-06, Sindy_z: -8.8021E-04, Reg: 2.30098E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1460, E_agr_Decoder: 0.007546, E_agr_Sindy_x: 1.18445E-06
+TEST exp: Epoch: 1470.0, Decoder: 0.009854, Sindy_x: 1.22051E-06, Sindy_z: -8.8076E-04, Reg: 2.27941E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1470, E_agr_Decoder: 0.007531, E_agr_Sindy_x: 1.18546E-06
+TEST exp: Epoch: 1480.0, Decoder: 0.009811, Sindy_x: 1.22013E-06, Sindy_z: -8.8126E-04, Reg: 2.25824E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1480, E_agr_Decoder: 0.007517, E_agr_Sindy_x: 1.18634E-06
+TEST exp: Epoch: 1490.0, Decoder: 0.00977, Sindy_x: 1.21989E-06, Sindy_z: -8.8163E-04, Reg: 2.23734E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1490, E_agr_Decoder: 0.007504, E_agr_Sindy_x: 1.18739E-06
+TEST exp: Epoch: 1500.0, Decoder: 0.00973, Sindy_x: 1.21947E-06, Sindy_z: -8.8219E-04, Reg: 2.21679E-06, Active_coeffs: 56.0, Coeff: 0E+00
+TEST exp: Epoch: 1500, E_agr_Decoder: 0.007491, E_agr_Sindy_x: 1.18845E-06
+TEST exp: Epoch: 0E+00, Decoder: 0.515543, Sindy_x: 2.19547E-06, Sindy_z: -5.7719E-04, Reg: 1E-05, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 0, E_agr_Decoder: 0.364162, E_agr_Sindy_x: 1.29478E-06
+TEST exp: Epoch: 10.0, Decoder: 0.438151, Sindy_x: 2.14979E-06, Sindy_z: -5.8058E-04, Reg: 9.92676E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 10, E_agr_Decoder: 0.298009, E_agr_Sindy_x: 1.29248E-06
+TEST exp: Epoch: 20.0, Decoder: 0.371091, Sindy_x: 2.06411E-06, Sindy_z: -5.8514E-04, Reg: 9.85289E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 20, E_agr_Decoder: 0.248438, E_agr_Sindy_x: 1.29025E-06
+TEST exp: Epoch: 30.0, Decoder: 0.313405, Sindy_x: 1.98696E-06, Sindy_z: -5.9081E-04, Reg: 9.77826E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 30, E_agr_Decoder: 0.210078, E_agr_Sindy_x: 1.28767E-06
+TEST exp: Epoch: 40.0, Decoder: 0.264452, Sindy_x: 1.93242E-06, Sindy_z: -5.9703E-04, Reg: 9.70334E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 40, E_agr_Decoder: 0.180098, E_agr_Sindy_x: 1.28395E-06
+TEST exp: Epoch: 50.0, Decoder: 0.22342, Sindy_x: 1.90236E-06, Sindy_z: -6.0364E-04, Reg: 9.62807E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 50, E_agr_Decoder: 0.156435, E_agr_Sindy_x: 1.27883E-06
+TEST exp: Epoch: 60.0, Decoder: 0.189411, Sindy_x: 1.89163E-06, Sindy_z: -6.1075E-04, Reg: 9.55261E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 60, E_agr_Decoder: 0.137528, E_agr_Sindy_x: 1.27297E-06
+TEST exp: Epoch: 70.0, Decoder: 0.161659, Sindy_x: 1.89261E-06, Sindy_z: -6.1836E-04, Reg: 9.47742E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 70, E_agr_Decoder: 0.122288, E_agr_Sindy_x: 1.26727E-06
+TEST exp: Epoch: 80.0, Decoder: 0.139527, Sindy_x: 1.89774E-06, Sindy_z: -6.2661E-04, Reg: 9.40263E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 80, E_agr_Decoder: 0.110004, E_agr_Sindy_x: 1.26222E-06
+TEST exp: Epoch: 90.0, Decoder: 0.122396, Sindy_x: 1.90028E-06, Sindy_z: -6.3563E-04, Reg: 9.32842E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 90, E_agr_Decoder: 0.100196, E_agr_Sindy_x: 1.25831E-06
+TEST exp: Epoch: 0E+00, Decoder: 0.637791, Sindy_x: 1.16543E-05, Sindy_z: -7.1529E-04, Reg: 1E-05, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 0, E_agr_Decoder: 0.452895, E_agr_Sindy_x: 1.79482E-06
+TEST exp: Epoch: 10.0, Decoder: 0.534948, Sindy_x: 8.17899E-06, Sindy_z: -7.1391E-04, Reg: 9.92132E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 10, E_agr_Decoder: 0.390414, E_agr_Sindy_x: 1.56085E-06
+TEST exp: Epoch: 20.0, Decoder: 0.45212, Sindy_x: 5.58511E-06, Sindy_z: -7.0905E-04, Reg: 9.84271E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 20, E_agr_Decoder: 0.337042, E_agr_Sindy_x: 1.41373E-06
+TEST exp: Epoch: 30.0, Decoder: 0.385082, Sindy_x: 3.97331E-06, Sindy_z: -7.0127E-04, Reg: 9.76528E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 30, E_agr_Decoder: 0.292631, E_agr_Sindy_x: 1.32435E-06
+TEST exp: Epoch: 40.0, Decoder: 0.32954, Sindy_x: 3.0437E-06, Sindy_z: -6.9134E-04, Reg: 9.68914E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 40, E_agr_Decoder: 0.255736, E_agr_Sindy_x: 1.27057E-06
+TEST exp: Epoch: 50.0, Decoder: 0.283269, Sindy_x: 2.49899E-06, Sindy_z: -6.8013E-04, Reg: 9.61374E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 50, E_agr_Decoder: 0.224982, E_agr_Sindy_x: 1.23906E-06
+TEST exp: Epoch: 60.0, Decoder: 0.245277, Sindy_x: 2.15993E-06, Sindy_z: -6.6847E-04, Reg: 9.53906E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 60, E_agr_Decoder: 0.199411, E_agr_Sindy_x: 1.22169E-06
+TEST exp: Epoch: 70.0, Decoder: 0.214716, Sindy_x: 1.93399E-06, Sindy_z: -6.5676E-04, Reg: 9.46478E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 70, E_agr_Decoder: 0.178312, E_agr_Sindy_x: 1.21298E-06
+TEST exp: Epoch: 80.0, Decoder: 0.190543, Sindy_x: 1.77457E-06, Sindy_z: -6.4551E-04, Reg: 9.39087E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 80, E_agr_Decoder: 0.161091, E_agr_Sindy_x: 1.20957E-06
+TEST exp: Epoch: 90.0, Decoder: 0.171583, Sindy_x: 1.65751E-06, Sindy_z: -6.3515E-04, Reg: 9.31719E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 90, E_agr_Decoder: 0.147165, E_agr_Sindy_x: 1.20913E-06
+TEST exp: Epoch: 100.0, Decoder: 0.1567, Sindy_x: 1.56942E-06, Sindy_z: -6.2576E-04, Reg: 9.24373E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 100, E_agr_Decoder: 0.135942, E_agr_Sindy_x: 1.21032E-06
+TEST exp: Epoch: 0E+00, Decoder: 1.126589, Sindy_x: 5.66955E-06, Sindy_z: -5.1952E-04, Reg: 1E-05, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 0, E_agr_Decoder: 0.682863, E_agr_Sindy_x: 1.71156E-06
+TEST exp: Epoch: 10.0, Decoder: 0.940941, Sindy_x: 4.52326E-06, Sindy_z: -5.2048E-04, Reg: 9.91998E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 10, E_agr_Decoder: 0.544369, E_agr_Sindy_x: 1.51378E-06
+TEST exp: Epoch: 20.0, Decoder: 0.775449, Sindy_x: 3.90312E-06, Sindy_z: -5.2801E-04, Reg: 9.84085E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 20, E_agr_Decoder: 0.426139, E_agr_Sindy_x: 1.42703E-06
+TEST exp: Epoch: 30.0, Decoder: 0.630849, Sindy_x: 3.60847E-06, Sindy_z: -5.3873E-04, Reg: 9.76307E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 30, E_agr_Decoder: 0.328452, E_agr_Sindy_x: 1.39779E-06
+TEST exp: Epoch: 40.0, Decoder: 0.508106, Sindy_x: 3.4499E-06, Sindy_z: -5.5022E-04, Reg: 9.68642E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 40, E_agr_Decoder: 0.251637, E_agr_Sindy_x: 1.39632E-06
+TEST exp: Epoch: 50.0, Decoder: 0.407642, Sindy_x: 3.35543E-06, Sindy_z: -5.6193E-04, Reg: 9.61072E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 50, E_agr_Decoder: 0.193686, E_agr_Sindy_x: 1.41196E-06
+TEST exp: Epoch: 60.0, Decoder: 0.328303, Sindy_x: 3.29198E-06, Sindy_z: -5.7349E-04, Reg: 9.53573E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 60, E_agr_Decoder: 0.151335, E_agr_Sindy_x: 1.43947E-06
+TEST exp: Epoch: 70.0, Decoder: 0.267136, Sindy_x: 3.24735E-06, Sindy_z: -5.8511E-04, Reg: 9.46111E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 70, E_agr_Decoder: 0.120941, E_agr_Sindy_x: 1.47599E-06
+TEST exp: Epoch: 80.0, Decoder: 0.220332, Sindy_x: 3.22016E-06, Sindy_z: -5.9689E-04, Reg: 9.38714E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 80, E_agr_Decoder: 0.099179, E_agr_Sindy_x: 1.51931E-06
+TEST exp: Epoch: 90.0, Decoder: 0.18427, Sindy_x: 3.21117E-06, Sindy_z: -6.0845E-04, Reg: 9.31378E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 90, E_agr_Decoder: 0.083434, E_agr_Sindy_x: 1.56809E-06
+TEST exp: Epoch: 100.0, Decoder: 0.156062, Sindy_x: 3.21874E-06, Sindy_z: -6.1965E-04, Reg: 9.24112E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 100, E_agr_Decoder: 0.071832, E_agr_Sindy_x: 1.62065E-06
+TEST exp: Epoch: 0E+00, Decoder: 1.381276, Sindy_x: 5.56917E-06, Sindy_z: -2.9005E-04, Reg: 1E-05, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 0, E_agr_Decoder: 1.094855, E_agr_Sindy_x: 1.24998E-06
+TEST exp: Epoch: 10.0, Decoder: 1.230994, Sindy_x: 6.13959E-06, Sindy_z: -2.7494E-04, Reg: 9.93194E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 10, E_agr_Decoder: 0.909118, E_agr_Sindy_x: 1.25451E-06
+TEST exp: Epoch: 20.0, Decoder: 1.079808, Sindy_x: 6.65156E-06, Sindy_z: -2.6095E-04, Reg: 9.86447E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 20, E_agr_Decoder: 0.742797, E_agr_Sindy_x: 1.26747E-06
+TEST exp: Epoch: 30.0, Decoder: 0.931758, Sindy_x: 6.98982E-06, Sindy_z: -2.4891E-04, Reg: 9.79843E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 30, E_agr_Decoder: 0.599823, E_agr_Sindy_x: 1.29009E-06
+TEST exp: Epoch: 40.0, Decoder: 0.792163, Sindy_x: 7.09237E-06, Sindy_z: -2.3864E-04, Reg: 9.73492E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 40, E_agr_Decoder: 0.481206, E_agr_Sindy_x: 1.32205E-06
+TEST exp: Epoch: 50.0, Decoder: 0.666855, Sindy_x: 6.97765E-06, Sindy_z: -2.2973E-04, Reg: 9.67386E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 50, E_agr_Decoder: 0.385649, E_agr_Sindy_x: 1.36191E-06
+TEST exp: Epoch: 60.0, Decoder: 0.559874, Sindy_x: 6.70797E-06, Sindy_z: -2.2145E-04, Reg: 9.61444E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 60, E_agr_Decoder: 0.310674, E_agr_Sindy_x: 1.40726E-06
+TEST exp: Epoch: 70.0, Decoder: 0.471608, Sindy_x: 6.36041E-06, Sindy_z: -2.1357E-04, Reg: 9.55619E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 70, E_agr_Decoder: 0.25297, E_agr_Sindy_x: 1.45544E-06
+TEST exp: Epoch: 80.0, Decoder: 0.399569, Sindy_x: 6.01208E-06, Sindy_z: -2.0601E-04, Reg: 9.49807E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 80, E_agr_Decoder: 0.208996, E_agr_Sindy_x: 1.50371E-06
+TEST exp: Epoch: 90.0, Decoder: 0.340484, Sindy_x: 5.71334E-06, Sindy_z: -1.9919E-04, Reg: 9.43956E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 90, E_agr_Decoder: 0.175538, E_agr_Sindy_x: 1.54979E-06
+TEST exp: Epoch: 100.0, Decoder: 0.291684, Sindy_x: 5.47498E-06, Sindy_z: -1.9332E-04, Reg: 9.38004E-06, Active_coeffs: 60.0, Coeff: 0E+00
+TEST exp: Epoch: 100, E_agr_Decoder: 0.149973, E_agr_Sindy_x: 1.59183E-06
