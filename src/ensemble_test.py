@@ -368,9 +368,9 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False,
         pass
 
     if small:
-        params, training_data, validation_data = get_lorenz_params(train_size=10, test_size=10)
+        params, training_data, validation_data = get_lorenz_params(train_size=20, test_size=20)
         params_update = {'replacement': replace, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                         'n_encoders': 4, 'n_decoders': 4, 'criterion': 'avg', 's1_epochs': s1_epochs,
+                         'n_encoders': 1, 'n_decoders': 1, 'criterion': 'avg', 's1_epochs': s1_epochs,
                          'test_freq': 10, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 500}
     else:
         params, training_data, validation_data = get_lorenz_params(train_size=256, test_size=20)
@@ -430,10 +430,10 @@ def plot_coeffs(ensemble_model, exp_name = 'exp', trial_n = 0):
 def run():
     exp_label = 'exp'
     model_name = 'exp_model'
-    s2_epochs = 10001
+    s2_epochs = 80001
 
-    #basic_test(exp_label=exp_label, model_save_name=model_name, small =  True, replace = True,
-               #s1_epochs=  8001)
+    basic_test(exp_label=exp_label, model_save_name=model_name, small =  True, replace = True,
+               s1_epochs=  6001)
 
     indep_model, bag_loader, test_loader = load_model(model_name)
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
@@ -452,7 +452,7 @@ def run():
 
 
     E_loss_dicts = []
-    n_trials = 2
+    n_trials = 1
     for i in range(n_trials):
         compressor_model = SindyNetTCompEnsemble(indep_model)
         model_params = compressor_model.params
