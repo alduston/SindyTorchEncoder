@@ -197,7 +197,7 @@ def str_list_sum(str_list, clip = True):
 
 def print_keyval(key,val_list):
     if len(val_list):
-        return f"{key.capitalize()}: {round(val_list[-1],9)}, "
+        return f"{key.capitalize()}: {format(val_list[-1])}, "
     return ''
 
 

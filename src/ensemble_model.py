@@ -187,7 +187,6 @@ class SindyNetEnsemble(nn.Module):
             Decoders.append({'decoder': decoder, 'decoder_layers': decoder_layers})
         Sindy_coeffs = []
         for i,encoder in enumerate(Encoders):
-            #for j,decoder in enumerate(Decoders):
             sindy_coeffs = torch.nn.Parameter(self.init_sindy_coefficients(), requires_grad=True)
             Sindy_coeffs.append(sindy_coeffs)
         return Encoders, Decoders, Sindy_coeffs
@@ -200,7 +199,7 @@ class SindyNetEnsemble(nn.Module):
         base_indexes = np.asarray(range(self.params['batch_size']))
 
         for encoder in self.Encoders:
-            encoder_idxs = np.random.choice(base_indexes, size  = n, replace = True) #self.params['replacement'])
+            encoder_idxs = np.random.choice(base_indexes, size  = n, replace = self.params['replacement'])
             encoder_idxs = torch.tensor(encoder_idxs, device = self.device, dtype = self.dtype).long()
             Encode_indexes.append(encoder_idxs)
 
@@ -428,15 +427,11 @@ class SindyNetEnsemble(nn.Module):
         return  reg_loss
 
 
-    def latent_loss(self, x):
-        zs = [submodel['encoder'](x) for submodel in self.Encoders]
-        z_mean = torch.mean(torch.stack(zs), dim = 0)
-        latent_variance = torch.mean((torch.stack(zs) - z_mean)**2)
-        return self.params['loss_weight_latent'] * latent_variance
-
-
     def s1_sub_items(self, x, dx, encode_idx, decode_idx):
-        xed, dxed = self.ed_sample(x, dx, encode_idx, decode_idx)
+        if not self.params['cp_batch']:
+            xed, dxed = self.ed_sample(x, dx, encode_idx, decode_idx)
+        else:
+            xed, dxed = x, dx
         coeffs = self.Sindy_coeffs[encode_idx]
         z, x_decode = self.sub_forward_s1(xed, encode_idx, decode_idx)
 
@@ -543,6 +538,7 @@ class SindyNetEnsemble(nn.Module):
         self.val_dict['E_Decoder'].append(agr_decoder_loss)
         self.val_dict['E_Sindy_x'].append(agr_dx_loss)
         self.refresh_val_dict = False
+
         return True
 
     def s1_Loss(self, x, dx):
@@ -582,8 +578,3 @@ class SindyNetEnsemble(nn.Module):
         if self.params['cp_batch']:
             self.params['cp_batch'] = False
         return  loss, loss_dict
-
-
-
-
-#0.00139449, Sindy_x: 0.000346457

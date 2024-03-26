@@ -1,1 +1,0 @@
-encoders = 3, epochs = 5001.0, data size = 1250

@@ -143,7 +143,7 @@ class SindyNetTCompEnsemble(nn.Module):
         self.params['indep_models'] = indep_models
 
         self.activation_f = indep_models.activation_f
-        self.criterion_f = self.criterion_function
+        self.criterion_f = self.criterion__function
 
         self.translators = self.init_translators()
         self.detranslators = self.init_detranslators()
@@ -304,7 +304,7 @@ class SindyNetTCompEnsemble(nn.Module):
         return Translator, layers
 
 
-    def criterion_function(self, vec):
+    def criterion__function(self, vec):
         criterion = self.params['criterion']
         if criterion == 'stability':
             zero_threshold = self.params['zero_threshold']
@@ -483,16 +483,7 @@ class SindyNetTCompEnsemble(nn.Module):
         return corr_loss/len(self.translators)
 
 
-    def var_loss(self):
-        var_loss = 0
-        sindy_coeffs = self.sindy_coeffs
-        for i in range(self.params['library_dim']):
-            for j in range(self.params['latent_dim']):
-                var_loss += torch.var(sindy_coeffs[:,i,j])
-        return var_loss
-
-
-    def val_test(self, x, dx, x_translate_stack, agr_key='median'):
+    def val_test(self, x, dx, x_translate_stack, agr_key='mean'):
         if self.refresh_val_dict:
             self.val_dict = {'E_Decoder': [],  'E_Sindy_x': [], 'E_agr_Decoder': [], 'E_agr_Sindy_x': []}
 
@@ -562,11 +553,7 @@ class SindyNetTCompEnsemble(nn.Module):
         loss_dict['reg'] = self.reg_loss()
         loss_dict['sindy_z'] = corr_loss
         loss =  loss_dict['decoder'] + loss_dict['sindy_x'] + loss_dict['reg'] + loss_dict['sindy_z']
-        loss += (1e-4 * self.var_loss())  # new
         if self.params['eval']:
             self.val_test(x, dx, x_translate_stack)
         return loss, loss_dict
-
-
-
 

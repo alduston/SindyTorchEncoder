@@ -106,7 +106,7 @@ class model_data(Dataset):
         return self.n_samples
 
 
-def get_lorenz_params(train_size = 100, max_data = 100000, noise = 1e-6, test_size = 20):
+def get_lorenz_params(train_size = 100, max_data = 1000000, noise = 1e-6, test_size = 20):
     training_data = get_lorenz_data(train_size, noise_strength=noise)
     validation_data = get_lorenz_data(test_size, noise_strength=noise)
 

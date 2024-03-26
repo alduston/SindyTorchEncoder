@@ -29,17 +29,17 @@ def ea_s1_test(model_params, training_data, validation_data, run  = 0):
     model_params['add_noise'] = False
 
     l = len(training_data['x'])
-    train_params = {'s1_epochs': model_params['s1_epochs'],'bag_size': min(l, 5000), 'refinement_epochs': 0,
+    train_params = {'s1_epochs': model_params['s1_epochs'],'bag_size': min(l, 8000),
+                    'refinement_epochs': model_params['s1_epochs']//10,
                     'n_encoders': model_params['n_encoders'],'n_decoders': model_params['n_decoders']}
-    train_params['nbags'] = 1 #max(train_params['n_encoders'], train_params['n_decoders'])
-
-    model_params['batch_size'] = min(l, 5000)
+    train_params['nbags'] = max(1, l // train_params['bag_size'])
+    model_params['batch_size'] = train_params['bag_size']
     model_params['run'] = run
     model_params['test_freq'] = model_params['test_freq']
     net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data)
     return net, Loss_dict, bag_loader, test_loader
 
-
+'''
 def ea_test(model_params, training_data, validation_data, run  = 0):
     model_params['sequential_thresholding'] = False
     model_params['use_activation_mask'] = False
@@ -56,6 +56,7 @@ def ea_test(model_params, training_data, validation_data, run  = 0):
     model_params['test_freq'] = model_params['test_freq']
     net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data)
     return net, Loss_dict
+'''
 
 
 def drop_index(df):
@@ -359,22 +360,23 @@ def load_model(save_dir = 'model'):
 
 #scp -r ald6fd@klone.hyak.uw.edu:/mmfs1/gscratch/dynamicsai/ald6fd/SindyTorchEncoder/data/stuff /Users/aloisduston/Desktop/Math/Research/Kutz/SindyEnsemble/data/
 
-def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False):
+def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False,
+               replace = False, s1_epochs  = 10001):
     try:
         os.mkdir(f'../data/{exp_label}')
     except OSError:
         pass
 
     if small:
-        params, training_data, validation_data = get_lorenz_params(train_size=5, test_size=2)
-        params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 5,
-                         'n_encoders': 3, 'n_decoders': 3, 'criterion': 'avg', 's1_epochs': 5001,
-                         'test_freq': 10, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
+        params, training_data, validation_data = get_lorenz_params(train_size=10, test_size=10)
+        params_update = {'replacement': replace, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
+                         'n_encoders': 4, 'n_decoders': 4, 'criterion': 'avg', 's1_epochs': s1_epochs,
+                         'test_freq': 10, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 500}
     else:
-        params, training_data, validation_data = get_lorenz_params(train_size=30, test_size=15)
-        params_update = {'replacement': True, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                         'n_encoders': 7, 'n_decoders': 7, 'criterion': 'avg', 's1_epochs': 10001,
-                         'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 100}
+        params, training_data, validation_data = get_lorenz_params(train_size=256, test_size=20)
+        params_update = {'replacement': replace, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
+                         'n_encoders': 7, 'n_decoders': 7, 'criterion': 'avg', 's1_epochs': s1_epochs,
+                         'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 500}
 
     params.update(params_update)
     model1, Loss_dict, bag_loader, test_loader = ea_s1_test(params, training_data, validation_data)
@@ -397,45 +399,78 @@ def get_step1_med_losses(item_loss_dict):
     return {'E_agr_Decoder': med_loss_dict['decoder'], 'E_agr_Sindy_x':  med_loss_dict['sindy_x']}
 
 
+def plot_masks(ensemble_model, exp_name = 'exp'):
+    try:
+        os.system(f'mkdir ../data/{exp_name}/masks')
+    except BaseException:
+        pass
+    for i,(coeffs, mask) in enumerate(zip(ensemble_model.Sindy_coeffs, ensemble_model.coefficient_masks)):
+        mask_str = (coeffs * mask).detach().cpu().numpy().round(2)
+        os.system(f'echo "{mask_str}" > ../data/{exp_name}/masks/mask{i}.txt')
+    return True
+
+
+def plot_coeffs(ensemble_model, exp_name = 'exp', trial_n = 0):
+    try:
+        os.system(f'mkdir ../data/{exp_name}/trial_{trial_n}')
+    except BaseException:
+        pass
+
+    (x, y) = ensemble_model.coefficient_mask.shape
+    for ix in range(x):
+        for iy in range(y):
+            coeff_vec = ensemble_model.sindy_coeffs[:, ix, iy]
+            coeff_list = list(coeff_vec.detach().cpu().numpy())
+            plt.hist(coeff_list)
+            plt.savefig(f'../data/{exp_name}/trial_{trial_n}/coeff_plot_{ix}_{iy}.png')
+            clear_plt()
+    return True
+
 
 def run():
-    basic_test(exp_label='med_exp', model_save_name='med_model', small = False)
-    indep_model, bag_loader, test_loader = load_model('med_model')
+    exp_label = 'exp'
+    model_name = 'exp_model'
+    s2_epochs = 10001
+
+    #basic_test(exp_label=exp_label, model_save_name=model_name, small =  True, replace = True,
+               #s1_epochs=  8001)
+
+    indep_model, bag_loader, test_loader = load_model(model_name)
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
+
     item_loss_dict = net.item_loss_dict
     med_losses = get_step1_med_losses(item_loss_dict)
-    s_1_losses = {'E_agr_Decoder': med_losses['E_agr_Decoder'][-1],
-                  'E_agr_Sindy_x': med_losses['E_agr_Sindy_x'][-1],
-                  'active_coeffs': Loss_dict['active_coeffs'][-1],
-                  'coeff': Loss_dict['coeff'][-1]}
+    s_1_losses = {'E_agr_Decoder': med_losses['E_agr_Decoder'][-1],'E_agr_Sindy_x': med_losses['E_agr_Sindy_x'][-1],
+                  'active_coeffs': Loss_dict['active_coeffs'][-1], 'coeff': Loss_dict['coeff'][-1]}
 
+    indep_model, bag_loader, test_loader = load_model(model_name)
+    plot_masks(indep_model, exp_name= exp_label)
 
-    indep_model, bag_loader, test_loader = load_model('med_model')
-
-    indep_model.params['coefficient_initialization'] = 'constant'
+    indep_model.params['coefficient_initialization'] = 'xavier'
     indep_model.params['criterion'] = 'stability'
+    indep_model.params['accept_threshold'] = .75
+
 
     E_loss_dicts = []
-    n_trials = 10
+    n_trials = 2
     for i in range(n_trials):
         compressor_model = SindyNetTCompEnsemble(indep_model)
         model_params = compressor_model.params
-        model_params['s2_epochs'] = 10001
+        model_params['s2_epochs'] = s2_epochs
 
         net, Loss_dict, E_loss_dict1, bag_loader, test_loader = train_step2(compressor_model, bag_loader,
                                                                        test_loader, compressor_model.params)
         E_loss_dicts.append(E_loss_dict1)
 
-    step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label='med_exp')
+        step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label=exp_label)
+        plot_coeffs(compressor_model, exp_name = exp_label, trial_n = i)
 
 
 if __name__=='__main__':
     sindy_x_range = [-6.57, -8.71]
     sindy_x_markers = [-6.75, -7, -7.25, -7.5, -7.75, -8.0, -8.25, -8.5]
-
     decoder_range = [-1.083, -7.76]
     decoder_markets = [-2, -3, -4, -5, -6, -7]
-
     coeff_range = [13.5, 62.1]
-    coeff_markers = [20,30,40,50,60]
+    coeff_markers = [20, 30, 40, 50, 60]
     run()
