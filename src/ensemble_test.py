@@ -294,9 +294,10 @@ def step_2_plots(E_loss_dicts2, E_loss_dict1, Indep_loss_dict1, exp_label = 'exp
 
         step_1_loss = Indep_loss_dict1[key]
         step_1_loss_vec = [step_1_loss for i in range(len(x))]
+        eps =  np.abs(np.asarray(1e-18,dtype=float))
         if key in ['E_agr_Decoder', 'E_agr_Sindy_x']:
-            step_1_eloss_vec = np.log(1e-15 + np.abs(np.asarray(step_1_eloss_vec,dtype=float)))
-            step_1_loss_vec = np.log(1e-15 + np.abs(np.asarray(step_1_loss_vec, dtype=float)))
+            step_1_eloss_vec = np.log(eps + np.abs(np.asarray(step_1_eloss_vec,dtype=float)))
+            step_1_loss_vec = np.log(eps + np.abs(np.asarray(step_1_loss_vec, dtype=float)))
             plt.plot(x, step_1_eloss_vec, linestyle='dashed', label='step 1 essemble error')
 
         plt.plot(x, step_1_loss_vec, linestyle='dashed', label='step 1 median error')
@@ -304,7 +305,7 @@ def step_2_plots(E_loss_dicts2, E_loss_dict1, Indep_loss_dict1, exp_label = 'exp
         for dict in E_loss_dicts2:
             plot_vec = dict[key][:len(x)]
             if key in ['E_agr_Decoder', 'E_agr_Sindy_x']:
-                plot_vec = np.log(1e-15 + np.abs(np.asarray(plot_vec),dtype=float))
+                plot_vec = np.log(eps + np.abs(np.asarray(plot_vec),dtype=float))
             plt.plot(x,plot_vec)
         plt.xlabel('Epoch')
         plt.ylabel(plot_labels[key])
@@ -428,7 +429,7 @@ def run():
 
     indep_model.params['coefficient_initialization'] = 'xavier'
     indep_model.params['criterion'] = 'stability'
-    indep_model.params['accept_threshold'] = .75
+    indep_model.params['accept_threshold'] = .77
 
     E_loss_dicts = []
     n_trials = 10
@@ -441,7 +442,7 @@ def run():
                                                                        test_loader, compressor_model.params)
         E_loss_dicts.append(E_loss_dict1)
 
-        step_2_plots(E_loss_dicts,E_loss_dict0, s_1_losses, exp_label=exp_label)
+        step_2_plots(deepcopy(E_loss_dicts),deepcopy(E_loss_dict0), s_1_losses, exp_label=exp_label)
         plot_coeffs(compressor_model, exp_name = exp_label, trial_n = i)
 
 
