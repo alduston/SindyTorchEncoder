@@ -207,7 +207,7 @@ def print_val_losses1(net):
     E_Decoder = format(np.mean(np.asarray(val_dict['E_Decoder'])))
     E_Sindy_x = format(np.mean(np.asarray(val_dict['E_Sindy_x'])))
 
-    print(f'TEST: Epoch: {epoch}, E_Decoder: {E_Decoder}, E_Sindy_x: {E_Sindy_x}')
+    print(f'TEST {net.exp_label}: Epoch: {epoch}, E_Decoder: {format(E_Decoder)}, E_Sindy_x: {format(E_Sindy_x)}')
     net.refresh_val_dict = True
 
     return {'Epoch': epoch, 'E_agr_Decoder': E_Decoder, 'E_agr_Sindy_x': E_Sindy_x,
@@ -227,7 +227,7 @@ def train_eas_1(net, bag_loader, test_loader, model_params):
         if (not epoch % test_freq):
             net.params['cp_batch'] = True
             net, Loss_dict = validate_epoch(net, test_loader, Loss_dict, true_coeffs)
-            print(f'{str_list_sum(["TEST: "] + [print_keyval(key, val) for key, val in Loss_dict.items()])}')
+            print(f'{str_list_sum([f"TEST {net.exp_label}: "] + [print_keyval(key, val) for key, val in Loss_dict.items()])}')
             e_loss_dict = print_val_losses1(net)
             E_loss_dict = update_list_dict(E_loss_dict, e_loss_dict)
 
@@ -245,7 +245,7 @@ def print_val_losses2(net):
     epoch = net.epoch
     E_agr_Decoder = format(np.mean(np.asarray(val_dict['E_agr_Decoder'])))
     E_agr_Sindy_x =  format(np.mean(np.asarray(val_dict['E_agr_Sindy_x'])))
-    print_str = f'TEST: Epoch: {epoch}, E_agr_Decoder: {E_agr_Decoder}, E_agr_Sindy_x: {E_agr_Sindy_x}'
+    print_str = f'TEST {net.exp_label}: Epoch: {epoch}, E_agr_Decoder: {E_agr_Decoder}, E_agr_Sindy_x: {E_agr_Sindy_x}'
     print(print_str)
     os.system(f'echo {print_str} >> ./job_outputs/job0.out')
 
@@ -271,7 +271,7 @@ def train_step2(net, bag_loader, test_loader, model_params):
     for epoch in range(model_params['s2_epochs']):
         if  (not epoch % test_freq):
             net, Loss_dict = validate_epoch(net, test_loader, Loss_dict, true_coeffs)
-            print_str = str_list_sum(["TEST: "] + [print_keyval(key, val) for key, val in Loss_dict.items()])
+            print_str = str_list_sum([f"TEST {net.exp_label}: "] + [print_keyval(key, val) for key, val in Loss_dict.items()])
             print(print_str)
             os.system(f'echo {print_str} >> ./job_outputs/job0.out')
             e_loss_dict = print_val_losses2(net)

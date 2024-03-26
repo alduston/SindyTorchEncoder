@@ -158,6 +158,7 @@ class SindyNetTCompEnsemble(nn.Module):
         self.epoch = 0
         self.refresh_val_dict = True
         self.stage = 2
+        self.exp_label = params['exp_label']
 
 
     def Stacked_encoder(self, params):

@@ -11,7 +11,7 @@ import warnings
 from data_utils import get_lorenz_params
 import matplotlib.pyplot as plt
 from copy import deepcopy
-from translator_model2 import SindyNetTCompEnsemble
+from translator_model import SindyNetTCompEnsemble
 import shutil
 
 warnings.filterwarnings("ignore")
@@ -38,25 +38,6 @@ def ea_s1_test(model_params, training_data, validation_data, run  = 0):
     model_params['test_freq'] = model_params['test_freq']
     net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data)
     return net, Loss_dict, bag_loader, test_loader
-
-'''
-def ea_test(model_params, training_data, validation_data, run  = 0):
-    model_params['sequential_thresholding'] = False
-    model_params['use_activation_mask'] = False
-    model_params['add_noise'] = False
-
-    l = len(training_data['x'])
-    train_params = {'s1_epochs': model_params['s1_epochs'],'bag_size': min(l, 20000), 'refinement_epochs': 0,
-                    'n_encoders': model_params['n_encoders'],'n_decoders': model_params['n_decoders']}
-    train_params['nbags'] = train_params['n_encoders']
-
-
-    model_params['batch_size'] = min(l, 20000)
-    model_params['run'] = run
-    model_params['test_freq'] = model_params['test_freq']
-    net, Loss_dict, bag_loader, test_loader = train_eas(model_params, train_params, training_data, validation_data)
-    return net, Loss_dict
-'''
 
 
 def drop_index(df):
@@ -361,7 +342,7 @@ def load_model(save_dir = 'model'):
 #scp -r ald6fd@klone.hyak.uw.edu:/mmfs1/gscratch/dynamicsai/ald6fd/SindyTorchEncoder/data/stuff /Users/aloisduston/Desktop/Math/Research/Kutz/SindyEnsemble/data/
 
 def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False,
-               replace = False, s1_epochs  = 10001):
+               replace = True, s1_epochs  = 10001):
     try:
         os.mkdir(f'../data/{exp_label}')
     except OSError:
@@ -373,9 +354,9 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False,
                          'n_encoders': 1, 'n_decoders': 1, 'criterion': 'avg', 's1_epochs': s1_epochs,
                          'test_freq': 10, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 500}
     else:
-        params, training_data, validation_data = get_lorenz_params(train_size=256, test_size=20)
+        params, training_data, validation_data = get_lorenz_params(train_size=64, test_size=20)
         params_update = {'replacement': replace, 'coefficient_initialization': 'constant', 'pretrain_epochs': 200,
-                         'n_encoders': 7, 'n_decoders': 7, 'criterion': 'avg', 's1_epochs': s1_epochs,
+                         'n_encoders': 10, 'n_decoders': 10, 'criterion': 'avg', 's1_epochs': s1_epochs,
                          'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 500}
 
     params.update(params_update)
@@ -428,12 +409,12 @@ def plot_coeffs(ensemble_model, exp_name = 'exp', trial_n = 0):
 
 
 def run():
-    exp_label = 'exp'
-    model_name = 'exp_model'
-    s2_epochs = 80001
+    exp_label = 'show_exp'
+    model_name = 'show_model'
+    s2_epochs = 15001
 
-    basic_test(exp_label=exp_label, model_save_name=model_name, small =  True, replace = True,
-               s1_epochs=  6001)
+    basic_test(exp_label=exp_label, model_save_name=model_name, small =  False, replace = True,
+               s1_epochs=  10001)
 
     indep_model, bag_loader, test_loader = load_model(model_name)
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
@@ -450,9 +431,8 @@ def run():
     indep_model.params['criterion'] = 'stability'
     indep_model.params['accept_threshold'] = .75
 
-
     E_loss_dicts = []
-    n_trials = 1
+    n_trials = 10
     for i in range(n_trials):
         compressor_model = SindyNetTCompEnsemble(indep_model)
         model_params = compressor_model.params
