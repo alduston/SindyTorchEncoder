@@ -11,7 +11,8 @@ import warnings
 from data_utils import get_lorenz_params
 import matplotlib.pyplot as plt
 from copy import deepcopy
-from translator_model import SindyNetTCompEnsemble
+#from translator_model import SindyNetTCompEnsemble
+from one_way_translator_model import SindyNetTCompEnsemble
 import shutil
 
 warnings.filterwarnings("ignore")
@@ -357,7 +358,7 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False,
     if small:
         params, training_data, validation_data = get_lorenz_params(train_size=20, test_size=20)
         params_update = {'replacement': replace, 'coefficient_initialization': 'constant', 'pretrain_epochs': 100,
-                         'n_encoders': 5, 'n_decoders': 5, 'criterion': 'avg', 's1_epochs': s1_epochs,
+                         'n_encoders': 20, 'n_decoders': 20, 'criterion': 'avg', 's1_epochs': s1_epochs,
                          'test_freq': 10, 'exp_label': exp_label, 's2_epochs': 0, 'crossval_freq': 500}
     else:
         params, training_data, validation_data = get_lorenz_params(train_size=64, test_size=20)
@@ -415,11 +416,11 @@ def plot_coeffs(ensemble_model, exp_name = 'exp', trial_n = 0):
 
 
 def run():
-    exp_label = 'subsample_exp'
+    exp_label = 'one_way_exp'
     model_name = 'subsample_model'
     s1_epochs = 4001
     s2_epochs = 6001
-    do_base = False
+    do_base = True
     do_corr_ensemble = True
     n_trials = 1
 
