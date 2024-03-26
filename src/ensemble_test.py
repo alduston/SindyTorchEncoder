@@ -415,7 +415,6 @@ def run():
 
     basic_test(exp_label=exp_label, model_save_name=model_name, small =  False, replace = True,
                s1_epochs=  10001)
-
     indep_model, bag_loader, test_loader = load_model(model_name)
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
 
