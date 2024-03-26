@@ -16,6 +16,11 @@ import shutil
 
 warnings.filterwarnings("ignore")
 
+
+def log_script_state(dir):
+    os.system(f'cp ./ensemble_test.py {dir}/exp_script.py')
+    return True
+
 def clear_plt():
     plt.figure().clear()
     plt.close()
@@ -350,15 +355,15 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False,
         pass
 
     if small:
-        params, training_data, validation_data = get_lorenz_params(train_size=10, test_size=10)
+        params, training_data, validation_data = get_lorenz_params(train_size=20, test_size=20)
         params_update = {'replacement': replace, 'coefficient_initialization': 'constant', 'pretrain_epochs': 100,
-                         'n_encoders': 2, 'n_decoders': 2, 'criterion': 'avg', 's1_epochs': s1_epochs,
-                         'test_freq': 10, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 500}
+                         'n_encoders': 5, 'n_decoders': 5, 'criterion': 'avg', 's1_epochs': s1_epochs,
+                         'test_freq': 10, 'exp_label': exp_label, 's2_epochs': 0, 'crossval_freq': 500}
     else:
         params, training_data, validation_data = get_lorenz_params(train_size=64, test_size=20)
         params_update = {'replacement': replace, 'coefficient_initialization': 'constant', 'pretrain_epochs': 100,
                          'n_encoders': 10, 'n_decoders': 10, 'criterion': 'avg', 's1_epochs': s1_epochs,
-                         'test_freq': 100, 'exp_label': 'exp', 's2_epochs': 0, 'crossval_freq': 500}
+                         'test_freq': 100, 'exp_label': exp_label, 's2_epochs': 0, 'crossval_freq': 500}
 
     params.update(params_update)
     model1, Loss_dict, bag_loader, test_loader = ea_s1_test(params, training_data, validation_data)
@@ -410,14 +415,16 @@ def plot_coeffs(ensemble_model, exp_name = 'exp', trial_n = 0):
 
 
 def run():
-    exp_label = 'show_exp'
-    model_name = 'show_model'
-    s1_epochs = 10001
-    s2_epochs = 15001
+    exp_label = 'subsample_exp'
+    model_name = 'subsample_model'
+    s1_epochs = 4001
+    s2_epochs = 6001
     do_base = False
+    do_corr_ensemble = True
+    n_trials = 1
 
     if do_base:
-        basic_test(exp_label=exp_label, model_save_name=model_name, small =  False,
+        basic_test(exp_label= exp_label, model_save_name = model_name, small =  True,
                    replace = True, s1_epochs=  s1_epochs)
 
     indep_model, bag_loader, test_loader = load_model(model_name)
@@ -431,23 +438,25 @@ def run():
     indep_model, bag_loader, test_loader = load_model(model_name)
     plot_masks(indep_model, exp_name= exp_label)
 
-    indep_model.params['coefficient_initialization'] = 'xavier'
-    indep_model.params['criterion'] = 'stability'
-    indep_model.params['accept_threshold'] = .77
+    if do_corr_ensemble:
+        indep_model.params['coefficient_initialization'] = 'xavier'
+        indep_model.params['criterion'] = 'stability'
+        indep_model.params['accept_threshold'] = .77
+        indep_model.params['exp_label'] = exp_label
 
-    E_loss_dicts = []
-    n_trials = 2
-    for i in range(n_trials):
-        compressor_model = SindyNetTCompEnsemble(indep_model)
-        model_params = compressor_model.params
-        model_params['s2_epochs'] = s2_epochs
+        E_loss_dicts = []
+        for i in range(n_trials):
+            compressor_model = SindyNetTCompEnsemble(indep_model)
+            model_params = compressor_model.params
+            model_params['s2_epochs'] = s2_epochs
 
-        net, Loss_dict, E_loss_dict1, bag_loader, test_loader = train_step2(compressor_model, bag_loader,
-                                                                       test_loader, compressor_model.params)
-        E_loss_dicts.append(E_loss_dict1)
+            net, Loss_dict, E_loss_dict1, bag_loader, test_loader = train_step2(compressor_model, bag_loader,
+                                                                           test_loader, compressor_model.params)
+            E_loss_dicts.append(E_loss_dict1)
 
-        step_2_plots(deepcopy(E_loss_dicts),deepcopy(E_loss_dict0), s_1_losses, exp_label=exp_label)
-        plot_coeffs(compressor_model, exp_name = exp_label, trial_n = i)
+            step_2_plots(deepcopy(E_loss_dicts),deepcopy(E_loss_dict0), s_1_losses, exp_label=exp_label)
+            plot_coeffs(compressor_model, exp_name = exp_label, trial_n = i)
+
 
 
 if __name__=='__main__':

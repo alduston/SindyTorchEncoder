@@ -513,8 +513,7 @@ class SindyNetTCompEnsemble(nn.Module):
         return True
 
 
-
-    def sub_loss(self, x, dx, encode_idx, decode_indexes):
+    def og_sub_loss(self, x, dx, encode_idx, decode_indexes):
         encoder = self.params['indep_models'].Encoders[encode_idx]['encoder']
         translator = self.translators[encode_idx]['translator']
         x_translate = translator(encoder(x))
@@ -529,6 +528,42 @@ class SindyNetTCompEnsemble(nn.Module):
 
             decoder_loss = self.decode_loss(x_decomp_decode, x)
             sindy_x_loss = self.sub_dx_loss(x_translate, dx, dz_pred, decode_idx)
+            loss_dicts.append({'decoder': decoder_loss, 'sindy_x': sindy_x_loss})
+        return dict_mean(loss_dicts), x_translate
+
+
+    def sub_sample(self, vec, idx, l = None):
+        if l == None:
+            l = len(vec) // self.params['n_decoders']
+        #base_idx = (self.epoch)%self.params['n_decoders']
+        #base_vec = vec[base_idx * l : min(len(vec), (base_idx +1) * (l))]
+        sub_vec = vec[idx * l : min(len(vec), (idx +1) * (l))]
+        #return torch.concat((base_vec, sub_vec), 0)
+        return sub_vec
+
+
+    def sub_loss(self, x, dx, encode_idx, decode_indexes):
+        encoder = self.params['indep_models'].Encoders[encode_idx]['encoder']
+        translator = self.translators[encode_idx]['translator']
+        x_translate = translator(encoder(x))
+        loss_dicts = []
+
+        for decode_idx in decode_indexes:
+            if self.params['eval']:
+                sub_x, sub_x_translate, sub_dx = x, x_translate, dx
+            else:
+                sub_idx = (self.epoch + decode_idx)%self.params['n_decoders']
+                sub_x_translate = self.sub_sample(x_translate, sub_idx)
+                sub_x, sub_dx = self.sub_sample(x, sub_idx), self.sub_sample(dx, sub_idx)
+
+            dz_pred = self.sindy_predict(sub_x_translate, encode_idx, decode_idx)
+            decoder = self.params['indep_models'].Decoders[decode_idx]['decoder']
+            detranslator = self.detranslators[decode_idx]['detranslator']
+            x_decomp = detranslator(sub_x_translate)
+            x_decomp_decode = decoder(x_decomp)
+
+            decoder_loss = self.decode_loss(x_decomp_decode, sub_x)
+            sindy_x_loss = self.sub_dx_loss(sub_x_translate, sub_dx, dz_pred, decode_idx)
             loss_dicts.append({'decoder': decoder_loss, 'sindy_x': sindy_x_loss})
         return dict_mean(loss_dicts), x_translate
 
