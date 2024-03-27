@@ -1,1 +1,1 @@
-encoders = 5, epochs = 4001.0, data size = 5000
+encoders = 20, epochs = 8001.0, data size = 5000
