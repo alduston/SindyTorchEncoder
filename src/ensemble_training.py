@@ -277,7 +277,8 @@ def train_step2(net, bag_loader, test_loader, model_params):
     for epoch in range(model_params['s2_epochs']):
         if  (not epoch % test_freq):
             net, Loss_dict = validate_epoch(net, test_loader, Loss_dict, true_coeffs)
-            print_str = str_list_sum([f"TEST {net.exp_label}: "] + [print_keyval(key, val) for key, val in Loss_dict.items()])
+            print_str = str_list_sum([f"TEST {net.exp_label}: "] + [print_keyval(key, val)
+                                                                    for key, val in Loss_dict.items()])
             print(print_str)
             os.system(f'echo {print_str} >> ./job_outputs/job0.out')
             e_loss_dict = print_val_losses2(net)
