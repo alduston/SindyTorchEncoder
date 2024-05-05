@@ -1,0 +1,226 @@
+TEST corr_exp5: Epoch: 5000, Decoder: 0.004744, Sindy_x: 0.001308, Sindy_z: 0, Reg: 1.07974E-05, Active_coeffs: 41, Coeff: 0.081633
+TEST corr_exp5: Epoch: 5000, E_Decoder: 0.002155, E_Sindy_x: 0.000662
+TEST corr_exp6: Epoch: 0, Decoder: 0.331107, Sindy_x: 0.001866, Sindy_z: -6.5798E-05, Reg: 2.53016E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 0, E_agr_Decoder: 0.330894, E_agr_Sindy_x: 0.001866
+TEST corr_exp6: Epoch: 10, Decoder: 0.164957, Sindy_x: 0.001866, Sindy_z: -6.7593E-05, Reg: 2.48487E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 10, E_agr_Decoder: 0.16471, E_agr_Sindy_x: 0.001866
+TEST corr_exp6: Epoch: 20, Decoder: 0.127761, Sindy_x: 0.001866, Sindy_z: -7.0189E-05, Reg: 2.44143E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 20, E_agr_Decoder: 0.12754, E_agr_Sindy_x: 0.001866
+TEST corr_exp6: Epoch: 30, Decoder: 0.119841, Sindy_x: 0.001866, Sindy_z: -7.3893E-05, Reg: 2.39967E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 30, E_agr_Decoder: 0.119631, E_agr_Sindy_x: 0.001866
+TEST corr_exp6: Epoch: 40, Decoder: 0.116548, Sindy_x: 0.001866, Sindy_z: -7.9076E-05, Reg: 2.35853E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 40, E_agr_Decoder: 0.116347, E_agr_Sindy_x: 0.001866
+TEST corr_exp6: Epoch: 50, Decoder: 0.115568, Sindy_x: 0.001866, Sindy_z: -8.6269E-05, Reg: 2.31833E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 50, E_agr_Decoder: 0.115376, E_agr_Sindy_x: 0.001866
+TEST corr_exp6: Epoch: 60, Decoder: 0.115415, Sindy_x: 0.001865, Sindy_z: -9.5721E-05, Reg: 2.27961E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 60, E_agr_Decoder: 0.115232, E_agr_Sindy_x: 0.001866
+TEST corr_exp6: Epoch: 70, Decoder: 0.114833, Sindy_x: 0.001865, Sindy_z: -1.0764E-04, Reg: 2.24411E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 70, E_agr_Decoder: 0.114654, E_agr_Sindy_x: 0.001866
+TEST corr_exp6: Epoch: 80, Decoder: 0.114411, Sindy_x: 0.001865, Sindy_z: -1.2233E-04, Reg: 2.21156E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 80, E_agr_Decoder: 0.114232, E_agr_Sindy_x: 0.001866
+TEST corr_exp6: Epoch: 90, Decoder: 0.114253, Sindy_x: 0.001865, Sindy_z: -1.3992E-04, Reg: 2.18199E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 90, E_agr_Decoder: 0.114067, E_agr_Sindy_x: 0.001866
+TEST corr_exp6: Epoch: 100, Decoder: 0.113931, Sindy_x: 0.001864, Sindy_z: -1.6077E-04, Reg: 2.15646E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 100, E_agr_Decoder: 0.11373, E_agr_Sindy_x: 0.001866
+TEST corr_exp6: Epoch: 110, Decoder: 0.113457, Sindy_x: 0.001864, Sindy_z: -1.8498E-04, Reg: 2.13549E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 110, E_agr_Decoder: 0.11323, E_agr_Sindy_x: 0.001866
+TEST corr_exp6: Epoch: 120, Decoder: 0.112874, Sindy_x: 0.001863, Sindy_z: -2.1252E-04, Reg: 2.11859E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 120, E_agr_Decoder: 0.112604, E_agr_Sindy_x: 0.001866
+TEST corr_exp6: Epoch: 130, Decoder: 0.112023, Sindy_x: 0.001862, Sindy_z: -2.4389E-04, Reg: 2.10668E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 130, E_agr_Decoder: 0.111681, E_agr_Sindy_x: 0.001866
+TEST corr_exp6: Epoch: 140, Decoder: 0.110776, Sindy_x: 0.00186, Sindy_z: -2.7853E-04, Reg: 2.10173E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 140, E_agr_Decoder: 0.110316, E_agr_Sindy_x: 0.001866
+TEST corr_exp6: Epoch: 150, Decoder: 0.108933, Sindy_x: 0.001859, Sindy_z: -3.1653E-04, Reg: 2.10422E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 150, E_agr_Decoder: 0.108281, E_agr_Sindy_x: 0.001866
+TEST corr_exp6: Epoch: 160, Decoder: 0.106176, Sindy_x: 0.001856, Sindy_z: -3.5757E-04, Reg: 2.11639E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 160, E_agr_Decoder: 0.105207, E_agr_Sindy_x: 0.001866
+TEST corr_exp6: Epoch: 170, Decoder: 0.102106, Sindy_x: 0.001852, Sindy_z: -4.0099E-04, Reg: 2.13769E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 170, E_agr_Decoder: 0.100626, E_agr_Sindy_x: 0.001865
+TEST corr_exp6: Epoch: 180, Decoder: 0.096329, Sindy_x: 0.001848, Sindy_z: -4.4593E-04, Reg: 2.17048E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 180, E_agr_Decoder: 0.094069, E_agr_Sindy_x: 0.001865
+TEST corr_exp6: Epoch: 190, Decoder: 0.088807, Sindy_x: 0.001842, Sindy_z: -4.9122E-04, Reg: 2.21252E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 190, E_agr_Decoder: 0.085486, E_agr_Sindy_x: 0.001865
+TEST corr_exp6: Epoch: 200, Decoder: 0.080228, Sindy_x: 0.001835, Sindy_z: -5.3612E-04, Reg: 2.26009E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 200, E_agr_Decoder: 0.075737, E_agr_Sindy_x: 0.001865
+TEST corr_exp6: Epoch: 210, Decoder: 0.071665, Sindy_x: 0.001827, Sindy_z: -5.7897E-04, Reg: 2.30736E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 210, E_agr_Decoder: 0.06629, E_agr_Sindy_x: 0.001865
+TEST corr_exp6: Epoch: 220, Decoder: 0.064038, Sindy_x: 0.001821, Sindy_z: -6.1707E-04, Reg: 2.35308E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 220, E_agr_Decoder: 0.058353, E_agr_Sindy_x: 0.001865
+TEST corr_exp6: Epoch: 230, Decoder: 0.058039, Sindy_x: 0.001815, Sindy_z: -6.4849E-04, Reg: 2.40348E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 230, E_agr_Decoder: 0.052592, E_agr_Sindy_x: 0.001865
+TEST corr_exp6: Epoch: 240, Decoder: 0.053669, Sindy_x: 0.00181, Sindy_z: -6.7235E-04, Reg: 2.45941E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 240, E_agr_Decoder: 0.048823, E_agr_Sindy_x: 0.001865
+TEST corr_exp6: Epoch: 250, Decoder: 0.050518, Sindy_x: 0.001806, Sindy_z: -6.8981E-04, Reg: 2.51948E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 250, E_agr_Decoder: 0.046397, E_agr_Sindy_x: 0.001864
+TEST corr_exp6: Epoch: 260, Decoder: 0.048234, Sindy_x: 0.001803, Sindy_z: -7.0209E-04, Reg: 2.58224E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 260, E_agr_Decoder: 0.044809, E_agr_Sindy_x: 0.001863
+TEST corr_exp6: Epoch: 270, Decoder: 0.046524, Sindy_x: 0.0018, Sindy_z: -7.1045E-04, Reg: 2.64475E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 270, E_agr_Decoder: 0.043696, E_agr_Sindy_x: 0.001862
+TEST corr_exp6: Epoch: 280, Decoder: 0.045232, Sindy_x: 0.001797, Sindy_z: -7.1635E-04, Reg: 2.70755E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 280, E_agr_Decoder: 0.042882, E_agr_Sindy_x: 0.001862
+TEST corr_exp6: Epoch: 290, Decoder: 0.044255, Sindy_x: 0.001794, Sindy_z: -7.2058E-04, Reg: 2.76886E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 290, E_agr_Decoder: 0.042274, E_agr_Sindy_x: 0.001861
+TEST corr_exp6: Epoch: 300, Decoder: 0.043501, Sindy_x: 0.00179, Sindy_z: -7.2354E-04, Reg: 2.82859E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 300, E_agr_Decoder: 0.041798, E_agr_Sindy_x: 0.00186
+TEST corr_exp6: Epoch: 310, Decoder: 0.042901, Sindy_x: 0.001787, Sindy_z: -7.2576E-04, Reg: 2.88696E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 310, E_agr_Decoder: 0.041403, E_agr_Sindy_x: 0.001859
+TEST corr_exp6: Epoch: 320, Decoder: 0.042404, Sindy_x: 0.001784, Sindy_z: -7.2731E-04, Reg: 2.94569E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 320, E_agr_Decoder: 0.041055, E_agr_Sindy_x: 0.001858
+TEST corr_exp6: Epoch: 330, Decoder: 0.041971, Sindy_x: 0.001781, Sindy_z: -7.2861E-04, Reg: 3.00483E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 330, E_agr_Decoder: 0.040727, E_agr_Sindy_x: 0.001857
+TEST corr_exp6: Epoch: 340, Decoder: 0.041578, Sindy_x: 0.001777, Sindy_z: -7.2978E-04, Reg: 3.06465E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 340, E_agr_Decoder: 0.040403, E_agr_Sindy_x: 0.001855
+TEST corr_exp6: Epoch: 350, Decoder: 0.041204, Sindy_x: 0.001774, Sindy_z: -7.3095E-04, Reg: 3.12477E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 350, E_agr_Decoder: 0.040073, E_agr_Sindy_x: 0.001854
+TEST corr_exp6: Epoch: 360, Decoder: 0.040836, Sindy_x: 0.001771, Sindy_z: -7.3226E-04, Reg: 3.18387E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 360, E_agr_Decoder: 0.039728, E_agr_Sindy_x: 0.001853
+TEST corr_exp6: Epoch: 370, Decoder: 0.040462, Sindy_x: 0.001767, Sindy_z: -7.3382E-04, Reg: 3.24403E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 370, E_agr_Decoder: 0.03936, E_agr_Sindy_x: 0.001851
+TEST corr_exp6: Epoch: 380, Decoder: 0.040071, Sindy_x: 0.001764, Sindy_z: -7.3565E-04, Reg: 3.30716E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 380, E_agr_Decoder: 0.038961, E_agr_Sindy_x: 0.00185
+TEST corr_exp6: Epoch: 390, Decoder: 0.039655, Sindy_x: 0.001761, Sindy_z: -7.3787E-04, Reg: 3.37229E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 390, E_agr_Decoder: 0.038523, E_agr_Sindy_x: 0.001848
+TEST corr_exp6: Epoch: 400, Decoder: 0.039207, Sindy_x: 0.001757, Sindy_z: -7.4034E-04, Reg: 3.43784E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 400, E_agr_Decoder: 0.038041, E_agr_Sindy_x: 0.001846
+TEST corr_exp6: Epoch: 410, Decoder: 0.03872, Sindy_x: 0.001753, Sindy_z: -7.4326E-04, Reg: 3.50601E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 410, E_agr_Decoder: 0.037506, E_agr_Sindy_x: 0.001844
+TEST corr_exp6: Epoch: 420, Decoder: 0.038188, Sindy_x: 0.001749, Sindy_z: -7.4656E-04, Reg: 3.57512E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 420, E_agr_Decoder: 0.036912, E_agr_Sindy_x: 0.001842
+TEST corr_exp6: Epoch: 430, Decoder: 0.037608, Sindy_x: 0.001745, Sindy_z: -7.5027E-04, Reg: 3.64549E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 430, E_agr_Decoder: 0.036251, E_agr_Sindy_x: 0.00184
+TEST corr_exp6: Epoch: 440, Decoder: 0.036976, Sindy_x: 0.001741, Sindy_z: -7.5449E-04, Reg: 3.71622E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 440, E_agr_Decoder: 0.035518, E_agr_Sindy_x: 0.001838
+TEST corr_exp6: Epoch: 450, Decoder: 0.036289, Sindy_x: 0.001737, Sindy_z: -7.5912E-04, Reg: 3.78715E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 450, E_agr_Decoder: 0.034705, E_agr_Sindy_x: 0.001836
+TEST corr_exp6: Epoch: 460, Decoder: 0.035543, Sindy_x: 0.001733, Sindy_z: -7.6429E-04, Reg: 3.85655E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 460, E_agr_Decoder: 0.033812, E_agr_Sindy_x: 0.001834
+TEST corr_exp6: Epoch: 470, Decoder: 0.034735, Sindy_x: 0.001729, Sindy_z: -7.6988E-04, Reg: 3.92397E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 470, E_agr_Decoder: 0.032837, E_agr_Sindy_x: 0.001832
+TEST corr_exp6: Epoch: 480, Decoder: 0.033862, Sindy_x: 0.001725, Sindy_z: -7.7591E-04, Reg: 3.98871E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 480, E_agr_Decoder: 0.031785, E_agr_Sindy_x: 0.00183
+TEST corr_exp6: Epoch: 490, Decoder: 0.032927, Sindy_x: 0.001721, Sindy_z: -7.8257E-04, Reg: 4.05506E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 490, E_agr_Decoder: 0.030667, E_agr_Sindy_x: 0.001827
+TEST corr_exp6: Epoch: 500, Decoder: 0.031931, Sindy_x: 0.001717, Sindy_z: -7.8943E-04, Reg: 4.12276E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 500, E_agr_Decoder: 0.029497, E_agr_Sindy_x: 0.001825
+TEST corr_exp6: Epoch: 510, Decoder: 0.030883, Sindy_x: 0.001713, Sindy_z: -7.9685E-04, Reg: 4.18908E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 510, E_agr_Decoder: 0.028294, E_agr_Sindy_x: 0.001822
+TEST corr_exp6: Epoch: 520, Decoder: 0.029794, Sindy_x: 0.001708, Sindy_z: -8.0462E-04, Reg: 4.25835E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 520, E_agr_Decoder: 0.02708, E_agr_Sindy_x: 0.001818
+TEST corr_exp6: Epoch: 530, Decoder: 0.028679, Sindy_x: 0.001702, Sindy_z: -8.1255E-04, Reg: 4.33436E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 530, E_agr_Decoder: 0.025875, E_agr_Sindy_x: 0.001814
+TEST corr_exp6: Epoch: 540, Decoder: 0.027555, Sindy_x: 0.001695, Sindy_z: -8.2065E-04, Reg: 4.40813E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 540, E_agr_Decoder: 0.024703, E_agr_Sindy_x: 0.001809
+TEST corr_exp6: Epoch: 550, Decoder: 0.02644, Sindy_x: 0.001686, Sindy_z: -8.2855E-04, Reg: 4.47778E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 550, E_agr_Decoder: 0.023584, E_agr_Sindy_x: 0.001802
+TEST corr_exp6: Epoch: 560, Decoder: 0.025352, Sindy_x: 0.001677, Sindy_z: -8.3604E-04, Reg: 4.54407E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 560, E_agr_Decoder: 0.022536, E_agr_Sindy_x: 0.001795
+TEST corr_exp6: Epoch: 570, Decoder: 0.024312, Sindy_x: 0.001665, Sindy_z: -8.4301E-04, Reg: 4.61062E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 570, E_agr_Decoder: 0.021573, E_agr_Sindy_x: 0.001786
+TEST corr_exp6: Epoch: 580, Decoder: 0.023335, Sindy_x: 0.001653, Sindy_z: -8.4922E-04, Reg: 4.67933E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 580, E_agr_Decoder: 0.020704, E_agr_Sindy_x: 0.001775
+TEST corr_exp6: Epoch: 590, Decoder: 0.022433, Sindy_x: 0.00164, Sindy_z: -8.5461E-04, Reg: 4.74678E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 590, E_agr_Decoder: 0.01993, E_agr_Sindy_x: 0.001764
+TEST corr_exp6: Epoch: 600, Decoder: 0.021611, Sindy_x: 0.001627, Sindy_z: -8.5923E-04, Reg: 4.81625E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 600, E_agr_Decoder: 0.019246, E_agr_Sindy_x: 0.001752
+TEST corr_exp6: Epoch: 610, Decoder: 0.020864, Sindy_x: 0.001615, Sindy_z: -8.6304E-04, Reg: 4.88676E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 610, E_agr_Decoder: 0.018642, E_agr_Sindy_x: 0.00174
+TEST corr_exp6: Epoch: 620, Decoder: 0.020188, Sindy_x: 0.001603, Sindy_z: -8.6624E-04, Reg: 4.95742E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 620, E_agr_Decoder: 0.018106, E_agr_Sindy_x: 0.001728
+TEST corr_exp6: Epoch: 630, Decoder: 0.019576, Sindy_x: 0.001591, Sindy_z: -8.6909E-04, Reg: 5.02716E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 630, E_agr_Decoder: 0.017627, E_agr_Sindy_x: 0.001717
+TEST corr_exp6: Epoch: 640, Decoder: 0.019019, Sindy_x: 0.00158, Sindy_z: -8.7144E-04, Reg: 5.09656E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 640, E_agr_Decoder: 0.017196, E_agr_Sindy_x: 0.001707
+TEST corr_exp6: Epoch: 650, Decoder: 0.018513, Sindy_x: 0.001569, Sindy_z: -8.7365E-04, Reg: 5.16463E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 650, E_agr_Decoder: 0.016804, E_agr_Sindy_x: 0.001698
+TEST corr_exp6: Epoch: 660, Decoder: 0.018053, Sindy_x: 0.001559, Sindy_z: -8.7562E-04, Reg: 5.23556E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 660, E_agr_Decoder: 0.016447, E_agr_Sindy_x: 0.001689
+TEST corr_exp6: Epoch: 670, Decoder: 0.017632, Sindy_x: 0.001548, Sindy_z: -8.7753E-04, Reg: 5.30724E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 670, E_agr_Decoder: 0.016118, E_agr_Sindy_x: 0.001679
+TEST corr_exp6: Epoch: 680, Decoder: 0.017248, Sindy_x: 0.001538, Sindy_z: -8.7929E-04, Reg: 5.37806E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 680, E_agr_Decoder: 0.015815, E_agr_Sindy_x: 0.00167
+TEST corr_exp6: Epoch: 690, Decoder: 0.016896, Sindy_x: 0.001527, Sindy_z: -8.8098E-04, Reg: 5.44725E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 690, E_agr_Decoder: 0.015535, E_agr_Sindy_x: 0.00166
+TEST corr_exp6: Epoch: 700, Decoder: 0.016572, Sindy_x: 0.001517, Sindy_z: -8.8246E-04, Reg: 5.51583E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 700, E_agr_Decoder: 0.015274, E_agr_Sindy_x: 0.001649
+TEST corr_exp6: Epoch: 710, Decoder: 0.016274, Sindy_x: 0.001505, Sindy_z: -8.8382E-04, Reg: 5.58445E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 710, E_agr_Decoder: 0.015031, E_agr_Sindy_x: 0.001637
+TEST corr_exp6: Epoch: 720, Decoder: 0.015998, Sindy_x: 0.001493, Sindy_z: -8.8516E-04, Reg: 5.65441E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 720, E_agr_Decoder: 0.014804, E_agr_Sindy_x: 0.001625
+TEST corr_exp6: Epoch: 730, Decoder: 0.015743, Sindy_x: 0.001481, Sindy_z: -8.8646E-04, Reg: 5.72283E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 730, E_agr_Decoder: 0.014592, E_agr_Sindy_x: 0.001612
+TEST corr_exp6: Epoch: 740, Decoder: 0.015506, Sindy_x: 0.001468, Sindy_z: -8.8759E-04, Reg: 5.78992E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 740, E_agr_Decoder: 0.014392, E_agr_Sindy_x: 0.001599
+TEST corr_exp6: Epoch: 750, Decoder: 0.015285, Sindy_x: 0.001454, Sindy_z: -8.8864E-04, Reg: 5.85693E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 750, E_agr_Decoder: 0.014205, E_agr_Sindy_x: 0.001585
+TEST corr_exp6: Epoch: 760, Decoder: 0.015077, Sindy_x: 0.001441, Sindy_z: -8.8961E-04, Reg: 5.92135E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 760, E_agr_Decoder: 0.014028, E_agr_Sindy_x: 0.001571
+TEST corr_exp6: Epoch: 770, Decoder: 0.014882, Sindy_x: 0.001426, Sindy_z: -8.9055E-04, Reg: 5.98331E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 770, E_agr_Decoder: 0.013861, E_agr_Sindy_x: 0.001557
+TEST corr_exp6: Epoch: 780, Decoder: 0.014698, Sindy_x: 0.001412, Sindy_z: -8.9131E-04, Reg: 6.04322E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 780, E_agr_Decoder: 0.013702, E_agr_Sindy_x: 0.001543
+TEST corr_exp6: Epoch: 790, Decoder: 0.014523, Sindy_x: 0.001398, Sindy_z: -8.9218E-04, Reg: 6.10101E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 790, E_agr_Decoder: 0.01355, E_agr_Sindy_x: 0.001528
+TEST corr_exp6: Epoch: 800, Decoder: 0.014357, Sindy_x: 0.001384, Sindy_z: -8.9295E-04, Reg: 6.15808E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 800, E_agr_Decoder: 0.013404, E_agr_Sindy_x: 0.001514
+TEST corr_exp6: Epoch: 810, Decoder: 0.014198, Sindy_x: 0.001369, Sindy_z: -8.9365E-04, Reg: 6.21418E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 810, E_agr_Decoder: 0.013265, E_agr_Sindy_x: 0.0015
+TEST corr_exp6: Epoch: 820, Decoder: 0.014046, Sindy_x: 0.001355, Sindy_z: -8.9422E-04, Reg: 6.26875E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 820, E_agr_Decoder: 0.01313, E_agr_Sindy_x: 0.001486
+TEST corr_exp6: Epoch: 830, Decoder: 0.0139, Sindy_x: 0.001341, Sindy_z: -8.9498E-04, Reg: 6.32291E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 830, E_agr_Decoder: 0.013, E_agr_Sindy_x: 0.001472
+TEST corr_exp6: Epoch: 840, Decoder: 0.01376, Sindy_x: 0.001327, Sindy_z: -8.9542E-04, Reg: 6.37629E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 840, E_agr_Decoder: 0.012874, E_agr_Sindy_x: 0.001459
+TEST corr_exp6: Epoch: 850, Decoder: 0.013625, Sindy_x: 0.001314, Sindy_z: -8.9607E-04, Reg: 6.43055E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 850, E_agr_Decoder: 0.012752, E_agr_Sindy_x: 0.001446
+TEST corr_exp6: Epoch: 860, Decoder: 0.013495, Sindy_x: 0.001301, Sindy_z: -8.9657E-04, Reg: 6.4844E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 860, E_agr_Decoder: 0.012633, E_agr_Sindy_x: 0.001434
+TEST corr_exp6: Epoch: 870, Decoder: 0.013369, Sindy_x: 0.001288, Sindy_z: -8.9706E-04, Reg: 6.53743E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 870, E_agr_Decoder: 0.012518, E_agr_Sindy_x: 0.001422
+TEST corr_exp6: Epoch: 880, Decoder: 0.013247, Sindy_x: 0.001276, Sindy_z: -8.9743E-04, Reg: 6.59152E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 880, E_agr_Decoder: 0.012405, E_agr_Sindy_x: 0.001411
+TEST corr_exp6: Epoch: 890, Decoder: 0.013129, Sindy_x: 0.001264, Sindy_z: -8.9786E-04, Reg: 6.64431E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 890, E_agr_Decoder: 0.012295, E_agr_Sindy_x: 0.0014
+TEST corr_exp6: Epoch: 900, Decoder: 0.013015, Sindy_x: 0.001252, Sindy_z: -8.9838E-04, Reg: 6.69801E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 900, E_agr_Decoder: 0.012187, E_agr_Sindy_x: 0.001389
+TEST corr_exp6: Epoch: 910, Decoder: 0.012904, Sindy_x: 0.001241, Sindy_z: -8.9877E-04, Reg: 6.75209E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 910, E_agr_Decoder: 0.012082, E_agr_Sindy_x: 0.001379
+TEST corr_exp6: Epoch: 920, Decoder: 0.012795, Sindy_x: 0.00123, Sindy_z: -8.9907E-04, Reg: 6.80622E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 920, E_agr_Decoder: 0.011979, E_agr_Sindy_x: 0.001369
+TEST corr_exp6: Epoch: 930, Decoder: 0.01269, Sindy_x: 0.001219, Sindy_z: -8.9942E-04, Reg: 6.85911E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 930, E_agr_Decoder: 0.011877, E_agr_Sindy_x: 0.00136
+TEST corr_exp6: Epoch: 940, Decoder: 0.012587, Sindy_x: 0.001209, Sindy_z: -8.9985E-04, Reg: 6.91108E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 940, E_agr_Decoder: 0.011778, E_agr_Sindy_x: 0.001351
+TEST corr_exp6: Epoch: 950, Decoder: 0.012486, Sindy_x: 0.001199, Sindy_z: -9.0011E-04, Reg: 6.96411E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 950, E_agr_Decoder: 0.011681, E_agr_Sindy_x: 0.001342
+TEST corr_exp6: Epoch: 960, Decoder: 0.012388, Sindy_x: 0.001189, Sindy_z: -9.0051E-04, Reg: 7.01647E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 960, E_agr_Decoder: 0.011585, E_agr_Sindy_x: 0.001333
+TEST corr_exp6: Epoch: 970, Decoder: 0.012293, Sindy_x: 0.001179, Sindy_z: -9.0085E-04, Reg: 7.06746E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 970, E_agr_Decoder: 0.011492, E_agr_Sindy_x: 0.001325
+TEST corr_exp6: Epoch: 980, Decoder: 0.012199, Sindy_x: 0.00117, Sindy_z: -9.0111E-04, Reg: 7.11735E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 980, E_agr_Decoder: 0.0114, E_agr_Sindy_x: 0.001317
+TEST corr_exp6: Epoch: 990, Decoder: 0.012108, Sindy_x: 0.001161, Sindy_z: -9.0155E-04, Reg: 7.16614E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 990, E_agr_Decoder: 0.01131, E_agr_Sindy_x: 0.001309
+TEST corr_exp6: Epoch: 1000, Decoder: 0.012018, Sindy_x: 0.001152, Sindy_z: -9.0181E-04, Reg: 7.21605E-06, Active_coeffs: 60, Coeff: 0
+TEST corr_exp6: Epoch: 1000, E_agr_Decoder: 0.011221, E_agr_Sindy_x: 0.001301
+TEST corr_exp6: Epoch: 1010, Decoder: 0.011928, Sindy_x: 0.00117, Sindy_z: -9.0234E-04, Reg: 7.25635E-06, Active_coeffs: 53, Coeff: 0
+TEST corr_exp6: Epoch: 1010, E_agr_Decoder: 0.011133, E_agr_Sindy_x: 0.00126
+TEST corr_exp6: Epoch: 1020, Decoder: 0.011841, Sindy_x: 0.001163, Sindy_z: -9.0284E-04, Reg: 7.28862E-06, Active_coeffs: 53, Coeff: 0
+TEST corr_exp6: Epoch: 1020, E_agr_Decoder: 0.011047, E_agr_Sindy_x: 0.001268
+TEST corr_exp6: Epoch: 1030, Decoder: 0.011757, Sindy_x: 0.001154, Sindy_z: -9.0327E-04, Reg: 7.31873E-06, Active_coeffs: 53, Coeff: 0
+TEST corr_exp6: Epoch: 1030, E_agr_Decoder: 0.010964, E_agr_Sindy_x: 0.001269
+TEST corr_exp6: Epoch: 1040, Decoder: 0.011676, Sindy_x: 0.001142, Sindy_z: -9.0365E-04, Reg: 7.35009E-06, Active_coeffs: 53, Coeff: 0
+TEST corr_exp6: Epoch: 1040, E_agr_Decoder: 0.010881, E_agr_Sindy_x: 0.001263
+TEST corr_exp6: Epoch: 1050, Decoder: 0.011597, Sindy_x: 0.001132, Sindy_z: -9.0394E-04, Reg: 7.38299E-06, Active_coeffs: 53, Coeff: 0
+TEST corr_exp6: Epoch: 1050, E_agr_Decoder: 0.010801, E_agr_Sindy_x: 0.001255
+TEST corr_exp6: Epoch: 1060, Decoder: 0.011519, Sindy_x: 0.001124, Sindy_z: -9.0423E-04, Reg: 7.41728E-06, Active_coeffs: 53, Coeff: 0
+TEST corr_exp6: Epoch: 1060, E_agr_Decoder: 0.010723, E_agr_Sindy_x: 0.001248
+TEST corr_exp6: Epoch: 1070, Decoder: 0.011442, Sindy_x: 0.001118, Sindy_z: -9.0458E-04, Reg: 7.45213E-06, Active_coeffs: 53, Coeff: 0
+TEST corr_exp6: Epoch: 1070, E_agr_Decoder: 0.010645, E_agr_Sindy_x: 0.001242
+TEST corr_exp6: Epoch: 1080, Decoder: 0.011367, Sindy_x: 0.001111, Sindy_z: -9.0493E-04, Reg: 7.48763E-06, Active_coeffs: 53, Coeff: 0
+TEST corr_exp6: Epoch: 1080, E_agr_Decoder: 0.010569, E_agr_Sindy_x: 0.001237
+TEST corr_exp6: Epoch: 1090, Decoder: 0.011294, Sindy_x: 0.001104, Sindy_z: -9.0524E-04, Reg: 7.52365E-06, Active_coeffs: 53, Coeff: 0
+TEST corr_exp6: Epoch: 1090, E_agr_Decoder: 0.010494, E_agr_Sindy_x: 0.001231
+TEST corr_exp6: Epoch: 1100, Decoder: 0.011222, Sindy_x: 0.001098, Sindy_z: -9.0547E-04, Reg: 7.56024E-06, Active_coeffs: 53, Coeff: 0
+TEST corr_exp6: Epoch: 1100, E_agr_Decoder: 0.010421, E_agr_Sindy_x: 0.001226
+TEST corr_exp6: Epoch: 1110, Decoder: 0.011151, Sindy_x: 0.001092, Sindy_z: -9.0578E-04, Reg: 7.59641E-06, Active_coeffs: 53, Coeff: 0
+TEST corr_exp6: Epoch: 1110, E_agr_Decoder: 0.010348, E_agr_Sindy_x: 0.00122

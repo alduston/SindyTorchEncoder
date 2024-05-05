@@ -35,6 +35,7 @@ def generate_pendulum_data(n_ics):
         i += 1
 
     x,dx,ddx = pendulum_to_movie(z, dz)
+    return t, x, dx, ddx, z
 
     # n = 51
     # xx,yy = np.meshgrid(np.linspace(-1.5,1.5,n),np.linspace(1.5,-1.5,n))
@@ -59,7 +60,6 @@ def generate_pendulum_data(n_ics):
     #         ddx[i,j] = create_image(z[i,j,0])*((argument_derivative(z[i,j,0], dz[i,j,0]))**2 \
     #                         + argument_derivative2(z[i,j,0], dz[i,j,0], dz[i,j,1]))
 
-    return t,x,dx,ddx,z
 
 
 def pendulum_to_movie(z, dz):
