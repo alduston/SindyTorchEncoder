@@ -18,8 +18,11 @@ def col_permutations(M):
 
 
 def coeff_pattern_loss(pred_coeffs, true_coeffs, binary = True):
-    if not true_coeffs:
-        return 0
+    try:
+        if not true_coeffs:
+            return 0
+    except RuntimeError:
+        pass
     pred_coeffs = deepcopy(pred_coeffs).detach().cpu().numpy()
     true_coeffs = deepcopy(true_coeffs).detach().cpu().numpy()
     if binary:

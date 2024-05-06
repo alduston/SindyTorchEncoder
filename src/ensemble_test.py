@@ -371,14 +371,20 @@ def get_step1_med_losses(item_loss_dict):
     return {'E_agr_Decoder': med_loss_dict['decoder'], 'E_agr_Sindy_x':  med_loss_dict['sindy_x']}
 
 
-def plot_masks(ensemble_model, exp_name = 'exp'):
+def plot_masks(ensemble_model, exp_name = 'exp', label = 'masks'):
     try:
-        os.system(f'mkdir ../data/{exp_name}/masks')
+        os.system(f'mkdir ../data/{exp_name}/{label}')
     except BaseException:
         pass
-    for i,(coeffs, mask) in enumerate(zip(ensemble_model.Sindy_coeffs, ensemble_model.coefficient_masks)):
-        mask_str = (coeffs * mask).detach().cpu().numpy().round(2)
-        os.system(f'echo "{mask_str}" > ../data/{exp_name}/masks/mask{i}.txt')
+    try:
+        for i,(coeffs, mask) in enumerate(zip(ensemble_model.Sindy_coeffs, ensemble_model.coefficient_masks)):
+            mask_str = (coeffs * mask).detach().cpu().numpy().round(2)
+            os.system(f'echo "{mask_str}" > ../data/{exp_name}/{label}/mask{i}.txt')
+    except AttributeError:
+        mask = ensemble_model.coefficient_mask
+        for i,(coeffs) in enumerate(ensemble_model.Sindy_coeffs):
+            mask_str = (coeffs * mask).detach().cpu().numpy().round(2)
+            os.system(f'echo "{mask_str}" > ../data/{exp_name}/{label}/mask{i}.txt')
     return True
 
 
@@ -388,10 +394,10 @@ def plot_coeffs(ensemble_model, exp_name = 'exp', trial_n = 0):
     except BaseException:
         pass
 
-    (x, y) = ensemble_model.coefficient_mask.shape
+    (x, y) = ensemble_model.Sindy_coeffs.shape[1:]
     for ix in range(x):
         for iy in range(y):
-            coeff_vec = ensemble_model.sindy_coeffs[:, ix, iy]
+            coeff_vec = ensemble_model.Sindy_coeffs[:, ix, iy]
             coeff_list = list(coeff_vec.detach().cpu().numpy())
             plt.hist(coeff_list)
             plt.savefig(f'../data/{exp_name}/trial_{trial_n}/coeff_plot_{ix}_{iy}.png')
@@ -415,13 +421,14 @@ def run():
                    replace = True, s1_epochs=  s1_epochs, param_func = get_lorenz_params)
 
     indep_model, bag_loader, test_loader = load_model(model_name)
-    net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
+    net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader,
+                                                model_params = {'s1_epochs': 1})
 
     item_loss_dict = net.item_loss_dict
     med_losses = get_step1_med_losses(item_loss_dict)
     s_1_losses = {'E_agr_Decoder': med_losses['E_agr_Decoder'][-1],'E_agr_Sindy_x': med_losses['E_agr_Sindy_x'][-1],
                   'active_coeffs': Loss_dict['active_coeffs'][-1], 'coeff': Loss_dict['coeff'][-1]}
-    plot_coeffs(indep_model, exp_label, 0)
+    plot_masks(indep_model, exp_label)
     if do_corr_ensemble:
         indep_model.params['coefficient_initialization'] = 'constant' #'xavier'
         indep_model.params['criterion'] = 'avg' #'stability'
@@ -439,7 +446,7 @@ def run():
                                                                            test_loader, compressor_model.params)
             E_loss_dicts.append(E_loss_dict1)
             step_2_plots(deepcopy(E_loss_dicts),deepcopy(E_loss_dict0), s_1_losses, exp_label=exp_label)
-            plot_coeffs(compressor_model, exp_label, i + 1)
+            plot_masks(compressor_model, exp_label, label = f'masks_{i}')
 
 
 

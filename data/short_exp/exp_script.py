@@ -410,7 +410,7 @@ def plot_coeffs(ensemble_model, exp_name = 'exp', trial_n = 0):
     (x, y) = ensemble_model.coefficient_mask.shape
     for ix in range(x):
         for iy in range(y):
-            coeff_vec = ensemble_model.sindy_coeffs[:, ix, iy]
+            coeff_vec = ensemble_model.Sindy_coeffs[:, ix, iy]
             coeff_list = list(coeff_vec.detach().cpu().numpy())
             plt.hist(coeff_list)
             plt.savefig(f'../data/{exp_name}/trial_{trial_n}/coeff_plot_{ix}_{iy}.png')

@@ -1,0 +1,2 @@
+TEST exp: Epoch: 0, Decoder: 0.358282, Sindy_x: 0.00042, Sindy_z: -1.9158E-04, Reg: 1E-05, Active_coeffs: 60, Coeff: 0
+TEST exp: Epoch: 0, E_agr_Decoder: 0.358019, E_agr_Sindy_x: 0.000417

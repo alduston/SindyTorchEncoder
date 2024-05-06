@@ -152,7 +152,7 @@ class SindyNetTCompEnsemble(nn.Module):
 
         #self.params['stacked_decoder'], self.params['stacked_decoder_layers'] = self.Stacked_decoder(self.params)
         self.params['stacked_encoder'], self.params['stacked_encoder_layers'] = self.Stacked_encoder(self.params)
-        self.sindy_coeffs = self.init_sindy_coeff_stack()
+        self.Sindy_coeffs = self.init_sindy_coeff_stack()
 
         self.coefficient_mask = torch.tensor(deepcopy(self.params['coefficient_mask']),dtype=self.dtype, device=self.device)
         self.epoch = 0
@@ -397,7 +397,7 @@ class SindyNetTCompEnsemble(nn.Module):
         mask = self.coefficient_mask
         if not len(coeffs):
             #coeffs = self.sindy_coeffs[encode_idx]
-            coeffs = self.sindy_coeffs[0]
+            coeffs = self.Sindy_coeffs[0]
         return torch.matmul(Theta, mask * coeffs)
 
 
@@ -422,7 +422,7 @@ class SindyNetTCompEnsemble(nn.Module):
 
 
     def reg_loss(self):
-        return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(self.sindy_coeffs))
+        return self.params['loss_weight_sindy_regularization'] * torch.mean(torch.abs(self.Sindy_coeffs))
 
 
     def sub_corr_loss(self, Z, encode_idx):
@@ -459,7 +459,7 @@ class SindyNetTCompEnsemble(nn.Module):
         agr_x_translate = self.collapse(x_translate_stack, agr_key=agr_key)
         agr_x_decomp_decode = self.Decoder(agr_x_translate)
 
-        agr_coeffs = torch.mean(self.sindy_coeffs, dim = 0)
+        agr_coeffs = torch.mean(self.Sindy_coeffs, dim = 0)
         agr_dz_pred = self.sindy_predict(agr_x_translate, coeffs=agr_coeffs)
         agr_dx_pred  = self.dx_decode(agr_x_translate, agr_dz_pred)
 

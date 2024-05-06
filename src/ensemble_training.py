@@ -41,8 +41,11 @@ def col_permutations(M):
 
 
 def coeff_pattern_loss(pred_coeffs, true_coeffs, binary = True):
-    if not true_coeffs:
-        return 0
+    try:
+        if not true_coeffs:
+            return 0
+    except RuntimeError:
+        pass
     pred_coeffs = deepcopy(pred_coeffs).detach().cpu().numpy()
     true_coeffs = deepcopy(true_coeffs).detach().cpu().numpy()
     if binary:
@@ -179,7 +182,7 @@ def sub_crossval(model, idx):
 
 
 def cross_val(model):
-    bag_coeffs = deepcopy(model.sindy_coeffs.detach())
+    bag_coeffs = deepcopy(model.Sindy_coeffs.detach())
     if len(bag_coeffs.shape) > 2:
         new_mask = process_bag_coeffs(bag_coeffs, model)[0]
     else:

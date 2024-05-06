@@ -159,7 +159,7 @@ def validate_ensemble_epoch(model, data_loader, Loss_dict, true_coeffs = None):
 
     total_loss_dict = {}
     val_model = copy(model)
-    val_model.sindy_coeffs = model.get_sindy_coefficients()
+    val_model.Sindy_coeffs = model.get_sindy_coefficients()
     l = len(data_loader)
 
     for batch_index, data in enumerate(data_loader):

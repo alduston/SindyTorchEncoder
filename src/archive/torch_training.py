@@ -249,7 +249,7 @@ def crossval(model):
     model.coefficient_mask = model.coefficient_mask * new_mask
     model.anti_mask = model.get_anti_mask()
     model.num_active_coeffs = int(torch.sum(copy(model.coefficient_mask)).cpu().detach())
-    model.sindy_coeffs = torch.nn.Parameter(model.coefficient_mask * avg_coeffs, requires_grad=True)
+    model.Sindy_coeffs = torch.nn.Parameter(model.coefficient_mask * avg_coeffs, requires_grad=True)
     return model
 
 
@@ -292,7 +292,7 @@ def validate_paralell_epochs(model, data_loader, Loss_dict, idx = None, true_coe
     coeffs = Bag_coeffs[idx]
     val_model = copy(model)
 
-    val_model.sindy_coeffs = torch.nn.Parameter(coeffs, requires_grad=True)
+    val_model.Sindy_coeffs = torch.nn.Parameter(coeffs, requires_grad=True)
     for batch_index, data in enumerate(data_loader):
         with torch.no_grad():
             loss, loss_refinement, losses = validate_one_step(val_model, data)
@@ -331,11 +331,11 @@ def validate_paralell_epoch(model, data_loader, Loss_dict, true_coeffs = None):
 
     if model.params['use_median']:
         med_coeffs = tensor_median(val_model.sub_model_coeffs)
-        val_model.sindy_coeffs = torch.nn.Parameter(med_coeffs, requires_grad=True)
+        val_model.Sindy_coeffs = torch.nn.Parameter(med_coeffs, requires_grad=True)
 
     else:
         avg_coeffs = (1 / n_bags) * torch.sum(Bag_coeffs, dim=0)
-        val_model.sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
+        val_model.Sindy_coeffs = torch.nn.Parameter(avg_coeffs, requires_grad=True)
 
     for batch_index, data in enumerate(data_loader):
         with torch.no_grad():
