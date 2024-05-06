@@ -12,7 +12,8 @@ import warnings
 from data_utils import get_lorenz_params, get_pendulum_params
 import matplotlib.pyplot as plt
 from copy import deepcopy
-from translator_model import SindyNetTCompEnsemble
+#from translator_model import SindyNetTCompEnsemble
+from translator_model_one_mask import SindyNetTCompEnsemble
 #from stacked_translator_model import SindyNetTCompEnsemble
 import shutil
 
@@ -344,9 +345,9 @@ def basic_test(exp_label = 'exp', model_save_name = 'model0', small = False,
                          'n_encoders': 5, 'n_decoders': 5, 'criterion': 'avg', 's1_epochs': s1_epochs,
                          'test_freq': 10, 'exp_label': exp_label, 's2_epochs': 0, 'crossval_freq': 500}
     else:
-        params, training_data, validation_data = param_func(train_size=64, test_size=20)
+        params, training_data, validation_data = param_func(train_size=512, test_size=20)
         params_update = {'replacement': replace, 'coefficient_initialization': 'constant', 'pretrain_epochs': 100,
-                         'n_encoders': 10, 'n_decoders': 10, 'criterion': 'avg', 's1_epochs': s1_epochs,
+                         'n_encoders': 7, 'n_decoders': 7, 'criterion': 'avg', 's1_epochs': s1_epochs,
                          'test_freq': 100, 'exp_label': exp_label, 's2_epochs': 0, 'crossval_freq': 500}
 
     params.update(params_update)
@@ -399,8 +400,8 @@ def plot_coeffs(ensemble_model, exp_name = 'exp', trial_n = 0):
 
 
 def run():
-    exp_label = 'pendulum_exp'
-    model_name = 'pendulum_model'
+    exp_label = 'show_exp'
+    model_name = 'show_model'
     s1_epochs = 5000
     s2_epochs = 5000
 
@@ -410,8 +411,8 @@ def run():
 
     log_script_state(f'../data/{exp_label}')
     if do_base:
-        basic_test(exp_label= exp_label, model_save_name = model_name, small = True,
-                   replace = True, s1_epochs=  s1_epochs, param_func = get_pendulum_params)
+        basic_test(exp_label= exp_label, model_save_name = model_name, small = False,
+                   replace = True, s1_epochs=  s1_epochs, param_func = get_lorenz_params)
 
     indep_model, bag_loader, test_loader = load_model(model_name)
     net, Loss_dict,  E_loss_dict0 = train_eas_1(indep_model, bag_loader, test_loader, model_params = {'s1_epochs': 1})
@@ -420,13 +421,13 @@ def run():
     med_losses = get_step1_med_losses(item_loss_dict)
     s_1_losses = {'E_agr_Decoder': med_losses['E_agr_Decoder'][-1],'E_agr_Sindy_x': med_losses['E_agr_Sindy_x'][-1],
                   'active_coeffs': Loss_dict['active_coeffs'][-1], 'coeff': Loss_dict['coeff'][-1]}
-
+    plot_coeffs(indep_model, exp_label, 0)
     if do_corr_ensemble:
-        indep_model.params['coefficient_initialization'] = 'xavier'
-        indep_model.params['criterion'] = 'stability'
+        indep_model.params['coefficient_initialization'] = 'constant' #'xavier'
+        indep_model.params['criterion'] = 'avg' #'stability'
         indep_model.params['accept_threshold'] = .77
         indep_model.params['exp_label'] = exp_label
-        indep_model.params['pretrain_epochs'] = 999
+        indep_model.params['pretrain_epochs'] = 499
 
         E_loss_dicts = []
         for i in range(n_trials):
@@ -438,6 +439,7 @@ def run():
                                                                            test_loader, compressor_model.params)
             E_loss_dicts.append(E_loss_dict1)
             step_2_plots(deepcopy(E_loss_dicts),deepcopy(E_loss_dict0), s_1_losses, exp_label=exp_label)
+            plot_coeffs(compressor_model, exp_label, i + 1)
 
 
 

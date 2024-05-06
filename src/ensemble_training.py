@@ -41,6 +41,8 @@ def col_permutations(M):
 
 
 def coeff_pattern_loss(pred_coeffs, true_coeffs, binary = True):
+    if not true_coeffs:
+        return 0
     pred_coeffs = deepcopy(pred_coeffs).detach().cpu().numpy()
     true_coeffs = deepcopy(true_coeffs).detach().cpu().numpy()
     if binary:
@@ -107,7 +109,8 @@ def validate_epoch(model, data_loader, Loss_dict,  true_coeffs = None):
 
             if len(total_loss_dict.keys()):
                 for key in total_loss_dict.keys():
-                    total_loss_dict[key] += losses[key]/l
+                    if key in losses.keys():
+                        total_loss_dict[key] += losses[key]/l
             else:
                 for key, val in losses.items():
                     if key == 'active_coeffs':
@@ -117,9 +120,7 @@ def validate_epoch(model, data_loader, Loss_dict,  true_coeffs = None):
 
     Loss_dict['epoch'].append(int(model.epoch))
     Loss_dict['active_coeffs'].append(int(model.num_active_coeffs()))
-
-    if true_coeffs != None:
-        Loss_dict['coeff'].append(get_coeff_loss(model,true_coeffs))
+    Loss_dict['coeff'].append(get_coeff_loss(model,true_coeffs))
 
     for key, val in total_loss_dict.items():
         Loss_dict[key].append(float(val.detach().cpu()))

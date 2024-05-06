@@ -176,8 +176,8 @@ def get_lorenz_params(train_size = 100, max_data = 1000000, noise = 1e-6, test_s
 
 
 def get_pendulum_params(train_size = 100, max_data = 100000, noise = 1e-6, test_size = 20):
-    training_data = get_pendulum_data(train_size, noise_strength=noise)
-    validation_data = get_pendulum_data(test_size, noise_strength=noise)
+    training_data = get_pendulum_data(train_size)
+    validation_data = get_pendulum_data(test_size)
 
     training_data = {key: vec[:min(max_data, len(training_data['x']))] for key, vec in training_data.items()}
     validation_data = {key: vec[:min(max_data, len(validation_data['x']))] for key, vec in validation_data.items()}
@@ -188,7 +188,7 @@ def get_pendulum_params(train_size = 100, max_data = 100000, noise = 1e-6, test_
     params['model_order'] = 1
     params['poly_order'] = 3
     params['include_sine'] = True
-    params['library_dim'] = library_size(2*params['latent_dim'], params['poly_order'], params['include_sine'], True) - 1
+    params['library_dim'] = library_size(params['latent_dim'], params['poly_order'], params['include_sine'], True)
 
 
     # sequential thresholding parameters
